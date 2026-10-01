@@ -1,0 +1,12 @@
+{
+  "component": "optimization",
+  "status": "verified",
+  "started_at_utc": "2026-09-27T01:01:30.562306+00:00",
+  "feasible": true,
+  "solver_status": "Optimal",
+  "objective_value": 187.0,
+  "runtime_seconds": 1.199315,
+  "assignments": 50,
+  "infeasibility_reason": null,
+  "assignments_artifact": "experiments/analytics/optimization_assignments.csv"
+}

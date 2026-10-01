@@ -1,0 +1,222 @@
+[
+  {
+    "model": "xgboost",
+    "slice": "overall",
+    "value": "all",
+    "sample_count": 21504,
+    "MAE": 1.2775,
+    "RMSE": 4.3961,
+    "R2": 0.8572,
+    "WAPE": 0.5052,
+    "sMAPE": 155.5725
+  },
+  {
+    "model": "xgboost",
+    "slice": "hour_band",
+    "value": "night (00-07)",
+    "sample_count": 7168,
+    "MAE": 0.2262,
+    "RMSE": 0.4644,
+    "R2": -0.017,
+    "WAPE": 1.4084,
+    "sMAPE": 189.4827
+  },
+  {
+    "model": "xgboost",
+    "slice": "hour_band",
+    "value": "morning (08-11)",
+    "sample_count": 3584,
+    "MAE": 2.5386,
+    "RMSE": 7.1457,
+    "R2": 0.8597,
+    "WAPE": 0.42,
+    "sMAPE": 129.6174
+  },
+  {
+    "model": "xgboost",
+    "slice": "hour_band",
+    "value": "afternoon (12-17)",
+    "sample_count": 5376,
+    "MAE": 2.3246,
+    "RMSE": 6.2018,
+    "R2": 0.8557,
+    "WAPE": 0.4385,
+    "sMAPE": 115.6743
+  },
+  {
+    "model": "xgboost",
+    "slice": "hour_band",
+    "value": "evening (18-23)",
+    "sample_count": 5376,
+    "MAE": 0.7914,
+    "RMSE": 2.1241,
+    "R2": -0.0016,
+    "WAPE": 1.3886,
+    "sMAPE": 170.7196
+  },
+  {
+    "model": "xgboost",
+    "slice": "actual_occupancy",
+    "value": "idle (0-5)",
+    "sample_count": 19816,
+    "MAE": 0.6867,
+    "RMSE": 2.906,
+    "R2": -16.0934,
+    "WAPE": 1.8726,
+    "sMAPE": 163.0237
+  },
+  {
+    "model": "xgboost",
+    "slice": "actual_occupancy",
+    "value": "moderate (6-35)",
+    "sample_count": 1318,
+    "MAE": 8.0446,
+    "RMSE": 9.7765,
+    "R2": -2.3266,
+    "WAPE": 0.5734,
+    "sMAPE": 87.6199
+  },
+  {
+    "model": "xgboost",
+    "slice": "actual_occupancy",
+    "value": "high (36+)",
+    "sample_count": 370,
+    "MAE": 8.8124,
+    "RMSE": 18.1778,
+    "R2": 0.7662,
+    "WAPE": 0.1139,
+    "sMAPE": 13.2269
+  },
+  {
+    "model": "xgboost",
+    "slice": "schedule_status",
+    "value": "scheduled",
+    "sample_count": 252,
+    "MAE": 13.1894,
+    "RMSE": 25.7562,
+    "R2": 0.4779,
+    "WAPE": 0.3655,
+    "sMAPE": 52.8289
+  },
+  {
+    "model": "xgboost",
+    "slice": "schedule_status",
+    "value": "unscheduled",
+    "sample_count": 21252,
+    "MAE": 1.1363,
+    "RMSE": 3.4189,
+    "R2": 0.8921,
+    "WAPE": 0.5332,
+    "sMAPE": 156.8188
+  },
+  {
+    "model": "historical_seasonal_baseline",
+    "slice": "overall",
+    "value": "all",
+    "sample_count": 21504,
+    "MAE": 2.5975,
+    "RMSE": 10.1839,
+    "R2": 0.2335,
+    "WAPE": 1.0272,
+    "sMAPE": 163.6674
+  },
+  {
+    "model": "historical_seasonal_baseline",
+    "slice": "hour_band",
+    "value": "night (00-07)",
+    "sample_count": 7168,
+    "MAE": 0.2276,
+    "RMSE": 0.468,
+    "R2": -0.0329,
+    "WAPE": 1.4175,
+    "sMAPE": 191.2142
+  },
+  {
+    "model": "historical_seasonal_baseline",
+    "slice": "hour_band",
+    "value": "morning (08-11)",
+    "sample_count": 3584,
+    "MAE": 6.0427,
+    "RMSE": 17.0732,
+    "R2": 0.1993,
+    "WAPE": 0.9997,
+    "sMAPE": 151.2292
+  },
+  {
+    "model": "historical_seasonal_baseline",
+    "slice": "hour_band",
+    "value": "afternoon (12-17)",
+    "sample_count": 5376,
+    "MAE": 5.2971,
+    "RMSE": 14.6875,
+    "R2": 0.1905,
+    "WAPE": 0.9992,
+    "sMAPE": 140.7872
+  },
+  {
+    "model": "historical_seasonal_baseline",
+    "slice": "hour_band",
+    "value": "evening (18-23)",
+    "sample_count": 5376,
+    "MAE": 0.761,
+    "RMSE": 2.1221,
+    "R2": 0.0003,
+    "WAPE": 1.3352,
+    "sMAPE": 173.1897
+  },
+  {
+    "model": "historical_seasonal_baseline",
+    "slice": "actual_occupancy",
+    "value": "idle (0-5)",
+    "sample_count": 19816,
+    "MAE": 1.0366,
+    "RMSE": 3.9752,
+    "R2": -30.9857,
+    "WAPE": 2.8267,
+    "sMAPE": 166.3786
+  },
+  {
+    "model": "historical_seasonal_baseline",
+    "slice": "actual_occupancy",
+    "value": "moderate (6-35)",
+    "sample_count": 1318,
+    "MAE": 11.3283,
+    "RMSE": 12.3119,
+    "R2": -4.2757,
+    "WAPE": 0.8075,
+    "sMAPE": 143.1021
+  },
+  {
+    "model": "historical_seasonal_baseline",
+    "slice": "actual_occupancy",
+    "value": "high (36+)",
+    "sample_count": 370,
+    "MAE": 55.093,
+    "RMSE": 68.1272,
+    "R2": -2.2836,
+    "WAPE": 0.7122,
+    "sMAPE": 120.5561
+  },
+  {
+    "model": "historical_seasonal_baseline",
+    "slice": "schedule_status",
+    "value": "scheduled",
+    "sample_count": 252,
+    "MAE": 20.2532,
+    "RMSE": 32.3464,
+    "R2": 0.1765,
+    "WAPE": 0.5612,
+    "sMAPE": 64.7594
+  },
+  {
+    "model": "historical_seasonal_baseline",
+    "slice": "schedule_status",
+    "value": "unscheduled",
+    "sample_count": 21252,
+    "MAE": 2.3882,
+    "RMSE": 9.6195,
+    "R2": 0.1458,
+    "WAPE": 1.1207,
+    "sMAPE": 165.1067
+  }
+]

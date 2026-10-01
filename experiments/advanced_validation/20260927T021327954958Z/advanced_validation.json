@@ -1,0 +1,3739 @@
+{
+  "run_id": "20260927T021327954958Z",
+  "generated_at_utc": "2026-09-27T02:13:27.954958+00:00",
+  "environment": {
+    "python": "3.14.7",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "cpu_count": 4,
+    "packages": {
+      "numpy": "2.5.3",
+      "pandas": "3.0.6",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1",
+      "PuLP": "3.3.2",
+      "FastAPI": "0.141.1",
+      "Streamlit": "1.64.0"
+    }
+  },
+  "configuration": {
+    "seed": 42,
+    "cluster_perturbation_repeats": 10,
+    "inference_repeats": 30,
+    "milp_timeout_seconds_per_case": 10.0,
+    "data_directory": "data/processed"
+  },
+  "provenance_sha256": {
+    "app/clustering/cluster.py": {
+      "sha256": "f37fb150be8e105ee308f49036b7e2f37e6ade7b31828fa9a49ab5fed814753e",
+      "bytes": 4599
+    },
+    "app/simulation/simulator.py": {
+      "sha256": "07c220fd5439c5225e6733cf3e5b62c293b30ff885e3e2643f5712d9ddf9dbcf",
+      "bytes": 3132
+    },
+    "app/optimization/solver.py": {
+      "sha256": "287770ef5052cc643b534192dcb9219b68cac043a4eb685a9ae9c225c902de6e",
+      "bytes": 4670
+    },
+    "app/optimization/heuristics.py": {
+      "sha256": "29c79b58eb74a3f205f884f7b127d85c446f189a4382294baae5b7df9756621b",
+      "bytes": 1720
+    },
+    "app/features/engineering.py": {
+      "sha256": "892a3fb75db5d3900d2ff64a96cb90bbf20520e0061590ea9e0f8250f7490bbb",
+      "bytes": 12831
+    },
+    "app/forecasting/model.py": {
+      "sha256": "38333530a0bee1a33b0b8cf32d1c9a4882870e5306225ea7d766d817cf518a27",
+      "bytes": 7914
+    },
+    "scripts/run_advanced_validation.py": {
+      "sha256": "4e976c7d7e0b5f013e885a224c3dfe3490bf8008b991b47c6bf1d9c6ca576e27",
+      "bytes": 31995
+    },
+    "data/processed/occupancy.parquet": {
+      "sha256": "35a85788b6fba0278bd526b65e84ce800d4220feafe18c0f460e91cd3acdf404",
+      "bytes": 650511
+    },
+    "data/processed/rooms.parquet": {
+      "sha256": "fb1130f1c9e01e36352a85cf0f011b2242ce263215f25d22715b9c09a886305b",
+      "bytes": 6510
+    },
+    "data/processed/timetable.parquet": {
+      "sha256": "4797c9c860f7fc628f765e4c74eb328322bb843107a4929de0e855df839434f3",
+      "bytes": 9056
+    },
+    "data/processed/events.parquet": {
+      "sha256": "e119a86d4f26eded2e6a7bf61d2c6752421d5449eaab6d85231af9ded32526df",
+      "bytes": 4815
+    },
+    "experiments/xgboost/model.json": {
+      "sha256": "becd7b4e0b991a1a7b179c822a4bfa408814c95befaf667894393d8ec25f9aec",
+      "bytes": 1160237
+    },
+    "experiments/xgboost/config.json": {
+      "sha256": "b4b367e1aad7f3378fd46373cf4f9563c21abefc76cb2afdf70c62499ab5409d",
+      "bytes": 887
+    },
+    "experiments/xgboost/test_predictions.parquet": {
+      "sha256": "0df909eb7fc51597a8abe58de96207fb204f304db62ff19d9048330c53ff0eb6",
+      "bytes": 632821
+    },
+    "experiments/baseline/test_predictions.parquet": {
+      "sha256": "0cf82ebc082021b7d0b8a6fb980b2025864b7dc5f1daeca7b4af644975e02d39",
+      "bytes": 185477
+    }
+  },
+  "performance": {
+    "processed_data_load_seconds": 0.5403534000070067,
+    "forecast_inference": {
+      "workload": "single-room direct XGBoost inference on latest engineered row; excludes HTTP and dashboard",
+      "room_id": "B01-L203",
+      "warmup_count": 1,
+      "measured_calls": 30,
+      "model_load_seconds": 0.4902414999960456,
+      "feature_engineering_seconds_for_200_rows": 0.07360530000005383,
+      "prediction_latency_ms": {
+        "p50": 12.614200000825804,
+        "p95": 14.410745000350287,
+        "p99": 32.62737799814206
+      },
+      "limitation": "local process measurements only; not an API latency or production capacity claim"
+    },
+    "measurement_scope": "observed wall time on this host; no memory/CPU sampling or dashboard/API latency claimed"
+  },
+  "forecast_evaluation": {
+    "source": "existing paired chronological holdout prediction artifacts; no model retraining",
+    "model": "XGBRegressor",
+    "forecast_horizon_hours": 1,
+    "split": {
+      "train_period": {
+        "start": "2026-08-03",
+        "end": "2026-10-11",
+        "records": 53760
+      },
+      "val_period": {
+        "start": "2026-10-12",
+        "end": "2026-10-25",
+        "records": 10752
+      },
+      "test_period": {
+        "start": "2026-10-26",
+        "end": "2026-11-22",
+        "records": 21504
+      }
+    },
+    "prediction_rows": 21504,
+    "overall_metrics": {
+      "HistoricalSeasonalProfile": {
+        "sample_count": 21504,
+        "MAE": 2.5975167410714284,
+        "RMSE": 10.18388538708979,
+        "mean_bias_pred_minus_actual": -0.9385974702380954,
+        "WAPE": 1.027160720853255,
+        "sMAPE_pct": 163.6674219172329,
+        "sMAPE_nonzero_denominator_count": 17569,
+        "MAPE_nonzero_actual_pct": 130.35164647527162,
+        "MAPE_nonzero_actual_count": 6987,
+        "R2": 0.23345855820325245
+      },
+      "SeasonalLastWeek": {
+        "sample_count": 21504,
+        "MAE": 2.9778061224489796,
+        "RMSE": 10.590058090357335,
+        "mean_bias_pred_minus_actual": -0.9385974702380954,
+        "WAPE": 1.177542163610571,
+        "sMAPE_pct": 168.34471858566636,
+        "sMAPE_nonzero_denominator_count": 21459,
+        "MAPE_nonzero_actual_pct": 138.70995198582312,
+        "MAPE_nonzero_actual_count": 6987,
+        "R2": 0.17109393362469882
+      },
+      "StaticTimetable": {
+        "sample_count": 21504,
+        "MAE": 2.5478050595238093,
+        "RMSE": 11.96889181502456,
+        "mean_bias_pred_minus_actual": -1.6774553571428572,
+        "WAPE": 1.0075027583670466,
+        "sMAPE_pct": 195.77839464612057,
+        "sMAPE_nonzero_denominator_count": 7014,
+        "MAPE_nonzero_actual_pct": 126.23232395505039,
+        "MAPE_nonzero_actual_count": 6987,
+        "R2": -0.05880629880204613
+      },
+      "XGBoost": {
+        "sample_count": 21504,
+        "MAE": 1.2775113041322252,
+        "RMSE": 4.39608879451763,
+        "mean_bias_pred_minus_actual": -0.1914306432045962,
+        "WAPE": 0.5051784311154721,
+        "sMAPE_pct": 155.57247964232414,
+        "sMAPE_nonzero_denominator_count": 20776,
+        "MAPE_nonzero_actual_pct": 66.62677094452772,
+        "MAPE_nonzero_actual_count": 6987,
+        "R2": 0.857162728648881
+      }
+    },
+    "slices": {
+      "period": {
+        "evening": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 3584,
+            "MAE": 1.0498325892857143,
+            "RMSE": 2.5833148520844302,
+            "mean_bias_pred_minus_actual": -0.16975446428571425,
+            "WAPE": 1.3276640790402259,
+            "sMAPE_pct": 166.53892792857386,
+            "sMAPE_nonzero_denominator_count": 3384,
+            "MAPE_nonzero_actual_pct": 66.17778273984307,
+            "MAPE_nonzero_actual_count": 1101,
+            "R2": -0.02130007375805465
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 3584,
+            "MAE": 1.0420440051020408,
+            "RMSE": 2.5451158708236385,
+            "mean_bias_pred_minus_actual": -0.1697544642857143,
+            "WAPE": 1.317814295795947,
+            "sMAPE_pct": 165.06536295935706,
+            "sMAPE_nonzero_denominator_count": 3584,
+            "MAPE_nonzero_actual_pct": 56.99771240948969,
+            "MAPE_nonzero_actual_count": 1101,
+            "R2": 0.008680155918913579
+          },
+          "StaticTimetable": {
+            "sample_count": 3584,
+            "MAE": 0.7907366071428571,
+            "RMSE": 2.675742553813,
+            "mean_bias_pred_minus_actual": -0.7907366071428571,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 1101,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 1101,
+            "R2": -0.09568907832264739
+          },
+          "XGBoost": {
+            "sample_count": 3584,
+            "MAE": 1.0670099483816426,
+            "RMSE": 2.5847916612110726,
+            "mean_bias_pred_minus_actual": -0.06808613200753046,
+            "WAPE": 1.3493873165136936,
+            "sMAPE_pct": 161.23529819425391,
+            "sMAPE_nonzero_denominator_count": 3570,
+            "MAPE_nonzero_actual_pct": 55.055641114746166,
+            "MAPE_nonzero_actual_count": 1101,
+            "R2": -0.02246810512315567
+          }
+        },
+        "night": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 8960,
+            "MAE": 0.21875,
+            "RMSE": 0.4558449767817376,
+            "mean_bias_pred_minus_actual": -0.05372767857142857,
+            "WAPE": 1.4192614047791456,
+            "sMAPE_pct": 191.97758737818756,
+            "sMAPE_nonzero_denominator_count": 5446,
+            "MAPE_nonzero_actual_pct": 87.27161598091831,
+            "MAPE_nonzero_actual_count": 1118,
+            "R2": -0.036574279557577416
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 8960,
+            "MAE": 0.22150510204081633,
+            "RMSE": 0.448143847624025,
+            "mean_bias_pred_minus_actual": -0.053727678571428586,
+            "WAPE": 1.437136650460329,
+            "sMAPE_pct": 195.14869462614328,
+            "sMAPE_nonzero_denominator_count": 8915,
+            "MAPE_nonzero_actual_pct": 88.29981259051026,
+            "MAPE_nonzero_actual_count": 1118,
+            "R2": -0.0018459774918773153
+          },
+          "StaticTimetable": {
+            "sample_count": 8960,
+            "MAE": 0.15412946428571428,
+            "RMSE": 0.47351742312189526,
+            "mean_bias_pred_minus_actual": -0.15412946428571428,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 1118,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 1118,
+            "R2": -0.11850520325654879
+          },
+          "XGBoost": {
+            "sample_count": 8960,
+            "MAE": 0.22898852400456104,
+            "RMSE": 0.4552263188779087,
+            "mean_bias_pred_minus_actual": -0.0003493903050899202,
+            "WAPE": 1.4856894823177893,
+            "sMAPE_pct": 189.74324235471582,
+            "sMAPE_nonzero_denominator_count": 8321,
+            "MAPE_nonzero_actual_pct": 74.40756947704897,
+            "MAPE_nonzero_actual_count": 1118,
+            "R2": -0.03376257936052918
+          }
+        },
+        "peak": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 3584,
+            "MAE": 10.015345982142858,
+            "RMSE": 23.4524416658327,
+            "mean_bias_pred_minus_actual": -4.395256696428572,
+            "WAPE": 1.0124100973064447,
+            "sMAPE_pct": 146.6482000334263,
+            "sMAPE_nonzero_denominator_count": 3519,
+            "MAPE_nonzero_actual_pct": 233.38498150700963,
+            "MAPE_nonzero_actual_count": 2127,
+            "R2": 0.14935115703092372
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 3584,
+            "MAE": 11.35062181122449,
+            "RMSE": 24.171077125104603,
+            "mean_bias_pred_minus_actual": -4.395256696428572,
+            "WAPE": 1.1473876342244698,
+            "sMAPE_pct": 145.7644698388654,
+            "sMAPE_nonzero_denominator_count": 3584,
+            "MAPE_nonzero_actual_pct": 252.89608724034102,
+            "MAPE_nonzero_actual_count": 2127,
+            "R2": 0.0964208624959485
+          },
+          "StaticTimetable": {
+            "sample_count": 3584,
+            "MAE": 9.503627232142858,
+            "RMSE": 26.443351471656754,
+            "mean_bias_pred_minus_actual": -7.403738839285714,
+            "WAPE": 0.9606825553518544,
+            "sMAPE_pct": 192.90196681915842,
+            "sMAPE_nonzero_denominator_count": 2133,
+            "MAPE_nonzero_actual_pct": 139.69678285866135,
+            "MAPE_nonzero_actual_count": 2127,
+            "R2": -0.08145183468726191
+          },
+          "XGBoost": {
+            "sample_count": 3584,
+            "MAE": 3.093447536302847,
+            "RMSE": 8.476622609801556,
+            "mean_bias_pred_minus_actual": -0.6773167633946287,
+            "WAPE": 0.31270387731235094,
+            "sMAPE_pct": 109.51560921830135,
+            "sMAPE_nonzero_denominator_count": 3581,
+            "MAPE_nonzero_actual_pct": 75.22789463550032,
+            "MAPE_nonzero_actual_count": 2127,
+            "R2": 0.8888729250096706
+          }
+        },
+        "regular_day": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 5376,
+            "MAE": 2.648697916666667,
+            "RMSE": 6.585798212459754,
+            "mean_bias_pred_minus_actual": -0.6215029761904762,
+            "WAPE": 0.9680081577158397,
+            "sMAPE_pct": 143.74334229393372,
+            "sMAPE_nonzero_denominator_count": 5220,
+            "MAPE_nonzero_actual_pct": 92.3611104862096,
+            "MAPE_nonzero_actual_count": 2641,
+            "R2": 0.250116246177027
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 5376,
+            "MAE": 3.2802721088435374,
+            "RMSE": 7.379038586373137,
+            "mean_bias_pred_minus_actual": -0.6215029761904761,
+            "WAPE": 1.1988268427697388,
+            "sMAPE_pct": 141.13552507234343,
+            "sMAPE_nonzero_denominator_count": 5376,
+            "MAPE_nonzero_actual_pct": 102.15175506463537,
+            "MAPE_nonzero_actual_count": 2641,
+            "R2": 0.05859463781313712
+          },
+          "StaticTimetable": {
+            "sample_count": 5376,
+            "MAE": 3.0714285714285716,
+            "RMSE": 10.08481517053285,
+            "mean_bias_pred_minus_actual": -0.9899553571428571,
+            "WAPE": 1.1225016995241333,
+            "sMAPE_pct": 194.56414906935555,
+            "sMAPE_nonzero_denominator_count": 2662,
+            "MAPE_nonzero_actual_pct": 137.4290762338374,
+            "MAPE_nonzero_actual_count": 2641,
+            "R2": -0.7583810355175871
+          },
+          "XGBoost": {
+            "sample_count": 5376,
+            "MAE": 1.9547593533983065,
+            "RMSE": 4.959920955777271,
+            "mean_bias_pred_minus_actual": -0.2682049920417956,
+            "WAPE": 0.7143974360210262,
+            "sMAPE_pct": 129.2486625661977,
+            "sMAPE_nonzero_denominator_count": 5304,
+            "MAPE_nonzero_actual_pct": 61.229683134051385,
+            "MAPE_nonzero_actual_count": 2641,
+            "R2": 0.5746694127458003
+          }
+        }
+      },
+      "day_type": {
+        "Saturday": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 3072,
+            "MAE": 2.4165364583333333,
+            "RMSE": 10.236475452395714,
+            "mean_bias_pred_minus_actual": -0.8020182291666665,
+            "WAPE": 1.0634006589313851,
+            "sMAPE_pct": 160.263284016688,
+            "sMAPE_nonzero_denominator_count": 2580,
+            "MAPE_nonzero_actual_pct": 118.59175903848131,
+            "MAPE_nonzero_actual_count": 1051,
+            "R2": 0.221436725215318
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 3072,
+            "MAE": 2.7375279017857146,
+            "RMSE": 10.564359389332266,
+            "mean_bias_pred_minus_actual": -0.6822265624999999,
+            "WAPE": 1.2046534471115478,
+            "sMAPE_pct": 163.84055152001224,
+            "sMAPE_nonzero_denominator_count": 3065,
+            "MAPE_nonzero_actual_pct": 138.8741129613176,
+            "MAPE_nonzero_actual_count": 1051,
+            "R2": 0.17076170598741203
+          },
+          "StaticTimetable": {
+            "sample_count": 3072,
+            "MAE": 2.2913411458333335,
+            "RMSE": 11.926410097447597,
+            "mean_bias_pred_minus_actual": -1.6669921875,
+            "WAPE": 1.0083082652915054,
+            "sMAPE_pct": 197.15622148678085,
+            "sMAPE_nonzero_denominator_count": 1052,
+            "MAPE_nonzero_actual_pct": 115.80816130559666,
+            "MAPE_nonzero_actual_count": 1051,
+            "R2": -0.05684791001676093
+          },
+          "XGBoost": {
+            "sample_count": 3072,
+            "MAE": 0.8715659960339887,
+            "RMSE": 2.5700834577710805,
+            "mean_bias_pred_minus_actual": 0.12126390402003533,
+            "WAPE": 0.38353398364366326,
+            "sMAPE_pct": 151.1893336374799,
+            "sMAPE_nonzero_denominator_count": 3026,
+            "MAPE_nonzero_actual_pct": 54.68616234069722,
+            "MAPE_nonzero_actual_count": 1051,
+            "R2": 0.9509219308737421
+          }
+        },
+        "Sunday": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 3072,
+            "MAE": 0.5154947916666667,
+            "RMSE": 1.4326957763251766,
+            "mean_bias_pred_minus_actual": 0.02734374999999999,
+            "WAPE": 1.8160550458715596,
+            "sMAPE_pct": 191.75265568500484,
+            "sMAPE_nonzero_denominator_count": 2279,
+            "MAPE_nonzero_actual_pct": 85.17916719672338,
+            "MAPE_nonzero_actual_count": 356,
+            "R2": -0.06433659780219814
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 3072,
+            "MAE": 1.6543991815476191,
+            "RMSE": 4.0082756123243,
+            "mean_bias_pred_minus_actual": 1.3063802083333333,
+            "WAPE": 5.828342070773264,
+            "sMAPE_pct": 189.76608509479337,
+            "sMAPE_nonzero_denominator_count": 3065,
+            "MAPE_nonzero_actual_pct": 136.24273050607317,
+            "MAPE_nonzero_actual_count": 356,
+            "R2": -7.330790006727966
+          },
+          "StaticTimetable": {
+            "sample_count": 3072,
+            "MAE": 0.2838541666666667,
+            "RMSE": 1.4174323910978377,
+            "mean_bias_pred_minus_actual": -0.2838541666666667,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 356,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 356,
+            "R2": -0.04177934065934075
+          },
+          "XGBoost": {
+            "sample_count": 3072,
+            "MAE": 0.5620980589785821,
+            "RMSE": 1.3922765671699442,
+            "mean_bias_pred_minus_actual": 0.09433318256892183,
+            "WAPE": 1.98023536374106,
+            "sMAPE_pct": 190.86839709334586,
+            "sMAPE_nonzero_denominator_count": 2867,
+            "MAPE_nonzero_actual_pct": 71.9586765563924,
+            "MAPE_nonzero_actual_count": 356,
+            "R2": -0.005129599040403665
+          }
+        },
+        "Weekday": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 15360,
+            "MAE": 3.0501171875,
+            "RMSE": 11.127826419985771,
+            "mean_bias_pred_minus_actual": -1.1591015624999996,
+            "WAPE": 1.0069379070217295,
+            "sMAPE_pct": 159.322530337898,
+            "sMAPE_nonzero_denominator_count": 12710,
+            "MAPE_nonzero_actual_pct": 135.44860782280384,
+            "MAPE_nonzero_actual_count": 5580,
+            "R2": 0.23012536268761308
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 15360,
+            "MAE": 3.290543154761905,
+            "RMSE": 11.466240445836409,
+            "mean_bias_pred_minus_actual": -1.4388671875,
+            "WAPE": 1.0863099459914214,
+            "sMAPE_pct": 164.9621615829758,
+            "sMAPE_nonzero_denominator_count": 15329,
+            "MAPE_nonzero_actual_pct": 138.83643902194248,
+            "MAPE_nonzero_actual_count": 5580,
+            "R2": 0.18258723296233392
+          },
+          "StaticTimetable": {
+            "sample_count": 15360,
+            "MAE": 3.051888020833333,
+            "RMSE": 13.10368060174316,
+            "mean_bias_pred_minus_actual": -1.9582682291666667,
+            "WAPE": 1.0075225138091861,
+            "sMAPE_pct": 195.25175081052373,
+            "sMAPE_nonzero_denominator_count": 5606,
+            "MAPE_nonzero_actual_pct": 129.86933153078047,
+            "MAPE_nonzero_actual_count": 5580,
+            "R2": -0.06754434616144844
+          },
+          "XGBoost": {
+            "sample_count": 15360,
+            "MAE": 1.5017830147826012,
+            "RMSE": 5.034588638718863,
+            "mean_bias_pred_minus_actual": -0.3111223178042261,
+            "WAPE": 0.495784965870586,
+            "sMAPE_pct": 149.66439689547067,
+            "sMAPE_nonzero_denominator_count": 14883,
+            "MAPE_nonzero_actual_pct": 68.53562779843489,
+            "MAPE_nonzero_actual_count": 5580,
+            "R2": 0.8424104881789958
+          }
+        }
+      },
+      "occupancy_band": {
+        "0-5": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 19816,
+            "MAE": 1.03663201453371,
+            "RMSE": 3.9752223222232663,
+            "mean_bias_pred_minus_actual": 0.6823223657650385,
+            "WAPE": 2.826737305628182,
+            "sMAPE_pct": 166.37860018788535,
+            "sMAPE_nonzero_denominator_count": 15881,
+            "MAPE_nonzero_actual_pct": 146.41039189784237,
+            "MAPE_nonzero_actual_count": 5299,
+            "R2": -30.98566327265073
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 19816,
+            "MAE": 1.2563584981832863,
+            "RMSE": 3.3349974091713652,
+            "mean_bias_pred_minus_actual": 0.9438548935924794,
+            "WAPE": 3.425897894591991,
+            "sMAPE_pct": 170.80493959836434,
+            "sMAPE_nonzero_denominator_count": 19771,
+            "MAPE_nonzero_actual_pct": 157.07520286846574,
+            "MAPE_nonzero_actual_count": 5299,
+            "R2": -21.512489213530323
+          },
+          "StaticTimetable": {
+            "sample_count": 19816,
+            "MAE": 0.6169257165926524,
+            "RMSE": 5.306221354464559,
+            "mean_bias_pred_minus_actual": -0.11167743237787646,
+            "WAPE": 1.682262281546718,
+            "sMAPE_pct": 199.95341417976258,
+            "sMAPE_nonzero_denominator_count": 5326,
+            "MAPE_nonzero_actual_pct": 135.1308422972888,
+            "MAPE_nonzero_actual_count": 5299,
+            "R2": -55.990601688232495
+          },
+          "XGBoost": {
+            "sample_count": 19816,
+            "MAE": 0.6867308559962645,
+            "RMSE": 2.9060164865176867,
+            "mean_bias_pred_minus_actual": 0.3921834650158281,
+            "WAPE": 1.8726102439000931,
+            "sMAPE_pct": 163.02372629900069,
+            "sMAPE_nonzero_denominator_count": 19088,
+            "MAPE_nonzero_actual_pct": 73.03299826510224,
+            "MAPE_nonzero_actual_count": 5299,
+            "R2": -16.093408188819797
+          }
+        },
+        "36+": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 370,
+            "MAE": 55.092972972972966,
+            "RMSE": 68.12720098105832,
+            "mean_bias_pred_minus_actual": -54.116216216216216,
+            "WAPE": 0.7121685357928937,
+            "sMAPE_pct": 120.55614209125692,
+            "sMAPE_nonzero_denominator_count": 370,
+            "MAPE_nonzero_actual_pct": 69.10676231325586,
+            "MAPE_nonzero_actual_count": 370,
+            "R2": -2.283598909162513
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 370,
+            "MAE": 65.2468725868726,
+            "RMSE": 73.25895807116265,
+            "mean_bias_pred_minus_actual": -65.2468725868726,
+            "WAPE": 0.8434246185634929,
+            "sMAPE_pct": 147.19121886699577,
+            "sMAPE_nonzero_denominator_count": 370,
+            "MAPE_nonzero_actual_pct": 84.2015933407101,
+            "MAPE_nonzero_actual_count": 370,
+            "R2": -2.796911595353299
+          },
+          "StaticTimetable": {
+            "sample_count": 370,
+            "MAE": 65.1054054054054,
+            "RMSE": 77.51308520745629,
+            "mean_bias_pred_minus_actual": -52.84054054054054,
+            "WAPE": 0.8415959193655452,
+            "sMAPE_pct": 154.2635072479085,
+            "sMAPE_nonzero_denominator_count": 370,
+            "MAPE_nonzero_actual_pct": 83.30691516866987,
+            "MAPE_nonzero_actual_count": 370,
+            "R2": -3.2506863133407427
+          },
+          "XGBoost": {
+            "sample_count": 370,
+            "MAE": 8.81242965749792,
+            "RMSE": 18.177766940588963,
+            "mean_bias_pred_minus_actual": -6.624200452340616,
+            "WAPE": 0.11391534686350945,
+            "sMAPE_pct": 13.226948599278757,
+            "sMAPE_nonzero_denominator_count": 370,
+            "MAPE_nonzero_actual_pct": 11.134826072909524,
+            "MAPE_nonzero_actual_count": 370,
+            "R2": 0.7662293027358985
+          }
+        },
+        "6-35": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 1318,
+            "MAE": 11.328300455235205,
+            "RMSE": 12.311880650791426,
+            "mean_bias_pred_minus_actual": -10.380500758725342,
+            "WAPE": 0.8075013520822065,
+            "sMAPE_pct": 143.10213467852202,
+            "sMAPE_nonzero_denominator_count": 1318,
+            "MAPE_nonzero_actual_pct": 82.98086889237597,
+            "MAPE_nonzero_actual_count": 1318,
+            "R2": -4.275716664166226
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 1318,
+            "MAE": 11.378907435508344,
+            "RMSE": 12.48725617140968,
+            "mean_bias_pred_minus_actual": -11.18792542813787,
+            "WAPE": 0.8111087074094103,
+            "sMAPE_pct": 137.37792439284152,
+            "sMAPE_nonzero_denominator_count": 1318,
+            "MAPE_nonzero_actual_pct": 80.17476858033625,
+            "MAPE_nonzero_actual_count": 1318,
+            "R2": -4.42708610536578
+          },
+          "StaticTimetable": {
+            "sample_count": 1318,
+            "MAE": 14.01669195751138,
+            "RMSE": 15.07542996968461,
+            "mean_bias_pred_minus_actual": -10.855842185128983,
+            "WAPE": 0.9991346673877772,
+            "sMAPE_pct": 190.5616680157419,
+            "sMAPE_nonzero_denominator_count": 1318,
+            "MAPE_nonzero_actual_pct": 102.50633955098334,
+            "MAPE_nonzero_actual_count": 1318,
+            "R2": -6.909919886544138
+          },
+          "XGBoost": {
+            "sample_count": 1318,
+            "MAE": 8.044571675541096,
+            "RMSE": 9.776458757481041,
+            "mean_bias_pred_minus_actual": -7.16015017212387,
+            "WAPE": 0.573431339554525,
+            "sMAPE_pct": 87.61986227000624,
+            "sMAPE_nonzero_denominator_count": 1318,
+            "MAPE_nonzero_actual_pct": 56.44878993601057,
+            "MAPE_nonzero_actual_count": 1318,
+            "R2": -2.3265634748806736
+          }
+        }
+      },
+      "room_type": {
+        "Auditorium": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 9.288095238095238,
+            "RMSE": 34.78800166039736,
+            "mean_bias_pred_minus_actual": -3.3970238095238083,
+            "WAPE": 1.0870080111459421,
+            "sMAPE_pct": 165.76517755693078,
+            "sMAPE_nonzero_denominator_count": 540,
+            "MAPE_nonzero_actual_pct": 394.54169089097826,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": 0.18898438301495102
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 10.97512755102041,
+            "RMSE": 35.86149553831934,
+            "mean_bias_pred_minus_actual": -3.3970238095238097,
+            "WAPE": 1.2844454396178537,
+            "sMAPE_pct": 173.39793926256135,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 500.88822708175763,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": 0.13815920595668907
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 8.696428571428571,
+            "RMSE": 40.02060481206912,
+            "mean_bias_pred_minus_actual": -5.6875,
+            "WAPE": 1.0177638453500522,
+            "sMAPE_pct": 196.1380326475724,
+            "sMAPE_nonzero_denominator_count": 224,
+            "MAPE_nonzero_actual_pct": 204.33889379874063,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": -0.07334057747241296
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 2.7960136175236023,
+            "RMSE": 14.52246388725179,
+            "mean_bias_pred_minus_actual": 0.17158297733874947,
+            "WAPE": 0.3272241642242878,
+            "sMAPE_pct": 154.74357001857226,
+            "sMAPE_nonzero_denominator_count": 655,
+            "MAPE_nonzero_actual_pct": 144.8132221487909,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": 0.8586646290041415
+          }
+        },
+        "Computer Lab": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 4704,
+            "MAE": 2.4312925170068027,
+            "RMSE": 5.047504771842094,
+            "mean_bias_pred_minus_actual": -1.3127551020408166,
+            "WAPE": 0.8695863746958636,
+            "sMAPE_pct": 159.1474063678256,
+            "sMAPE_nonzero_denominator_count": 3906,
+            "MAPE_nonzero_actual_pct": 83.08787109586603,
+            "MAPE_nonzero_actual_count": 1772,
+            "R2": 0.28501860378134025
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 4704,
+            "MAE": 2.742018950437318,
+            "RMSE": 5.416479999773789,
+            "mean_bias_pred_minus_actual": -1.3127551020408166,
+            "WAPE": 0.9807221063607925,
+            "sMAPE_pct": 165.11440075516416,
+            "sMAPE_nonzero_denominator_count": 4704,
+            "MAPE_nonzero_actual_pct": 96.41031914832233,
+            "MAPE_nonzero_actual_count": 1772,
+            "R2": 0.1766669426389903
+          },
+          "StaticTimetable": {
+            "sample_count": 4704,
+            "MAE": 2.758503401360544,
+            "RMSE": 6.491491029209924,
+            "mean_bias_pred_minus_actual": -1.8877551020408163,
+            "WAPE": 0.98661800486618,
+            "sMAPE_pct": 192.81394029955234,
+            "sMAPE_nonzero_denominator_count": 1772,
+            "MAPE_nonzero_actual_pct": 104.18054155184507,
+            "MAPE_nonzero_actual_count": 1772,
+            "R2": -0.18257906850574623
+          },
+          "XGBoost": {
+            "sample_count": 4704,
+            "MAE": 1.6465214020547112,
+            "RMSE": 3.7536079647381175,
+            "mean_bias_pred_minus_actual": -0.6889060341006314,
+            "WAPE": 0.5889018153334369,
+            "sMAPE_pct": 148.7844542422775,
+            "sMAPE_nonzero_denominator_count": 4662,
+            "MAPE_nonzero_actual_pct": 50.58910755986632,
+            "MAPE_nonzero_actual_count": 1772,
+            "R2": 0.6045977929117997
+          }
+        },
+        "Lecture Hall": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 7392,
+            "MAE": 3.7393939393939397,
+            "RMSE": 12.787545305298627,
+            "mean_bias_pred_minus_actual": -1.0838744588744587,
+            "WAPE": 1.0530133333333334,
+            "sMAPE_pct": 165.63286767846174,
+            "sMAPE_nonzero_denominator_count": 5953,
+            "MAPE_nonzero_actual_pct": 204.6561448924069,
+            "MAPE_nonzero_actual_count": 2329,
+            "R2": 0.2424875055792416
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 7392,
+            "MAE": 4.503590754483612,
+            "RMSE": 13.371939653578632,
+            "mean_bias_pred_minus_actual": -1.0838744588744589,
+            "WAPE": 1.268211156462585,
+            "sMAPE_pct": 171.97461020313153,
+            "sMAPE_nonzero_denominator_count": 7369,
+            "MAPE_nonzero_actual_pct": 224.87739451313948,
+            "MAPE_nonzero_actual_count": 2329,
+            "R2": 0.17166836925357243
+          },
+          "StaticTimetable": {
+            "sample_count": 7392,
+            "MAE": 3.606331168831169,
+            "RMSE": 15.171458735835529,
+            "mean_bias_pred_minus_actual": -1.9986471861471862,
+            "WAPE": 1.015542857142857,
+            "sMAPE_pct": 193.88744374954842,
+            "sMAPE_nonzero_denominator_count": 2352,
+            "MAPE_nonzero_actual_pct": 160.89446062221094,
+            "MAPE_nonzero_actual_count": 2329,
+            "R2": -0.06627716870255163
+          },
+          "XGBoost": {
+            "sample_count": 7392,
+            "MAE": 1.162984424856286,
+            "RMSE": 4.4636545789659,
+            "mean_bias_pred_minus_actual": 0.11696276124990279,
+            "WAPE": 0.3274964140395301,
+            "sMAPE_pct": 155.4030771978982,
+            "sMAPE_nonzero_denominator_count": 7069,
+            "MAPE_nonzero_actual_pct": 81.63658127074821,
+            "MAPE_nonzero_actual_count": 2329,
+            "R2": 0.9077010866184093
+          }
+        },
+        "Seminar Room": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 4704,
+            "MAE": 1.6747023809523809,
+            "RMSE": 4.093865703043741,
+            "mean_bias_pred_minus_actual": -0.8272534013605443,
+            "WAPE": 1.087342995169082,
+            "sMAPE_pct": 167.15719706048563,
+            "sMAPE_nonzero_denominator_count": 3900,
+            "MAPE_nonzero_actual_pct": 80.8777454221065,
+            "MAPE_nonzero_actual_count": 1477,
+            "R2": 0.03141009766872027
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 4704,
+            "MAE": 1.698287172011662,
+            "RMSE": 4.11200673252352,
+            "mean_bias_pred_minus_actual": -0.8272534013605443,
+            "WAPE": 1.1026560189293109,
+            "sMAPE_pct": 168.65317262315736,
+            "sMAPE_nonzero_denominator_count": 4682,
+            "MAPE_nonzero_actual_pct": 66.93388050660593,
+            "MAPE_nonzero_actual_count": 1477,
+            "R2": 0.022806909061131808
+          },
+          "StaticTimetable": {
+            "sample_count": 4704,
+            "MAE": 1.5559098639455782,
+            "RMSE": 4.500496004410435,
+            "mean_bias_pred_minus_actual": -1.404124149659864,
+            "WAPE": 1.0102139406487232,
+            "sMAPE_pct": 198.89538569262746,
+            "sMAPE_nonzero_denominator_count": 1480,
+            "MAPE_nonzero_actual_pct": 107.30301674869287,
+            "MAPE_nonzero_actual_count": 1477,
+            "R2": -0.17055955549770974
+          },
+          "XGBoost": {
+            "sample_count": 4704,
+            "MAE": 1.4359902696990188,
+            "RMSE": 3.320788945802049,
+            "mean_bias_pred_minus_actual": -0.4739051325928058,
+            "WAPE": 0.93235310264516,
+            "sMAPE_pct": 160.70187027625465,
+            "sMAPE_nonzero_denominator_count": 4652,
+            "MAPE_nonzero_actual_pct": 62.75638556818242,
+            "MAPE_nonzero_actual_count": 1477,
+            "R2": 0.3626832936946778
+          }
+        },
+        "Tutorial Room": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 4032,
+            "MAE": 0.6595238095238096,
+            "RMSE": 1.5367650521133103,
+            "mean_bias_pred_minus_actual": 0.04409722222222222,
+            "WAPE": 1.335610246107484,
+            "sMAPE_pct": 160.9799512796998,
+            "sMAPE_nonzero_denominator_count": 3270,
+            "MAPE_nonzero_actual_pct": 66.99144842267538,
+            "MAPE_nonzero_actual_count": 1186,
+            "R2": -0.14588900411114114
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 4032,
+            "MAE": 0.6155045351473922,
+            "RMSE": 1.4205194707899726,
+            "mean_bias_pred_minus_actual": 0.04409722222222222,
+            "WAPE": 1.246466240941379,
+            "sMAPE_pct": 164.27894419260477,
+            "sMAPE_nonzero_denominator_count": 4032,
+            "MAPE_nonzero_actual_pct": 53.9869148613221,
+            "MAPE_nonzero_actual_count": 1186,
+            "R2": 0.020911425492597724
+          },
+          "StaticTimetable": {
+            "sample_count": 4032,
+            "MAE": 0.4937996031746032,
+            "RMSE": 1.5181605672446206,
+            "mean_bias_pred_minus_actual": -0.4937996031746032,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 1186,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 1186,
+            "R2": -0.11831207574802716
+          },
+          "XGBoost": {
+            "sample_count": 4032,
+            "MAE": 0.6189896231687256,
+            "RMSE": 1.445125061971994,
+            "mean_bias_pred_minus_actual": 0.09262070553655027,
+            "WAPE": 1.2535239380292826,
+            "sMAPE_pct": 158.12044402680183,
+            "sMAPE_nonzero_denominator_count": 3738,
+            "MAPE_nonzero_actual_pct": 51.232059182439905,
+            "MAPE_nonzero_actual_count": 1186,
+            "R2": -0.01330098879611974
+          }
+        }
+      },
+      "building_id": {
+        "B01": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 6720,
+            "MAE": 2.3488690476190475,
+            "RMSE": 8.054857304165989,
+            "mean_bias_pred_minus_actual": -0.939672619047619,
+            "WAPE": 1.0622787536173364,
+            "sMAPE_pct": 163.71673075875572,
+            "sMAPE_nonzero_denominator_count": 5465,
+            "MAPE_nonzero_actual_pct": 116.36813400493675,
+            "MAPE_nonzero_actual_count": 2176,
+            "R2": 0.18424046310826359
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 6720,
+            "MAE": 2.5485246598639453,
+            "RMSE": 8.30010337203065,
+            "mean_bias_pred_minus_actual": -0.9396726190476192,
+            "WAPE": 1.152573236037803,
+            "sMAPE_pct": 167.79660476494294,
+            "sMAPE_nonzero_denominator_count": 6698,
+            "MAPE_nonzero_actual_pct": 112.74891913711241,
+            "MAPE_nonzero_actual_count": 2176,
+            "R2": 0.1338094126173992
+          },
+          "StaticTimetable": {
+            "sample_count": 6720,
+            "MAE": 2.254315476190476,
+            "RMSE": 9.415689477320996,
+            "mean_bias_pred_minus_actual": -1.7165178571428572,
+            "WAPE": 1.0195167911703344,
+            "sMAPE_pct": 197.02044379706268,
+            "sMAPE_nonzero_denominator_count": 2184,
+            "MAPE_nonzero_actual_pct": 113.10364167980565,
+            "MAPE_nonzero_actual_count": 2176,
+            "R2": -0.11468129195595256
+          },
+          "XGBoost": {
+            "sample_count": 6720,
+            "MAE": 1.1267501130492055,
+            "RMSE": 3.170860563111255,
+            "mean_bias_pred_minus_actual": -0.2438912901223375,
+            "WAPE": 0.5095740466848819,
+            "sMAPE_pct": 155.23008156317414,
+            "sMAPE_nonzero_denominator_count": 6462,
+            "MAPE_nonzero_actual_pct": 56.10408892003863,
+            "MAPE_nonzero_actual_count": 2176,
+            "R2": 0.8735843777398379
+          }
+        },
+        "B02": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 5376,
+            "MAE": 2.0893229166666663,
+            "RMSE": 5.610913578952736,
+            "mean_bias_pred_minus_actual": -0.8437872023809525,
+            "WAPE": 0.9419035639412997,
+            "sMAPE_pct": 161.88492341290154,
+            "sMAPE_nonzero_denominator_count": 4383,
+            "MAPE_nonzero_actual_pct": 93.68310581576287,
+            "MAPE_nonzero_actual_count": 1821,
+            "R2": 0.26807095975227724
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 5376,
+            "MAE": 2.3672991071428573,
+            "RMSE": 5.898243029354871,
+            "mean_bias_pred_minus_actual": -0.8437872023809525,
+            "WAPE": 1.0672201257861635,
+            "sMAPE_pct": 167.20164163177353,
+            "sMAPE_nonzero_denominator_count": 5376,
+            "MAPE_nonzero_actual_pct": 103.66063845492262,
+            "MAPE_nonzero_actual_count": 1821,
+            "R2": 0.19118882011383198
+          },
+          "StaticTimetable": {
+            "sample_count": 5376,
+            "MAE": 2.2200520833333335,
+            "RMSE": 6.972109082589271,
+            "mean_bias_pred_minus_actual": -1.4034598214285714,
+            "WAPE": 1.00083857442348,
+            "sMAPE_pct": 193.9200934004772,
+            "sMAPE_nonzero_denominator_count": 1825,
+            "MAPE_nonzero_actual_pct": 108.06067613153974,
+            "MAPE_nonzero_actual_count": 1821,
+            "R2": -0.13013458598128658
+          },
+          "XGBoost": {
+            "sample_count": 5376,
+            "MAE": 1.34993735354417,
+            "RMSE": 3.410698311744442,
+            "mean_bias_pred_minus_actual": -0.3748382303500269,
+            "WAPE": 0.6085755314594096,
+            "sMAPE_pct": 154.01497616296763,
+            "sMAPE_nonzero_denominator_count": 5253,
+            "MAPE_nonzero_actual_pct": 54.91587977103774,
+            "MAPE_nonzero_actual_count": 1821,
+            "R2": 0.7295490994244462
+          }
+        },
+        "B03": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 5376,
+            "MAE": 2.0438988095238093,
+            "RMSE": 7.3063939708410786,
+            "mean_bias_pred_minus_actual": -0.6366815476190476,
+            "WAPE": 1.0606177606177607,
+            "sMAPE_pct": 164.53533286966376,
+            "sMAPE_nonzero_denominator_count": 4471,
+            "MAPE_nonzero_actual_pct": 120.15882600250991,
+            "MAPE_nonzero_actual_count": 1687,
+            "R2": 0.24925692583471581
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 5376,
+            "MAE": 2.344669430272109,
+            "RMSE": 7.6600049621660276,
+            "mean_bias_pred_minus_actual": -0.6366815476190476,
+            "WAPE": 1.2166933259790405,
+            "sMAPE_pct": 168.5772485317075,
+            "sMAPE_nonzero_denominator_count": 5353,
+            "MAPE_nonzero_actual_pct": 117.36187638506328,
+            "MAPE_nonzero_actual_count": 1687,
+            "R2": 0.17483031638380764
+          },
+          "StaticTimetable": {
+            "sample_count": 5376,
+            "MAE": 1.9713541666666667,
+            "RMSE": 8.791716034616526,
+            "mean_bias_pred_minus_actual": -1.322172619047619,
+            "WAPE": 1.022972972972973,
+            "sMAPE_pct": 197.46948875959686,
+            "sMAPE_nonzero_denominator_count": 1692,
+            "MAPE_nonzero_actual_pct": 131.51642691815275,
+            "MAPE_nonzero_actual_count": 1687,
+            "R2": -0.08700731435462505
+          },
+          "XGBoost": {
+            "sample_count": 5376,
+            "MAE": 1.0844658570767824,
+            "RMSE": 3.1409696780319285,
+            "mean_bias_pred_minus_actual": -0.07310676982033978,
+            "WAPE": 0.5627498501587628,
+            "sMAPE_pct": 157.2485862560655,
+            "sMAPE_nonzero_denominator_count": 5189,
+            "MAPE_nonzero_actual_pct": 66.63189802078935,
+            "MAPE_nonzero_actual_count": 1687,
+            "R2": 0.8612564988459174
+          }
+        },
+        "B04": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 4032,
+            "MAE": 4.4276785714285705,
+            "RMSE": 18.216455364086233,
+            "mean_bias_pred_minus_actual": -1.4657738095238095,
+            "WAPE": 1.0357623578556507,
+            "sMAPE_pct": 164.79443368869258,
+            "sMAPE_nonzero_denominator_count": 3250,
+            "MAPE_nonzero_actual_pct": 218.14659951745364,
+            "MAPE_nonzero_actual_count": 1303,
+            "R2": 0.23370552466734196
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 4032,
+            "MAE": 5.351466836734694,
+            "RMSE": 18.939121049363642,
+            "mean_bias_pred_minus_actual": -1.4657738095238095,
+            "WAPE": 1.2518632098929152,
+            "sMAPE_pct": 170.47064003263446,
+            "sMAPE_nonzero_denominator_count": 4032,
+            "MAPE_nonzero_actual_pct": 258.6870900956051,
+            "MAPE_nonzero_actual_count": 1303,
+            "R2": 0.1717001432955363
+          },
+          "StaticTimetable": {
+            "sample_count": 4032,
+            "MAE": 4.242559523809524,
+            "RMSE": 21.17526540753067,
+            "mean_bias_pred_minus_actual": -2.451388888888889,
+            "WAPE": 0.9924576467857972,
+            "sMAPE_pct": 194.11611984615055,
+            "sMAPE_nonzero_denominator_count": 1313,
+            "MAPE_nonzero_actual_pct": 166.71145029334042,
+            "MAPE_nonzero_actual_count": 1303,
+            "R2": -0.035441748085315083
+          },
+          "XGBoost": {
+            "sample_count": 4032,
+            "MAE": 1.6896058194619226,
+            "RMSE": 7.592618114696558,
+            "mean_bias_pred_minus_actual": -0.017217946660128377,
+            "WAPE": 0.3952477758221439,
+            "sMAPE_pct": 156.01070922543974,
+            "sMAPE_nonzero_denominator_count": 3872,
+            "MAPE_nonzero_actual_pct": 100.55941832331526,
+            "MAPE_nonzero_actual_count": 1303,
+            "R2": 0.8668776241143735
+          }
+        }
+      },
+      "room_id": {
+        "B01-L203": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 2.6559523809523813,
+            "RMSE": 5.441200847852123,
+            "mean_bias_pred_minus_actual": -1.4345238095238095,
+            "WAPE": 0.830139534883721,
+            "sMAPE_pct": 156.76356860487596,
+            "sMAPE_nonzero_denominator_count": 542,
+            "MAPE_nonzero_actual_pct": 78.212953394794,
+            "MAPE_nonzero_actual_count": 253,
+            "R2": 0.30105447174889544
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 3.1220238095238093,
+            "RMSE": 5.901848839803605,
+            "mean_bias_pred_minus_actual": -1.4345238095238095,
+            "WAPE": 0.9758139534883721,
+            "sMAPE_pct": 163.99676776621502,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 104.18739919237458,
+            "MAPE_nonzero_actual_count": 253,
+            "R2": 0.17770058636597186
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 3.1279761904761907,
+            "RMSE": 7.055899254220845,
+            "mean_bias_pred_minus_actual": -1.7827380952380953,
+            "WAPE": 0.9776744186046512,
+            "sMAPE_pct": 187.3229289257184,
+            "sMAPE_nonzero_denominator_count": 253,
+            "MAPE_nonzero_actual_pct": 102.19662100117066,
+            "MAPE_nonzero_actual_count": 253,
+            "R2": -0.1753265831159807
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.7357155735856697,
+            "RMSE": 3.9027798367104602,
+            "mean_bias_pred_minus_actual": -0.8350338317118474,
+            "WAPE": 0.5425120304416605,
+            "sMAPE_pct": 148.14528494236967,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 45.45095003537514,
+            "MAPE_nonzero_actual_count": 253,
+            "R2": 0.6404147062459316
+          }
+        },
+        "B01-L303": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 2.0931547619047617,
+            "RMSE": 4.160535965931496,
+            "mean_bias_pred_minus_actual": -1.255952380952381,
+            "WAPE": 0.9491228070175438,
+            "sMAPE_pct": 158.66193875588547,
+            "sMAPE_nonzero_denominator_count": 567,
+            "MAPE_nonzero_actual_pct": 74.70239332207174,
+            "MAPE_nonzero_actual_count": 257,
+            "R2": 0.08490635004698999
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 2.154974489795918,
+            "RMSE": 4.175654252374608,
+            "mean_bias_pred_minus_actual": -1.255952380952381,
+            "WAPE": 0.9771544245228455,
+            "sMAPE_pct": 164.28017167168295,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 72.4422982484242,
+            "MAPE_nonzero_actual_count": 257,
+            "R2": 0.07824385090742048
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 2.205357142857143,
+            "RMSE": 4.876449723391179,
+            "mean_bias_pred_minus_actual": -2.205357142857143,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 257,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 257,
+            "R2": -0.2571134770802399
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.405644612303669,
+            "RMSE": 3.0315092705162763,
+            "mean_bias_pred_minus_actual": -0.48811415676581893,
+            "WAPE": 0.6373773140810158,
+            "sMAPE_pct": 147.14084383175938,
+            "sMAPE_nonzero_denominator_count": 665,
+            "MAPE_nonzero_actual_pct": 47.60800019602126,
+            "MAPE_nonzero_actual_count": 257,
+            "R2": 0.514169493501701
+          }
+        },
+        "B01-R101": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 4.6398809523809526,
+            "RMSE": 15.304628929401282,
+            "mean_bias_pred_minus_actual": -1.3708333333333333,
+            "WAPE": 1.091736694677871,
+            "sMAPE_pct": 169.55569655591546,
+            "sMAPE_nonzero_denominator_count": 529,
+            "MAPE_nonzero_actual_pct": 296.1401292681001,
+            "MAPE_nonzero_actual_count": 206,
+            "R2": 0.1845636429570533
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 5.553571428571429,
+            "RMSE": 15.881609181820387,
+            "mean_bias_pred_minus_actual": -1.3708333333333333,
+            "WAPE": 1.3067226890756303,
+            "sMAPE_pct": 176.37831587438683,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 301.6396572839299,
+            "MAPE_nonzero_actual_count": 206,
+            "R2": 0.12192124096180457
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 4.607142857142857,
+            "RMSE": 18.370687054575363,
+            "mean_bias_pred_minus_actual": -2.1785714285714284,
+            "WAPE": 1.084033613445378,
+            "sMAPE_pct": 192.65033967533233,
+            "sMAPE_nonzero_denominator_count": 209,
+            "MAPE_nonzero_actual_pct": 238.11876714505496,
+            "MAPE_nonzero_actual_count": 206,
+            "R2": -0.17488473294306583
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.3268329453892962,
+            "RMSE": 5.177100818981306,
+            "mean_bias_pred_minus_actual": 0.03249333393233385,
+            "WAPE": 0.3121959871504226,
+            "sMAPE_pct": 157.90149555550747,
+            "sMAPE_nonzero_denominator_count": 660,
+            "MAPE_nonzero_actual_pct": 103.83696752503594,
+            "MAPE_nonzero_actual_count": 206,
+            "R2": 0.9066922520747515
+          }
+        },
+        "B01-R102": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 3.4458333333333333,
+            "RMSE": 12.027891692704443,
+            "mean_bias_pred_minus_actual": -1.4318452380952382,
+            "WAPE": 1.17602844083291,
+            "sMAPE_pct": 169.24009620552005,
+            "sMAPE_nonzero_denominator_count": 540,
+            "MAPE_nonzero_actual_pct": 171.7502435191959,
+            "MAPE_nonzero_actual_count": 203,
+            "R2": 0.14063179042680984
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 3.4866496598639456,
+            "RMSE": 12.19443144075464,
+            "mean_bias_pred_minus_actual": -1.431845238095238,
+            "WAPE": 1.189958644707248,
+            "sMAPE_pct": 171.14342731939342,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 143.19213368421364,
+            "MAPE_nonzero_actual_count": 203,
+            "R2": 0.11666918905641122
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 2.9300595238095237,
+            "RMSE": 13.301505911881163,
+            "mean_bias_pred_minus_actual": -2.9300595238095237,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 203,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 203,
+            "R2": -0.050998000929285414
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.8541199572971978,
+            "RMSE": 2.632051552534251,
+            "mean_bias_pred_minus_actual": -0.04319945489156193,
+            "WAPE": 0.2915025958881244,
+            "sMAPE_pct": 157.35338570694162,
+            "sMAPE_nonzero_denominator_count": 631,
+            "MAPE_nonzero_actual_pct": 55.13624854561739,
+            "MAPE_nonzero_actual_count": 203,
+            "R2": 0.9588481798402362
+          }
+        },
+        "B01-R201": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 3.039880952380952,
+            "RMSE": 9.904992127589958,
+            "mean_bias_pred_minus_actual": -1.1461309523809522,
+            "WAPE": 1.129242675511332,
+            "sMAPE_pct": 168.8140366816449,
+            "sMAPE_nonzero_denominator_count": 548,
+            "MAPE_nonzero_actual_pct": 143.36456055677158,
+            "MAPE_nonzero_actual_count": 197,
+            "R2": 0.17791232230403387
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 3.282355442176871,
+            "RMSE": 10.237426334737831,
+            "mean_bias_pred_minus_actual": -1.1461309523809526,
+            "WAPE": 1.2193161178235805,
+            "sMAPE_pct": 172.79502771606258,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 141.31001078676508,
+            "MAPE_nonzero_actual_count": 197,
+            "R2": 0.1218040121060906
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 2.787202380952381,
+            "RMSE": 11.584767811143012,
+            "mean_bias_pred_minus_actual": -2.2157738095238093,
+            "WAPE": 1.035378662244334,
+            "sMAPE_pct": 197.89358587172794,
+            "sMAPE_nonzero_denominator_count": 198,
+            "MAPE_nonzero_actual_pct": 99.8192346901241,
+            "MAPE_nonzero_actual_count": 197,
+            "R2": -0.12456493285165604
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.9044048945583026,
+            "RMSE": 2.7772183572180786,
+            "mean_bias_pred_minus_actual": -0.1052361617676936,
+            "WAPE": 0.3359646706153562,
+            "sMAPE_pct": 157.45037629247992,
+            "sMAPE_nonzero_denominator_count": 637,
+            "MAPE_nonzero_actual_pct": 50.17285331978236,
+            "MAPE_nonzero_actual_count": 197,
+            "R2": 0.9353706298203798
+          }
+        },
+        "B01-R202": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 1.9354166666666666,
+            "RMSE": 4.66928285510231,
+            "mean_bias_pred_minus_actual": -0.9791666666666666,
+            "WAPE": 1.078441127694859,
+            "sMAPE_pct": 171.1160119461367,
+            "sMAPE_nonzero_denominator_count": 580,
+            "MAPE_nonzero_actual_pct": 80.47789482185507,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": 0.08884395881665053
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 2.020748299319728,
+            "RMSE": 4.828207756098988,
+            "mean_bias_pred_minus_actual": -0.9791666666666666,
+            "WAPE": 1.1259891021085051,
+            "sMAPE_pct": 172.52370125419293,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 79.76067770576587,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": 0.02576373657493214
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 1.7589285714285714,
+            "RMSE": 5.064465373937265,
+            "mean_bias_pred_minus_actual": -1.5446428571428572,
+            "WAPE": 0.9800995024875622,
+            "sMAPE_pct": 197.57328824628223,
+            "sMAPE_nonzero_denominator_count": 209,
+            "MAPE_nonzero_actual_pct": 99.22726564933042,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": -0.07191316447908358
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.6321532025883374,
+            "RMSE": 3.807001838126652,
+            "mean_bias_pred_minus_actual": -0.6367553099130635,
+            "WAPE": 0.9094585009447452,
+            "sMAPE_pct": 162.30269256152658,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 55.938103302589916,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": 0.394298616989914
+          }
+        },
+        "B01-R301": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 2.842857142857143,
+            "RMSE": 9.133305092066173,
+            "mean_bias_pred_minus_actual": -0.9434523809523809,
+            "WAPE": 1.1030023094688222,
+            "sMAPE_pct": 165.32974585666486,
+            "sMAPE_nonzero_denominator_count": 542,
+            "MAPE_nonzero_actual_pct": 143.94297633872034,
+            "MAPE_nonzero_actual_count": 215,
+            "R2": 0.1956779758584044
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 3.1570153061224486,
+            "RMSE": 9.427908526479957,
+            "mean_bias_pred_minus_actual": -0.9434523809523809,
+            "WAPE": 1.2248927746618277,
+            "sMAPE_pct": 169.84545830950972,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 144.0970904003618,
+            "MAPE_nonzero_actual_count": 215,
+            "R2": 0.14295277961783293
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 2.6636904761904763,
+            "RMSE": 10.825455010782512,
+            "mean_bias_pred_minus_actual": -1.8452380952380953,
+            "WAPE": 1.033487297921478,
+            "sMAPE_pct": 196.14807337779163,
+            "sMAPE_nonzero_denominator_count": 218,
+            "MAPE_nonzero_actual_pct": 98.61233795843918,
+            "MAPE_nonzero_actual_count": 215,
+            "R2": -0.12996853249939244
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.8830480586690274,
+            "RMSE": 2.4820053801941846,
+            "mean_bias_pred_minus_actual": 0.03425827040475616,
+            "WAPE": 0.34261448927574273,
+            "sMAPE_pct": 154.08940322714335,
+            "sMAPE_nonzero_denominator_count": 632,
+            "MAPE_nonzero_actual_pct": 49.43930247772717,
+            "MAPE_nonzero_actual_count": 215,
+            "R2": 0.9406009543206411
+          }
+        },
+        "B01-R302": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 1.5705357142857144,
+            "RMSE": 3.8253384537468427,
+            "mean_bias_pred_minus_actual": -0.9136904761904762,
+            "WAPE": 1.0532934131736529,
+            "sMAPE_pct": 161.90813897236472,
+            "sMAPE_nonzero_denominator_count": 549,
+            "MAPE_nonzero_actual_pct": 70.16461740944789,
+            "MAPE_nonzero_actual_count": 229,
+            "R2": -0.022201118583597745
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 1.5447278911564628,
+            "RMSE": 3.7890382981028043,
+            "mean_bias_pred_minus_actual": -0.9136904761904762,
+            "WAPE": 1.0359851725121187,
+            "sMAPE_pct": 164.21913539136696,
+            "sMAPE_nonzero_denominator_count": 650,
+            "MAPE_nonzero_actual_pct": 60.426002560204054,
+            "MAPE_nonzero_actual_count": 229,
+            "R2": -0.002893021753536784
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 1.4910714285714286,
+            "RMSE": 4.066778882136386,
+            "mean_bias_pred_minus_actual": -1.4910714285714286,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 229,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 229,
+            "R2": -0.15530788892869563
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.351000262173156,
+            "RMSE": 3.0964414205182904,
+            "mean_bias_pred_minus_actual": -0.5529083166527146,
+            "WAPE": 0.9060600560682244,
+            "sMAPE_pct": 156.36418825151375,
+            "sMAPE_nonzero_denominator_count": 647,
+            "MAPE_nonzero_actual_pct": 60.74752690976326,
+            "MAPE_nonzero_actual_count": 229,
+            "R2": 0.3302351429759366
+          }
+        },
+        "B01-R401": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 0.5642857142857144,
+            "RMSE": 1.3507713845552598,
+            "mean_bias_pred_minus_actual": 0.005059523809523818,
+            "WAPE": 1.1962145110410096,
+            "sMAPE_pct": 156.0257586676188,
+            "sMAPE_nonzero_denominator_count": 526,
+            "MAPE_nonzero_actual_pct": 61.112637362637365,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": -0.055668767448683765
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 0.5462159863945578,
+            "RMSE": 1.2834106346539509,
+            "mean_bias_pred_minus_actual": 0.005059523809523794,
+            "WAPE": 1.1579089680036052,
+            "sMAPE_pct": 162.97512858508324,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 52.94054160125589,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": 0.046994873818550276
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 0.47172619047619047,
+            "RMSE": 1.3967436619304407,
+            "mean_bias_pred_minus_actual": -0.47172619047619047,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 208,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": -0.12874902466742588
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.5412508989235599,
+            "RMSE": 1.2897469045051198,
+            "mean_bias_pred_minus_actual": 0.04067486838193006,
+            "WAPE": 1.14738360907455,
+            "sMAPE_pct": 153.01397456060158,
+            "sMAPE_nonzero_denominator_count": 576,
+            "MAPE_nonzero_actual_pct": 49.39753304144968,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": 0.0375615659039259
+          }
+        },
+        "B01-R402": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 0.7008928571428572,
+            "RMSE": 1.7895696476554144,
+            "mean_bias_pred_minus_actual": 0.0738095238095238,
+            "WAPE": 1.4017857142857144,
+            "sMAPE_pct": 159.36702226845227,
+            "sMAPE_nonzero_denominator_count": 542,
+            "MAPE_nonzero_actual_pct": 68.25707407407407,
+            "MAPE_nonzero_actual_count": 200,
+            "R2": -0.14840981856990387
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 0.6169642857142857,
+            "RMSE": 1.6473257033110105,
+            "mean_bias_pred_minus_actual": 0.07380952380952377,
+            "WAPE": 1.2339285714285715,
+            "sMAPE_pct": 159.69179422847236,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 44.50219047619048,
+            "MAPE_nonzero_actual_count": 200,
+            "R2": 0.02689739289525861
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 0.5,
+            "RMSE": 1.7431840052589045,
+            "mean_bias_pred_minus_actual": -0.5,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 200,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 200,
+            "R2": -0.08964781216648876
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.6333307250038377,
+            "RMSE": 1.665475270282938,
+            "mean_bias_pred_minus_actual": 0.11490785776030472,
+            "WAPE": 1.2666614500076754,
+            "sMAPE_pct": 158.414984924295,
+            "sMAPE_nonzero_denominator_count": 670,
+            "MAPE_nonzero_actual_pct": 47.15289578577227,
+            "MAPE_nonzero_actual_count": 200,
+            "R2": 0.005336770212942765
+          }
+        },
+        "B02-L101": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 3.000892857142857,
+            "RMSE": 6.22993445658406,
+            "mean_bias_pred_minus_actual": -1.732738095238095,
+            "WAPE": 0.8184253246753246,
+            "sMAPE_pct": 158.26282482914672,
+            "sMAPE_nonzero_denominator_count": 547,
+            "MAPE_nonzero_actual_pct": 91.26994004871204,
+            "MAPE_nonzero_actual_count": 254,
+            "R2": 0.2889647777252734
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 3.5731717687074833,
+            "RMSE": 6.686673211654341,
+            "mean_bias_pred_minus_actual": -1.732738095238095,
+            "WAPE": 0.9745013914656773,
+            "sMAPE_pct": 166.17867674139316,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 113.76240962776238,
+            "MAPE_nonzero_actual_count": 254,
+            "R2": 0.18088598326902994
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 3.613095238095238,
+            "RMSE": 8.288151324689505,
+            "mean_bias_pred_minus_actual": -2.0952380952380953,
+            "WAPE": 0.9853896103896104,
+            "sMAPE_pct": 187.08535186056918,
+            "sMAPE_nonzero_denominator_count": 254,
+            "MAPE_nonzero_actual_pct": 101.59552031759776,
+            "MAPE_nonzero_actual_count": 254,
+            "R2": -0.2584602522627315
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 2.0926714388603744,
+            "RMSE": 4.869753717442989,
+            "mean_bias_pred_minus_actual": -1.0013862234357345,
+            "WAPE": 0.5707285742346475,
+            "sMAPE_pct": 149.44548688832216,
+            "sMAPE_nonzero_denominator_count": 670,
+            "MAPE_nonzero_actual_pct": 51.697073134084526,
+            "MAPE_nonzero_actual_count": 254,
+            "R2": 0.5655516470012321
+          }
+        },
+        "B02-L102": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 3.16875,
+            "RMSE": 6.354849104648918,
+            "mean_bias_pred_minus_actual": -1.6553571428571427,
+            "WAPE": 0.8344043887147335,
+            "sMAPE_pct": 162.0731293405227,
+            "sMAPE_nonzero_denominator_count": 568,
+            "MAPE_nonzero_actual_pct": 95.50415843994882,
+            "MAPE_nonzero_actual_count": 252,
+            "R2": 0.35606934874818363
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 3.802593537414966,
+            "RMSE": 7.171212171844133,
+            "mean_bias_pred_minus_actual": -1.6553571428571427,
+            "WAPE": 1.0013098969995522,
+            "sMAPE_pct": 166.71918917348077,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 125.70375672013432,
+            "MAPE_nonzero_actual_count": 252,
+            "R2": 0.18000018078401492
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 3.6220238095238093,
+            "RMSE": 8.27143679578504,
+            "mean_bias_pred_minus_actual": -2.0,
+            "WAPE": 0.9537617554858934,
+            "sMAPE_pct": 187.05350093010193,
+            "sMAPE_nonzero_denominator_count": 252,
+            "MAPE_nonzero_actual_pct": 118.32557519732818,
+            "MAPE_nonzero_actual_count": 252,
+            "R2": -0.09091402138222948
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 2.1100797717836466,
+            "RMSE": 4.692551121971564,
+            "mean_bias_pred_minus_actual": -1.00181358037073,
+            "WAPE": 0.5556322910025903,
+            "sMAPE_pct": 149.98816048006483,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 61.840665454210544,
+            "MAPE_nonzero_actual_count": 252,
+            "R2": 0.6488872196005445
+          }
+        },
+        "B02-L202": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 2.4684523809523813,
+            "RMSE": 5.13289461637945,
+            "mean_bias_pred_minus_actual": -1.0324404761904762,
+            "WAPE": 0.829814907453727,
+            "sMAPE_pct": 152.9640640909065,
+            "sMAPE_nonzero_denominator_count": 527,
+            "MAPE_nonzero_actual_pct": 88.11747703876581,
+            "MAPE_nonzero_actual_count": 270,
+            "R2": 0.3224441701680941
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 2.859736394557823,
+            "RMSE": 5.566174262306863,
+            "mean_bias_pred_minus_actual": -1.0324404761904762,
+            "WAPE": 0.9613521046237404,
+            "sMAPE_pct": 162.36465429018537,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 115.65726868311319,
+            "MAPE_nonzero_actual_count": 270,
+            "R2": 0.20322813836170606
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 3.013392857142857,
+            "RMSE": 7.0300164261814455,
+            "mean_bias_pred_minus_actual": -1.4032738095238095,
+            "WAPE": 1.0130065032516258,
+            "sMAPE_pct": 188.94977624307325,
+            "sMAPE_nonzero_denominator_count": 270,
+            "MAPE_nonzero_actual_pct": 106.77358298583974,
+            "MAPE_nonzero_actual_count": 270,
+            "R2": -0.2709634759460888
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.6162851302838785,
+            "RMSE": 3.610614284427639,
+            "mean_bias_pred_minus_actual": -0.6406873385900066,
+            "WAPE": 0.5433434755131398,
+            "sMAPE_pct": 143.59491364888893,
+            "sMAPE_nonzero_denominator_count": 649,
+            "MAPE_nonzero_actual_pct": 49.290920280753646,
+            "MAPE_nonzero_actual_count": 270,
+            "R2": 0.6647393499916201
+          }
+        },
+        "B02-L203": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 1.9229166666666668,
+            "RMSE": 3.911688832692284,
+            "mean_bias_pred_minus_actual": -1.1723214285714285,
+            "WAPE": 0.9564766839378238,
+            "sMAPE_pct": 161.938720491448,
+            "sMAPE_nonzero_denominator_count": 566,
+            "MAPE_nonzero_actual_pct": 77.32217780377769,
+            "MAPE_nonzero_actual_count": 243,
+            "R2": 0.07622429623168925
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 1.9809098639455782,
+            "RMSE": 3.9475537073115095,
+            "mean_bias_pred_minus_actual": -1.1723214285714287,
+            "WAPE": 0.9853230411335518,
+            "sMAPE_pct": 167.59944542067024,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 72.96297710999423,
+            "MAPE_nonzero_actual_count": 243,
+            "R2": 0.059207102476035
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 2.0104166666666665,
+            "RMSE": 4.5393451908733224,
+            "mean_bias_pred_minus_actual": -2.0104166666666665,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 243,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 243,
+            "R2": -0.2440113834483315
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.372966764415261,
+            "RMSE": 3.0679050949625157,
+            "mean_bias_pred_minus_actual": -0.5313399141750346,
+            "WAPE": 0.6829264734915287,
+            "sMAPE_pct": 152.07329648638066,
+            "sMAPE_nonzero_denominator_count": 667,
+            "MAPE_nonzero_actual_pct": 49.26053722671466,
+            "MAPE_nonzero_actual_count": 243,
+            "R2": 0.43177311682772523
+          }
+        },
+        "B02-R201": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 3.3910714285714283,
+            "RMSE": 10.778624680356952,
+            "mean_bias_pred_minus_actual": -0.8077380952380954,
+            "WAPE": 1.0749056603773584,
+            "sMAPE_pct": 165.2328014906628,
+            "sMAPE_nonzero_denominator_count": 537,
+            "MAPE_nonzero_actual_pct": 173.0774140748214,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": 0.19506560684985996
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 4.090178571428572,
+            "RMSE": 11.042604183020288,
+            "mean_bias_pred_minus_actual": -0.807738095238095,
+            "WAPE": 1.2965094339622643,
+            "sMAPE_pct": 170.8011052946961,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 197.37075059181933,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": 0.15515547198342539
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 3.3601190476190474,
+            "RMSE": 12.886870394763369,
+            "mean_bias_pred_minus_actual": -1.5773809523809523,
+            "WAPE": 1.0650943396226416,
+            "sMAPE_pct": 193.0862082082419,
+            "sMAPE_nonzero_denominator_count": 227,
+            "MAPE_nonzero_actual_pct": 135.09559066798474,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": -0.1506114894222883
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.1617769970793492,
+            "RMSE": 3.8161928101003455,
+            "mean_bias_pred_minus_actual": 0.08704147663298673,
+            "WAPE": 0.36826138775345413,
+            "sMAPE_pct": 154.2257036965792,
+            "sMAPE_nonzero_denominator_count": 663,
+            "MAPE_nonzero_actual_pct": 61.231674134904715,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": 0.8990992480564336
+          }
+        },
+        "B02-R301": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 0.7633928571428571,
+            "RMSE": 1.4918029998884537,
+            "mean_bias_pred_minus_actual": 0.21190476190476187,
+            "WAPE": 1.6234177215189873,
+            "sMAPE_pct": 164.09202140180585,
+            "sMAPE_nonzero_denominator_count": 542,
+            "MAPE_nonzero_actual_pct": 83.25281315275252,
+            "MAPE_nonzero_actual_count": 194,
+            "R2": -0.8162634820576582
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 0.6889880952380952,
+            "RMSE": 1.1933311005945746,
+            "mean_bias_pred_minus_actual": 0.21190476190476187,
+            "WAPE": 1.4651898734177216,
+            "sMAPE_pct": 166.72496371788515,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 66.60667119081309,
+            "MAPE_nonzero_actual_count": 194,
+            "R2": -0.16219182835497237
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 0.47023809523809523,
+            "RMSE": 1.2026755886059097,
+            "mean_bias_pred_minus_actual": -0.47023809523809523,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 194,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 194,
+            "R2": -0.18046439001821724
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.7024895093608869,
+            "RMSE": 1.2315981412311476,
+            "mean_bias_pred_minus_actual": 0.30505301812497365,
+            "WAPE": 1.4939017414256837,
+            "sMAPE_pct": 160.85351694241342,
+            "sMAPE_nonzero_denominator_count": 670,
+            "MAPE_nonzero_actual_pct": 58.20648864693787,
+            "MAPE_nonzero_actual_count": 194,
+            "R2": -0.23792390172642408
+          }
+        },
+        "B02-R302": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 0.6008928571428571,
+            "RMSE": 1.4563694259225248,
+            "mean_bias_pred_minus_actual": 0.023809523809523805,
+            "WAPE": 1.2540372670807451,
+            "sMAPE_pct": 156.51961562340244,
+            "sMAPE_nonzero_denominator_count": 534,
+            "MAPE_nonzero_actual_pct": 58.696937012352834,
+            "MAPE_nonzero_actual_count": 203,
+            "R2": -0.06549384831023208
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 0.5677721088435375,
+            "RMSE": 1.3791819521523827,
+            "mean_bias_pred_minus_actual": 0.023809523809523794,
+            "WAPE": 1.1849157054125998,
+            "sMAPE_pct": 162.86537942878826,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 51.14901976116117,
+            "MAPE_nonzero_actual_count": 203,
+            "R2": 0.04445538078180944
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 0.4791666666666667,
+            "RMSE": 1.4900463399633233,
+            "mean_bias_pred_minus_actual": -0.4791666666666667,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 203,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 203,
+            "R2": -0.11534028967450571
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.5591313204256169,
+            "RMSE": 1.3915210325813308,
+            "mean_bias_pred_minus_actual": 0.0476055503649626,
+            "WAPE": 1.1668827556708528,
+            "sMAPE_pct": 154.875935419867,
+            "sMAPE_nonzero_denominator_count": 590,
+            "MAPE_nonzero_actual_pct": 49.32492236675501,
+            "MAPE_nonzero_actual_count": 203,
+            "R2": 0.02728101896195967
+          }
+        },
+        "B02-S303": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 1.3982142857142856,
+            "RMSE": 3.2387442451842796,
+            "mean_bias_pred_minus_actual": -0.5854166666666666,
+            "WAPE": 1.1730337078651685,
+            "sMAPE_pct": 173.30173372697232,
+            "sMAPE_nonzero_denominator_count": 562,
+            "MAPE_nonzero_actual_pct": 77.49191033325651,
+            "MAPE_nonzero_actual_count": 182,
+            "R2": 0.009181112570430305
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 1.3750425170068028,
+            "RMSE": 3.2164450418875483,
+            "mean_bias_pred_minus_actual": -0.5854166666666666,
+            "WAPE": 1.1535937221330481,
+            "sMAPE_pct": 174.35971898708925,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 65.47766648796869,
+            "MAPE_nonzero_actual_count": 182,
+            "R2": 0.0227779935729977
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 1.1919642857142858,
+            "RMSE": 3.4651753889508212,
+            "mean_bias_pred_minus_actual": -1.1919642857142858,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 182,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 182,
+            "R2": -0.13420461612122092
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.1840978961443485,
+            "RMSE": 2.6197894909616335,
+            "mean_bias_pred_minus_actual": -0.26317883135163267,
+            "WAPE": 0.9934004821585545,
+            "sMAPE_pct": 166.80634257704497,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 60.70534286046737,
+            "MAPE_nonzero_actual_count": 182,
+            "R2": 0.35170337687648234
+          }
+        },
+        "B03-L303": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 1.7089285714285716,
+            "RMSE": 3.2527369427987285,
+            "mean_bias_pred_minus_actual": -0.9059523809523808,
+            "WAPE": 0.9951473136915079,
+            "sMAPE_pct": 162.65860032813168,
+            "sMAPE_nonzero_denominator_count": 589,
+            "MAPE_nonzero_actual_pct": 75.7806361448337,
+            "MAPE_nonzero_actual_count": 243,
+            "R2": 0.06574262412917364
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 1.700722789115646,
+            "RMSE": 3.2243638300978903,
+            "mean_bias_pred_minus_actual": -0.9059523809523808,
+            "WAPE": 0.9903689031938597,
+            "sMAPE_pct": 164.66190022252167,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 67.20797598443102,
+            "MAPE_nonzero_actual_count": 243,
+            "R2": 0.08197029863272332
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 1.7172619047619047,
+            "RMSE": 3.778069549890463,
+            "mean_bias_pred_minus_actual": -1.7172619047619047,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 243,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 243,
+            "R2": -0.26040044519982763
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.1922865231504798,
+            "RMSE": 2.454008124697617,
+            "mean_bias_pred_minus_actual": -0.3239671936552484,
+            "WAPE": 0.6942950984030523,
+            "sMAPE_pct": 150.95101240746772,
+            "sMAPE_nonzero_denominator_count": 667,
+            "MAPE_nonzero_actual_pct": 49.036168289473515,
+            "MAPE_nonzero_actual_count": 243,
+            "R2": 0.4682339052783837
+          }
+        },
+        "B03-R101": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 4.05327380952381,
+            "RMSE": 13.683545036353145,
+            "mean_bias_pred_minus_actual": -0.7690476190476195,
+            "WAPE": 0.996269202633504,
+            "sMAPE_pct": 164.31411277406417,
+            "sMAPE_nonzero_denominator_count": 545,
+            "MAPE_nonzero_actual_pct": 263.72187011991946,
+            "MAPE_nonzero_actual_count": 213,
+            "R2": 0.273909273711761
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 5.450425170068027,
+            "RMSE": 14.389449850734485,
+            "mean_bias_pred_minus_actual": -0.769047619047619,
+            "WAPE": 1.339680217368586,
+            "sMAPE_pct": 172.83732059761837,
+            "sMAPE_nonzero_denominator_count": 649,
+            "MAPE_nonzero_actual_pct": 286.3872963849534,
+            "MAPE_nonzero_actual_count": 213,
+            "R2": 0.1970619887161219
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 4.035714285714286,
+            "RMSE": 16.319631035745175,
+            "mean_bias_pred_minus_actual": -1.5386904761904763,
+            "WAPE": 0.991953182150695,
+            "sMAPE_pct": 189.49457599477734,
+            "sMAPE_nonzero_denominator_count": 215,
+            "MAPE_nonzero_actual_pct": 248.61283314354523,
+            "MAPE_nonzero_actual_count": 213,
+            "R2": -0.032795434787708855
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.3693618249523016,
+            "RMSE": 5.639665424630491,
+            "mean_bias_pred_minus_actual": 0.3182287798779379,
+            "WAPE": 0.3365805217146842,
+            "sMAPE_pct": 155.5238782194998,
+            "sMAPE_nonzero_denominator_count": 629,
+            "MAPE_nonzero_actual_pct": 147.1934264698669,
+            "MAPE_nonzero_actual_count": 213,
+            "R2": 0.8766610297453149
+          }
+        },
+        "B03-R102": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 3.6321428571428567,
+            "RMSE": 11.338351480074795,
+            "mean_bias_pred_minus_actual": -1.0303571428571427,
+            "WAPE": 0.9930024410089503,
+            "sMAPE_pct": 160.64307749155304,
+            "sMAPE_nonzero_denominator_count": 547,
+            "MAPE_nonzero_actual_pct": 190.41498115783006,
+            "MAPE_nonzero_actual_count": 225,
+            "R2": 0.26124359015144705
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 4.775297619047619,
+            "RMSE": 12.271731383813067,
+            "mean_bias_pred_minus_actual": -1.0303571428571427,
+            "WAPE": 1.30553295362083,
+            "sMAPE_pct": 173.82736759229462,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 225.66160515174295,
+            "MAPE_nonzero_actual_count": 225,
+            "R2": 0.13460753069242382
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 4.044642857142857,
+            "RMSE": 14.672414999064125,
+            "mean_bias_pred_minus_actual": -1.3482142857142858,
+            "WAPE": 1.1057770545158665,
+            "sMAPE_pct": 191.12737343140697,
+            "sMAPE_nonzero_denominator_count": 228,
+            "MAPE_nonzero_actual_pct": 195.6163500059936,
+            "MAPE_nonzero_actual_count": 225,
+            "R2": -0.23709951092161385
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.1725545137907742,
+            "RMSE": 3.562825005395641,
+            "mean_bias_pred_minus_actual": 0.016067146986512983,
+            "WAPE": 0.32056819905101724,
+            "sMAPE_pct": 152.69393303212757,
+            "sMAPE_nonzero_denominator_count": 651,
+            "MAPE_nonzero_actual_pct": 62.49540697060391,
+            "MAPE_nonzero_actual_count": 225,
+            "R2": 0.9270558590244238
+          }
+        },
+        "B03-R201": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 2.552083333333333,
+            "RMSE": 8.390644591845533,
+            "mean_bias_pred_minus_actual": -0.9708333333333337,
+            "WAPE": 1.1572199730094466,
+            "sMAPE_pct": 166.98127445372398,
+            "sMAPE_nonzero_denominator_count": 553,
+            "MAPE_nonzero_actual_pct": 135.08392328666966,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": 0.15419323923500106
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 2.586267006802721,
+            "RMSE": 8.509812263611035,
+            "mean_bias_pred_minus_actual": -0.9708333333333333,
+            "WAPE": 1.1727202621939463,
+            "sMAPE_pct": 171.02357076049108,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 120.01477544794463,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": 0.12999758332037736
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 2.205357142857143,
+            "RMSE": 9.38622344056386,
+            "mean_bias_pred_minus_actual": -2.205357142857143,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 204,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": -0.058430333064423357
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.9272322979217972,
+            "RMSE": 2.56489279996502,
+            "mean_bias_pred_minus_actual": -0.09725690631672651,
+            "WAPE": 0.4204454144422724,
+            "sMAPE_pct": 157.34432470515463,
+            "sMAPE_nonzero_denominator_count": 666,
+            "MAPE_nonzero_actual_pct": 45.664952742171316,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": 0.9209650946434452
+          }
+        },
+        "B03-R301": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 0.6711309523809523,
+            "RMSE": 1.4150340732899078,
+            "mean_bias_pred_minus_actual": 0.02172619047619047,
+            "WAPE": 1.3072463768115943,
+            "sMAPE_pct": 164.59437063889607,
+            "sMAPE_nonzero_denominator_count": 580,
+            "MAPE_nonzero_actual_pct": 65.44324093152217,
+            "MAPE_nonzero_actual_count": 192,
+            "R2": -0.07140855334018203
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 0.6371173469387754,
+            "RMSE": 1.3436294638234239,
+            "mean_bias_pred_minus_actual": 0.02172619047619049,
+            "WAPE": 1.2409937888198757,
+            "sMAPE_pct": 164.93043863165704,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 51.607513063986275,
+            "MAPE_nonzero_actual_count": 192,
+            "R2": 0.03399282659775271
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 0.5133928571428571,
+            "RMSE": 1.460287805944594,
+            "mean_bias_pred_minus_actual": -0.5133928571428571,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 192,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 192,
+            "R2": -0.14103306945545424
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.6335719367641668,
+            "RMSE": 1.3742456891031878,
+            "mean_bias_pred_minus_actual": 0.04203112310192193,
+            "WAPE": 1.2340879463928118,
+            "sMAPE_pct": 161.7771966025552,
+            "sMAPE_nonzero_denominator_count": 652,
+            "MAPE_nonzero_actual_pct": 48.56128509244274,
+            "MAPE_nonzero_actual_count": 192,
+            "R2": -0.010532023104918187
+          }
+        },
+        "B03-R302": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 0.656547619047619,
+            "RMSE": 1.6715048822628582,
+            "mean_bias_pred_minus_actual": -0.07172619047619047,
+            "WAPE": 1.2428169014084507,
+            "sMAPE_pct": 164.78732645185784,
+            "sMAPE_nonzero_denominator_count": 546,
+            "MAPE_nonzero_actual_pct": 65.9121069791309,
+            "MAPE_nonzero_actual_count": 189,
+            "R2": -0.011887709313954886
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 0.635969387755102,
+            "RMSE": 1.6170672412070668,
+            "mean_bias_pred_minus_actual": -0.07172619047619046,
+            "WAPE": 1.2038631790744467,
+            "sMAPE_pct": 168.48596056374262,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 57.68689177994639,
+            "MAPE_nonzero_actual_count": 189,
+            "R2": 0.052949406955490996
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 0.5282738095238095,
+            "RMSE": 1.743610785533449,
+            "mean_bias_pred_minus_actual": -0.5282738095238095,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 189,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 189,
+            "R2": -0.10107300594849034
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.6441633485342858,
+            "RMSE": 1.6587187028588852,
+            "mean_bias_pred_minus_actual": 0.005451815485208672,
+            "WAPE": 1.2193740006057467,
+            "sMAPE_pct": 158.88403464137326,
+            "sMAPE_nonzero_denominator_count": 580,
+            "MAPE_nonzero_actual_pct": 55.17021896767995,
+            "MAPE_nonzero_actual_count": 189,
+            "R2": 0.0035339536657624793
+          }
+        },
+        "B03-S202": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 1.6425595238095236,
+            "RMSE": 3.790872496631123,
+            "mean_bias_pred_minus_actual": -0.7205357142857142,
+            "WAPE": 1.1462097611630322,
+            "sMAPE_pct": 169.0360544609844,
+            "sMAPE_nonzero_denominator_count": 555,
+            "MAPE_nonzero_actual_pct": 80.14857632672062,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": 0.0022591835313340303
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 1.5853741496598641,
+            "RMSE": 3.718715307389767,
+            "mean_bias_pred_minus_actual": -0.7205357142857142,
+            "WAPE": 1.1063047025663848,
+            "sMAPE_pct": 168.59753793059943,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 59.5987714332698,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": 0.039880595527959306
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 1.4330357142857142,
+            "RMSE": 4.056703740488728,
+            "mean_bias_pred_minus_actual": -1.4330357142857142,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 204,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": -0.14257829345881357
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.4779025856322343,
+            "RMSE": 3.086300986136966,
+            "mean_bias_pred_minus_actual": -0.22956934139143587,
+            "WAPE": 1.0313089694131479,
+            "sMAPE_pct": 161.48211776749798,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 63.940714113351525,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": 0.3386734791594398
+          }
+        },
+        "B03-S304": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 1.4345238095238095,
+            "RMSE": 3.334568223637843,
+            "mean_bias_pred_minus_actual": -0.6467261904761904,
+            "WAPE": 1.1093210586881472,
+            "sMAPE_pct": 163.33513058493295,
+            "sMAPE_nonzero_denominator_count": 556,
+            "MAPE_nonzero_actual_pct": 75.33269764030133,
+            "MAPE_nonzero_actual_count": 217,
+            "R2": -0.004699518651190893
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 1.3861819727891158,
+            "RMSE": 3.2697450960582963,
+            "mean_bias_pred_minus_actual": -0.6467261904761904,
+            "WAPE": 1.0719381883938848,
+            "sMAPE_pct": 164.39969799270543,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 57.28554557504525,
+            "MAPE_nonzero_actual_count": 217,
+            "R2": 0.033982989820984355
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 1.2931547619047619,
+            "RMSE": 3.569255291140343,
+            "mean_bias_pred_minus_actual": -1.2931547619047619,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 217,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 217,
+            "R2": -0.15109774620230243
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.2586538258682205,
+            "RMSE": 2.7676691182339717,
+            "mean_bias_pred_minus_actual": -0.31583958265088896,
+            "WAPE": 0.9733203348486124,
+            "sMAPE_pct": 159.39217757843488,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 59.76065667785655,
+            "MAPE_nonzero_actual_count": 217,
+            "R2": 0.3078737587383452
+          }
+        },
+        "B04-AUD01": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 9.288095238095238,
+            "RMSE": 34.78800166039736,
+            "mean_bias_pred_minus_actual": -3.3970238095238083,
+            "WAPE": 1.0870080111459421,
+            "sMAPE_pct": 165.76517755693078,
+            "sMAPE_nonzero_denominator_count": 540,
+            "MAPE_nonzero_actual_pct": 394.54169089097826,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": 0.18898438301495102
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 10.97512755102041,
+            "RMSE": 35.86149553831934,
+            "mean_bias_pred_minus_actual": -3.3970238095238097,
+            "WAPE": 1.2844454396178537,
+            "sMAPE_pct": 173.39793926256135,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 500.88822708175763,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": 0.13815920595668907
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 8.696428571428571,
+            "RMSE": 40.02060481206912,
+            "mean_bias_pred_minus_actual": -5.6875,
+            "WAPE": 1.0177638453500522,
+            "sMAPE_pct": 196.1380326475724,
+            "sMAPE_nonzero_denominator_count": 224,
+            "MAPE_nonzero_actual_pct": 204.33889379874063,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": -0.07334057747241296
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 2.7960136175236023,
+            "RMSE": 14.52246388725179,
+            "mean_bias_pred_minus_actual": 0.17158297733874947,
+            "WAPE": 0.3272241642242878,
+            "sMAPE_pct": 154.74357001857226,
+            "sMAPE_nonzero_denominator_count": 655,
+            "MAPE_nonzero_actual_pct": 144.8132221487909,
+            "MAPE_nonzero_actual_count": 223,
+            "R2": 0.8586646290041415
+          }
+        },
+        "B04-R101": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 5.127678571428571,
+            "RMSE": 18.17837870606046,
+            "mean_bias_pred_minus_actual": -1.0931547619047615,
+            "WAPE": 0.964939792775133,
+            "sMAPE_pct": 164.88264720159376,
+            "sMAPE_nonzero_denominator_count": 534,
+            "MAPE_nonzero_actual_pct": 330.6258586330965,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": 0.29754974501587417
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 6.745875850340137,
+            "RMSE": 19.103829040629666,
+            "mean_bias_pred_minus_actual": -1.0931547619047621,
+            "WAPE": 1.2694563347601713,
+            "sMAPE_pct": 170.66675407407666,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 404.27438285448335,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": 0.22420651708647987
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 5.123511904761905,
+            "RMSE": 21.830141078880125,
+            "mean_bias_pred_minus_actual": -1.8616071428571428,
+            "WAPE": 0.9641556986838421,
+            "sMAPE_pct": 188.40576766021468,
+            "sMAPE_nonzero_denominator_count": 207,
+            "MAPE_nonzero_actual_pct": 241.49467880689124,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": -0.013020807210579743
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.5206277118302838,
+            "RMSE": 7.323041692175218,
+            "mean_bias_pred_minus_actual": 0.7373293732193166,
+            "WAPE": 0.2861556489358585,
+            "sMAPE_pct": 153.5145329044488,
+            "sMAPE_nonzero_denominator_count": 624,
+            "MAPE_nonzero_actual_pct": 151.75488970158654,
+            "MAPE_nonzero_actual_count": 204,
+            "R2": 0.8860043460208459
+          }
+        },
+        "B04-R102": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 4.920238095238095,
+            "RMSE": 16.216125865792918,
+            "mean_bias_pred_minus_actual": -0.8395833333333338,
+            "WAPE": 0.9492965834051105,
+            "sMAPE_pct": 161.9110963585585,
+            "sMAPE_nonzero_denominator_count": 545,
+            "MAPE_nonzero_actual_pct": 251.72491948236893,
+            "MAPE_nonzero_actual_count": 222,
+            "R2": 0.3238182609164607
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 6.867517006802721,
+            "RMSE": 17.570690315501704,
+            "mean_bias_pred_minus_actual": -0.8395833333333327,
+            "WAPE": 1.3249989746113777,
+            "sMAPE_pct": 173.22979268367342,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 371.4118099017525,
+            "MAPE_nonzero_actual_count": 222,
+            "R2": 0.20613460072419998
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 4.882440476190476,
+            "RMSE": 19.45075436167182,
+            "mean_bias_pred_minus_actual": -1.2544642857142858,
+            "WAPE": 0.9420040195233994,
+            "sMAPE_pct": 185.2530909630946,
+            "sMAPE_nonzero_denominator_count": 226,
+            "MAPE_nonzero_actual_pct": 207.41102457540075,
+            "MAPE_nonzero_actual_count": 222,
+            "R2": 0.02715842207602759
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.7544142503029434,
+            "RMSE": 6.711294576564576,
+            "mean_bias_pred_minus_actual": 0.429394883407873,
+            "WAPE": 0.3384916383013431,
+            "sMAPE_pct": 153.70850700858085,
+            "sMAPE_nonzero_denominator_count": 641,
+            "MAPE_nonzero_actual_pct": 121.95619225871313,
+            "MAPE_nonzero_actual_count": 222,
+            "R2": 0.8841804620497474
+          }
+        },
+        "B04-R201": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 3.488392857142857,
+            "RMSE": 11.937797615337676,
+            "mean_bias_pred_minus_actual": -1.5196428571428573,
+            "WAPE": 1.1513752455795676,
+            "sMAPE_pct": 165.15297628661133,
+            "sMAPE_nonzero_denominator_count": 533,
+            "MAPE_nonzero_actual_pct": 152.45768192084566,
+            "MAPE_nonzero_actual_count": 217,
+            "R2": 0.14277099254048986
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 3.5443452380952385,
+            "RMSE": 12.107160415776002,
+            "mean_bias_pred_minus_actual": -1.5196428571428573,
+            "WAPE": 1.169842829076621,
+            "sMAPE_pct": 169.2020993025314,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 131.4206910536823,
+            "MAPE_nonzero_actual_count": 217,
+            "R2": 0.11827525702074415
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 3.0297619047619047,
+            "RMSE": 13.244832775014384,
+            "mean_bias_pred_minus_actual": -3.0297619047619047,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 217,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 217,
+            "R2": -0.05521606280813529
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 0.9184552216278722,
+            "RMSE": 2.6931409448260153,
+            "mean_bias_pred_minus_actual": -0.12253036773680444,
+            "WAPE": 0.30314435605792245,
+            "sMAPE_pct": 155.53942298116704,
+            "sMAPE_nonzero_denominator_count": 635,
+            "MAPE_nonzero_actual_pct": 48.93442211720807,
+            "MAPE_nonzero_actual_count": 217,
+            "R2": 0.9563718698414724
+          }
+        },
+        "B04-S202": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 2.0264880952380953,
+            "RMSE": 5.031265343070364,
+            "mean_bias_pred_minus_actual": -0.8663690476190475,
+            "WAPE": 1.0355893536121672,
+            "sMAPE_pct": 163.13904162210778,
+            "sMAPE_nonzero_denominator_count": 549,
+            "MAPE_nonzero_actual_pct": 105.61114267134182,
+            "MAPE_nonzero_actual_count": 229,
+            "R2": 0.0655353215369121
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 2.2739370748299317,
+            "RMSE": 5.117624109937369,
+            "mean_bias_pred_minus_actual": -0.8663690476190475,
+            "WAPE": 1.1620423682781096,
+            "sMAPE_pct": 166.8790092585044,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 84.03638386659253,
+            "MAPE_nonzero_actual_count": 229,
+            "R2": 0.03318091781691679
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 2.1026785714285716,
+            "RMSE": 6.039182576348904,
+            "mean_bias_pred_minus_actual": -1.2544642857142858,
+            "WAPE": 1.0745247148288974,
+            "sMAPE_pct": 195.11841377322784,
+            "sMAPE_nonzero_denominator_count": 231,
+            "MAPE_nonzero_actual_pct": 147.80473573257038,
+            "MAPE_nonzero_actual_count": 229,
+            "R2": -0.346371050114858
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.6979885665045695,
+            "RMSE": 3.9905964625099353,
+            "mean_bias_pred_minus_actual": -0.6227785141672939,
+            "WAPE": 0.8677173510958713,
+            "sMAPE_pct": 157.86234080517337,
+            "sMAPE_nonzero_denominator_count": 665,
+            "MAPE_nonzero_actual_pct": 76.66199823601026,
+            "MAPE_nonzero_actual_count": 229,
+            "R2": 0.4121262443240985
+          }
+        },
+        "B04-S203": {
+          "HistoricalSeasonalProfile": {
+            "sample_count": 672,
+            "MAE": 1.7151785714285717,
+            "RMSE": 4.426012125303469,
+            "mean_bias_pred_minus_actual": -1.0788690476190477,
+            "WAPE": 1.0584022038567495,
+            "sMAPE_pct": 167.9234285521708,
+            "sMAPE_nonzero_denominator_count": 549,
+            "MAPE_nonzero_actual_pct": 75.30454888344006,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": -0.015424231978840242
+          },
+          "SeasonalLastWeek": {
+            "sample_count": 672,
+            "MAE": 1.701998299319728,
+            "RMSE": 4.431266461067263,
+            "mean_bias_pred_minus_actual": -1.0788690476190477,
+            "WAPE": 1.050268922996196,
+            "sMAPE_pct": 169.44824561445944,
+            "sMAPE_nonzero_denominator_count": 672,
+            "MAPE_nonzero_actual_pct": 60.9768557247071,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": -0.01783658271432853
+          },
+          "StaticTimetable": {
+            "sample_count": 672,
+            "MAE": 1.6205357142857142,
+            "RMSE": 4.681682898478362,
+            "mean_bias_pred_minus_actual": -1.6205357142857142,
+            "WAPE": 1.0,
+            "sMAPE_pct": 200.0,
+            "sMAPE_nonzero_denominator_count": 208,
+            "MAPE_nonzero_actual_pct": 100.0,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": -0.1361255156269534
+          },
+          "XGBoost": {
+            "sample_count": 672,
+            "MAE": 1.4501355489822647,
+            "RMSE": 3.6247563867273502,
+            "mean_bias_pred_minus_actual": -0.696306032022611,
+            "WAPE": 0.8948494847714251,
+            "sMAPE_pct": 160.50646626592038,
+            "sMAPE_nonzero_denominator_count": 652,
+            "MAPE_nonzero_actual_pct": 60.23526038490835,
+            "MAPE_nonzero_actual_count": 208,
+            "R2": 0.31894847158586503
+          }
+        }
+      }
+    },
+    "peak_detection": {
+      "definition": "occupancy / room capacity >= 0.8",
+      "test_observations": 21504,
+      "actual_peak_observations": 13,
+      "predicted_peak_observations": 0,
+      "true_positive": 0,
+      "false_positive": 0,
+      "false_negative": 13,
+      "precision": null,
+      "recall": 0.0
+    },
+    "error_table": "forecast_test_errors.csv",
+    "limitation": "single-hour point forecasts; no calibrated interval evaluation or future horizons in persisted predictions"
+  },
+  "clustering_evaluation": {
+    "algorithm": "KMeans with StandardScaler and silhouette-selected k",
+    "seed": 42,
+    "rooms": 32,
+    "selected_clusters": 6,
+    "silhouette_score": 0.4378954459308809,
+    "cluster_sizes": {
+      "0": 5,
+      "1": 9,
+      "2": 6,
+      "3": 5,
+      "4": 1,
+      "5": 6
+    },
+    "between_cluster_dispersion_share_by_feature": {
+      "capacity": 0.21840929382519209,
+      "mean_utilization": 0.19239863319117478,
+      "peak_utilization": 0.16819276570733,
+      "occupancy_std": 0.21643098843256442,
+      "off_peak_utilization": 0.2045683188437388
+    },
+    "perturbation_stability": {
+      "replicates": 10,
+      "ari_mean": 0.8339797569387285,
+      "ari_min": 0.676460578559274,
+      "ari_max": 1.0,
+      "runs": [
+        {
+          "replicate": 1,
+          "seed": 43,
+          "noise_sd_fraction": 0.02,
+          "adjusted_rand_index_vs_baseline": 0.676460578559274,
+          "silhouette_score": 0.4590648694086704
+        },
+        {
+          "replicate": 2,
+          "seed": 44,
+          "noise_sd_fraction": 0.02,
+          "adjusted_rand_index_vs_baseline": 1.0,
+          "silhouette_score": 0.43134428567501354
+        },
+        {
+          "replicate": 3,
+          "seed": 45,
+          "noise_sd_fraction": 0.02,
+          "adjusted_rand_index_vs_baseline": 0.8137062290535074,
+          "silhouette_score": 0.42115065406658275
+        },
+        {
+          "replicate": 4,
+          "seed": 46,
+          "noise_sd_fraction": 0.02,
+          "adjusted_rand_index_vs_baseline": 0.8137062290535074,
+          "silhouette_score": 0.4051585981875472
+        },
+        {
+          "replicate": 5,
+          "seed": 47,
+          "noise_sd_fraction": 0.02,
+          "adjusted_rand_index_vs_baseline": 0.7361246908609881,
+          "silhouette_score": 0.4174379125243673
+        },
+        {
+          "replicate": 6,
+          "seed": 48,
+          "noise_sd_fraction": 0.02,
+          "adjusted_rand_index_vs_baseline": 0.676460578559274,
+          "silhouette_score": 0.4305520285127767
+        },
+        {
+          "replicate": 7,
+          "seed": 49,
+          "noise_sd_fraction": 0.02,
+          "adjusted_rand_index_vs_baseline": 1.0,
+          "silhouette_score": 0.4257659139275445
+        },
+        {
+          "replicate": 8,
+          "seed": 50,
+          "noise_sd_fraction": 0.02,
+          "adjusted_rand_index_vs_baseline": 0.8154339363407374,
+          "silhouette_score": 0.4451549648175751
+        },
+        {
+          "replicate": 9,
+          "seed": 51,
+          "noise_sd_fraction": 0.02,
+          "adjusted_rand_index_vs_baseline": 0.9072870535457526,
+          "silhouette_score": 0.4397216380515322
+        },
+        {
+          "replicate": 10,
+          "seed": 52,
+          "noise_sd_fraction": 0.02,
+          "adjusted_rand_index_vs_baseline": 0.9006182734142432,
+          "silhouette_score": 0.4303396514324376
+        }
+      ]
+    },
+    "profiles_artifact": "cluster_profiles.csv",
+    "assignments_artifact": "cluster_assignments.csv",
+    "interpretation_limit": "cluster labels describe aggregate synthetic room profiles; they are not causal or operational prescriptions"
+  },
+  "scenario_optimization_evaluation": {
+    "case_count": 11,
+    "matrix_artifact": "scenario_optimization_matrix.json",
+    "cases": [
+      {
+        "scenario": "baseline",
+        "parameters": {
+          "occupancy_multiplier": 1.0,
+          "enrollment_multiplier": 1.0
+        },
+        "scenario_id": "e8167f2c5357",
+        "simulation": {
+          "baseline_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "scenario_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "metric_deltas": {
+            "seat_utilization_rate": 0.0,
+            "room_frequency_of_use": 0.0,
+            "wasted_seat_hours": 0.0,
+            "peak_occupancy": 0.0,
+            "observations": 0
+          },
+          "peak_occupancy": 220.0
+        },
+        "optimization": {
+          "milp": {
+            "status": "Optimal",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 187.0,
+            "unused_capacity_recomputed": 187.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 1.3051058999990346,
+            "diagnostic": null
+          },
+          "greedy": {
+            "status": "Greedy",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 187.0,
+            "unused_capacity_recomputed": 187.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.1491702999919653,
+            "diagnostic": null
+          }
+        },
+        "expected_infeasible": false,
+        "observed": "feasible",
+        "passed": true
+      },
+      {
+        "scenario": "occupancy_increase_small",
+        "parameters": {
+          "occupancy_multiplier": 1.05,
+          "enrollment_multiplier": 1.05
+        },
+        "scenario_id": "a91af0978fc9",
+        "simulation": {
+          "baseline_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "scenario_metrics": {
+            "seat_utilization_rate": 0.02643,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 32977.8,
+            "peak_occupancy": 231.0,
+            "observations": 86016
+          },
+          "metric_deltas": {
+            "seat_utilization_rate": 0.001255,
+            "room_frequency_of_use": 0.0,
+            "wasted_seat_hours": 1575.8,
+            "peak_occupancy": 11.0,
+            "observations": 0
+          },
+          "peak_occupancy": 231.0
+        },
+        "optimization": {
+          "milp": {
+            "status": "Optimal",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 174.0,
+            "unused_capacity_recomputed": 174.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 1.0546405000059167,
+            "diagnostic": null
+          },
+          "greedy": {
+            "status": "Greedy",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 174.0,
+            "unused_capacity_recomputed": 174.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.15951569999742787,
+            "diagnostic": null
+          }
+        },
+        "expected_infeasible": false,
+        "observed": "feasible",
+        "passed": true
+      },
+      {
+        "scenario": "occupancy_increase_moderate",
+        "parameters": {
+          "occupancy_multiplier": 1.15,
+          "enrollment_multiplier": 1.15
+        },
+        "scenario_id": "5d529b74e0aa",
+        "simulation": {
+          "baseline_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "scenario_metrics": {
+            "seat_utilization_rate": 0.028915,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 36174.8,
+            "peak_occupancy": 253.0,
+            "observations": 86016
+          },
+          "metric_deltas": {
+            "seat_utilization_rate": 0.00374,
+            "room_frequency_of_use": 0.0,
+            "wasted_seat_hours": 4772.8,
+            "peak_occupancy": 33.0,
+            "observations": 0
+          },
+          "peak_occupancy": 253.0
+        },
+        "optimization": {
+          "milp": {
+            "status": "Infeasible",
+            "feasible": false,
+            "assigned_sessions": 0,
+            "unassigned_sessions": 50,
+            "objective_unused_capacity": null,
+            "unused_capacity_recomputed": null,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.007423000002745539,
+            "diagnostic": "No suitable room for TT-0004"
+          },
+          "greedy": {
+            "status": "GreedyInfeasible",
+            "feasible": false,
+            "assigned_sessions": 1,
+            "unassigned_sessions": 49,
+            "objective_unused_capacity": null,
+            "unused_capacity_recomputed": 4.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.007074900000588968,
+            "diagnostic": "No available room for TT-0046"
+          }
+        },
+        "expected_infeasible": false,
+        "observed": "infeasible",
+        "passed": true
+      },
+      {
+        "scenario": "occupancy_increase_large",
+        "parameters": {
+          "occupancy_multiplier": 1.3,
+          "enrollment_multiplier": 1.3
+        },
+        "scenario_id": "d2057e2d12c5",
+        "simulation": {
+          "baseline_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "scenario_metrics": {
+            "seat_utilization_rate": 0.032577,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 41236.7,
+            "peak_occupancy": 280.0,
+            "observations": 86016
+          },
+          "metric_deltas": {
+            "seat_utilization_rate": 0.007402,
+            "room_frequency_of_use": 0.0,
+            "wasted_seat_hours": 9834.7,
+            "peak_occupancy": 60.0,
+            "observations": 0
+          },
+          "peak_occupancy": 280.0
+        },
+        "optimization": {
+          "milp": {
+            "status": "Infeasible",
+            "feasible": false,
+            "assigned_sessions": 0,
+            "unassigned_sessions": 50,
+            "objective_unused_capacity": null,
+            "unused_capacity_recomputed": null,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.0076259000052232295,
+            "diagnostic": "No suitable room for TT-0004"
+          },
+          "greedy": {
+            "status": "GreedyInfeasible",
+            "feasible": false,
+            "assigned_sessions": 0,
+            "unassigned_sessions": 50,
+            "objective_unused_capacity": null,
+            "unused_capacity_recomputed": null,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.0033830000029411167,
+            "diagnostic": "No available room for TT-0050"
+          }
+        },
+        "expected_infeasible": false,
+        "observed": "infeasible",
+        "passed": true
+      },
+      {
+        "scenario": "occupancy_decrease_small",
+        "parameters": {
+          "occupancy_multiplier": 0.9,
+          "enrollment_multiplier": 0.9
+        },
+        "scenario_id": "1ba9afcdeec2",
+        "simulation": {
+          "baseline_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "scenario_metrics": {
+            "seat_utilization_rate": 0.022657,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 28261.8,
+            "peak_occupancy": 198.0,
+            "observations": 86016
+          },
+          "metric_deltas": {
+            "seat_utilization_rate": -0.002518,
+            "room_frequency_of_use": 0.0,
+            "wasted_seat_hours": -3140.2,
+            "peak_occupancy": -22.0,
+            "observations": 0
+          },
+          "peak_occupancy": 198.0
+        },
+        "optimization": {
+          "milp": {
+            "status": "Optimal",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 294.0,
+            "unused_capacity_recomputed": 294.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 1.3235691000008956,
+            "diagnostic": null
+          },
+          "greedy": {
+            "status": "Greedy",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 294.0,
+            "unused_capacity_recomputed": 294.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.14821959999972023,
+            "diagnostic": null
+          }
+        },
+        "expected_infeasible": false,
+        "observed": "feasible",
+        "passed": true
+      },
+      {
+        "scenario": "room_closure",
+        "parameters": {
+          "occupancy_multiplier": 1.0,
+          "enrollment_multiplier": 1.0,
+          "closed_rooms": [
+            "B01-L203"
+          ]
+        },
+        "scenario_id": "9b89c083a412",
+        "simulation": {
+          "baseline_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "scenario_metrics": {
+            "seat_utilization_rate": 0.02392,
+            "room_frequency_of_use": 0.276972,
+            "wasted_seat_hours": 29767.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "metric_deltas": {
+            "seat_utilization_rate": -0.001255,
+            "room_frequency_of_use": -0.009812,
+            "wasted_seat_hours": -1635.0,
+            "peak_occupancy": 0.0,
+            "observations": 0
+          },
+          "peak_occupancy": 220.0
+        },
+        "optimization": {
+          "milp": {
+            "status": "Optimal",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 207.0,
+            "unused_capacity_recomputed": 207.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 1.297606399995857,
+            "diagnostic": null
+          },
+          "greedy": {
+            "status": "Greedy",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 207.0,
+            "unused_capacity_recomputed": 207.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.1604942999983905,
+            "diagnostic": null
+          }
+        },
+        "expected_infeasible": false,
+        "observed": "feasible",
+        "passed": true
+      },
+      {
+        "scenario": "capacity_reduction",
+        "parameters": {
+          "occupancy_multiplier": 1.0,
+          "enrollment_multiplier": 1.0,
+          "capacity_adjustments": {
+            "B01-L203": 40.0
+          }
+        },
+        "scenario_id": "518145ab918a",
+        "simulation": {
+          "baseline_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "scenario_metrics": {
+            "seat_utilization_rate": 0.025487,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31405.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "metric_deltas": {
+            "seat_utilization_rate": 0.000312,
+            "room_frequency_of_use": 0.0,
+            "wasted_seat_hours": 3.0,
+            "peak_occupancy": 0.0,
+            "observations": 0
+          },
+          "peak_occupancy": 220.0
+        },
+        "optimization": {
+          "milp": {
+            "status": "Optimal",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 207.0,
+            "unused_capacity_recomputed": 207.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 1.2210144999990007,
+            "diagnostic": null
+          },
+          "greedy": {
+            "status": "Greedy",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 207.0,
+            "unused_capacity_recomputed": 207.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.1549410000006901,
+            "diagnostic": null
+          }
+        },
+        "expected_infeasible": false,
+        "observed": "feasible",
+        "passed": true
+      },
+      {
+        "scenario": "capacity_increase",
+        "parameters": {
+          "occupancy_multiplier": 1.0,
+          "enrollment_multiplier": 1.0,
+          "capacity_adjustments": {
+            "B01-L203": 60.0
+          }
+        },
+        "scenario_id": "138627d97ebb",
+        "simulation": {
+          "baseline_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "scenario_metrics": {
+            "seat_utilization_rate": 0.024966,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "metric_deltas": {
+            "seat_utilization_rate": -0.000209,
+            "room_frequency_of_use": 0.0,
+            "wasted_seat_hours": 0.0,
+            "peak_occupancy": 0.0,
+            "observations": 0
+          },
+          "peak_occupancy": 220.0
+        },
+        "optimization": {
+          "milp": {
+            "status": "Optimal",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 207.0,
+            "unused_capacity_recomputed": 207.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 1.1409088000073098,
+            "diagnostic": null
+          },
+          "greedy": {
+            "status": "Greedy",
+            "feasible": true,
+            "assigned_sessions": 50,
+            "unassigned_sessions": 0,
+            "objective_unused_capacity": 207.0,
+            "unused_capacity_recomputed": 207.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.14363669999875128,
+            "diagnostic": null
+          }
+        },
+        "expected_infeasible": false,
+        "observed": "feasible",
+        "passed": true
+      },
+      {
+        "scenario": "combined_valid_perturbation",
+        "parameters": {
+          "occupancy_multiplier": 1.15,
+          "enrollment_multiplier": 1.1,
+          "closed_rooms": [
+            "B01-L203"
+          ],
+          "capacity_adjustments": {
+            "B01-L303": 32.0
+          }
+        },
+        "scenario_id": "d113fae23d76",
+        "simulation": {
+          "baseline_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "scenario_metrics": {
+            "seat_utilization_rate": 0.027741,
+            "room_frequency_of_use": 0.276972,
+            "wasted_seat_hours": 30926.0,
+            "peak_occupancy": 253.0,
+            "observations": 86016
+          },
+          "metric_deltas": {
+            "seat_utilization_rate": 0.002566,
+            "room_frequency_of_use": -0.009812,
+            "wasted_seat_hours": -476.0,
+            "peak_occupancy": 33.0,
+            "observations": 0
+          },
+          "peak_occupancy": 253.0
+        },
+        "optimization": {
+          "milp": {
+            "status": "Infeasible",
+            "feasible": false,
+            "assigned_sessions": 0,
+            "unassigned_sessions": 50,
+            "objective_unused_capacity": null,
+            "unused_capacity_recomputed": null,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.007442200003424659,
+            "diagnostic": "No suitable room for TT-0004"
+          },
+          "greedy": {
+            "status": "GreedyInfeasible",
+            "feasible": false,
+            "assigned_sessions": 1,
+            "unassigned_sessions": 49,
+            "objective_unused_capacity": null,
+            "unused_capacity_recomputed": 16.0,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.0059843999915756285,
+            "diagnostic": "No available room for TT-0046"
+          }
+        },
+        "expected_infeasible": false,
+        "observed": "infeasible",
+        "passed": true
+      },
+      {
+        "scenario": "invalid_negative_multiplier",
+        "parameters": {
+          "occupancy_multiplier": -0.1,
+          "enrollment_multiplier": 1.0
+        },
+        "expected_invalid": true,
+        "observed": "rejected",
+        "passed": true,
+        "error_type": "ValueError",
+        "error": "scenario multipliers must be positive"
+      },
+      {
+        "scenario": "infeasible_demand",
+        "parameters": {
+          "occupancy_multiplier": 1.0,
+          "enrollment_multiplier": 100.0
+        },
+        "scenario_id": "7f0c18631e1d",
+        "simulation": {
+          "baseline_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 31402.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "scenario_metrics": {
+            "seat_utilization_rate": 0.025175,
+            "room_frequency_of_use": 0.286784,
+            "wasted_seat_hours": 7281064.0,
+            "peak_occupancy": 220.0,
+            "observations": 86016
+          },
+          "metric_deltas": {
+            "seat_utilization_rate": 0.0,
+            "room_frequency_of_use": 0.0,
+            "wasted_seat_hours": 7249662.0,
+            "peak_occupancy": 0.0,
+            "observations": 0
+          },
+          "peak_occupancy": 220.0
+        },
+        "optimization": {
+          "milp": {
+            "status": "Infeasible",
+            "feasible": false,
+            "assigned_sessions": 0,
+            "unassigned_sessions": 50,
+            "objective_unused_capacity": null,
+            "unused_capacity_recomputed": null,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.0027513999957591295,
+            "diagnostic": "No suitable room for TT-0001"
+          },
+          "greedy": {
+            "status": "GreedyInfeasible",
+            "feasible": false,
+            "assigned_sessions": 0,
+            "unassigned_sessions": 50,
+            "objective_unused_capacity": null,
+            "unused_capacity_recomputed": null,
+            "constraint_violations": {
+              "capacity": 0,
+              "room_type": 0,
+              "overlap": 0,
+              "duplicate_assignment": 0
+            },
+            "runtime_seconds": 0.003924200005712919,
+            "diagnostic": "No available room for TT-0050"
+          }
+        },
+        "expected_infeasible": true,
+        "observed": "infeasible",
+        "passed": true
+      }
+    ],
+    "comparison_basis": "same transformed timetable and room inventory for CBC MILP and capacity-first greedy baseline",
+    "limits": "scenario simulation scales observed occupancy and scheduled enrollment but does not reassign displaced courses or shift schedules"
+  },
+  "data_quality": {
+    "source_characterization": "checked-in synthetic repository data; not institutional sensor data",
+    "datasets": {
+      "events": {
+        "raw_records": 31,
+        "analysis_ready_records": 31,
+        "raw_duplicate_rows": 0,
+        "processed_duplicate_rows": 0,
+        "raw_missing_cells": 0,
+        "processed_missing_cells": 0,
+        "raw_pii_like_columns": [
+          "event_name"
+        ],
+        "room_id_normalization_changes": null,
+        "invalid_timestamps": null,
+        "negative_occupancy": null,
+        "occupancy_over_capacity": null
+      },
+      "occupancy": {
+        "raw_records": 86016,
+        "analysis_ready_records": 86016,
+        "raw_duplicate_rows": 0,
+        "processed_duplicate_rows": 0,
+        "raw_missing_cells": 85008,
+        "processed_missing_cells": 85008,
+        "raw_pii_like_columns": [],
+        "room_id_normalization_changes": 0,
+        "invalid_timestamps": 0,
+        "negative_occupancy": 0,
+        "occupancy_over_capacity": 0,
+        "missing_scheduled_course_code": 85008
+      },
+      "rooms": {
+        "raw_records": 32,
+        "analysis_ready_records": 32,
+        "raw_duplicate_rows": 0,
+        "processed_duplicate_rows": 0,
+        "raw_missing_cells": 0,
+        "processed_missing_cells": 0,
+        "raw_pii_like_columns": [
+          "building_name"
+        ],
+        "room_id_normalization_changes": 0,
+        "invalid_timestamps": null,
+        "negative_occupancy": null,
+        "occupancy_over_capacity": null
+      },
+      "timetable": {
+        "raw_records": 50,
+        "analysis_ready_records": 50,
+        "raw_duplicate_rows": 0,
+        "processed_duplicate_rows": 0,
+        "raw_missing_cells": 0,
+        "processed_missing_cells": 0,
+        "raw_pii_like_columns": [
+          "course_name"
+        ],
+        "room_id_normalization_changes": 0,
+        "invalid_timestamps": null,
+        "negative_occupancy": null,
+        "occupancy_over_capacity": null
+      }
+    },
+    "validation_report_summary": {
+      "execution_timestamp": "2026-09-24T14:34:42.802900+00:00",
+      "overall_status": "SUCCESS",
+      "quarantined_records_count": 0,
+      "summaries": {
+        "rooms": {
+          "dataset_name": "rooms",
+          "total_raw_records": 32,
+          "cleaned_records": 32,
+          "records_corrected": 0,
+          "records_rejected": 0,
+          "duplicates_removed": 0,
+          "missing_imputed": 0,
+          "capacity_clamped": 0,
+          "negative_clamped": 0,
+          "timestamps_reconciled": 0,
+          "decisions": []
+        },
+        "timetable": {
+          "dataset_name": "timetable",
+          "total_raw_records": 50,
+          "cleaned_records": 50,
+          "records_corrected": 0,
+          "records_rejected": 0,
+          "duplicates_removed": 0,
+          "missing_imputed": 0,
+          "capacity_clamped": 0,
+          "negative_clamped": 0,
+          "timestamps_reconciled": 0,
+          "decisions": []
+        },
+        "occupancy": {
+          "dataset_name": "occupancy",
+          "total_raw_records": 86016,
+          "cleaned_records": 86016,
+          "records_corrected": 0,
+          "records_rejected": 0,
+          "duplicates_removed": 0,
+          "missing_imputed": 0,
+          "capacity_clamped": 0,
+          "negative_clamped": 0,
+          "timestamps_reconciled": 0,
+          "decisions": []
+        }
+      }
+    },
+    "flow_note": "Counts are raw and processed snapshots; the prior validation report records 0 corrected/rejected occupancy rows. Missing scheduled_course_code is structural for unscheduled slots and is reported separately, not silently treated as an occupancy defect."
+  },
+  "failure_probes": [
+    {
+      "case": "empty_scenario_data",
+      "expected": "reject",
+      "observed": "rejected",
+      "error_type": "ValueError",
+      "passed": true
+    },
+    {
+      "case": "invalid_scenario_multiplier",
+      "expected": "reject",
+      "observed": "rejected",
+      "error_type": "ValueError",
+      "passed": true
+    },
+    {
+      "case": "unknown_closed_room",
+      "expected": "reject",
+      "observed": "rejected",
+      "error_type": "ValueError",
+      "passed": true
+    },
+    {
+      "case": "empty_cluster_data",
+      "expected": "reject",
+      "observed": "rejected",
+      "error_type": "ValueError",
+      "passed": true
+    },
+    {
+      "case": "single_course_demand_exceeds_all_rooms",
+      "expected": "infeasible with diagnostic",
+      "observed": "Infeasible",
+      "diagnostic": "No suitable room for TT-0001",
+      "passed": true
+    }
+  ],
+  "not_executed_or_not_supported": [
+    "multi-horizon and calibrated prediction interval evaluation",
+    "schedule-shift and calendar-change scenarios",
+    "equipment, accessibility, cohort-travel, and schedule-inertia optimization constraints",
+    "full API security fuzzing and dependency vulnerability scan",
+    "container build/runtime because Docker availability has not been established in this run",
+    "dashboard visual QA and clean-machine replay"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "component": "clustering",
+  "status": "verified",
+  "started_at_utc": "2026-09-27T01:01:29.749619+00:00",
+  "selected_clusters": 6,
+  "silhouette_score": 0.4378954459308809,
+  "feature_names": [
+    "capacity",
+    "mean_utilization",
+    "peak_utilization",
+    "occupancy_std",
+    "off_peak_utilization"
+  ],
+  "rooms_profiled": 32,
+  "assignments_artifact": "experiments/analytics/clustering_assignments.csv"
+}

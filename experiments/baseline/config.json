@@ -1,0 +1,30 @@
+{
+  "experiment_name": "campus_occupancy_baseline",
+  "timestamp": "2026-09-24T14:40:35.168826",
+  "data_source": "data/processed/occupancy.parquet",
+  "chronological_splits": {
+    "train_period": {
+      "start": "2026-08-03",
+      "end": "2026-10-11",
+      "records": 53760
+    },
+    "val_period": {
+      "start": "2026-10-12",
+      "end": "2026-10-25",
+      "records": 10752
+    },
+    "test_period": {
+      "start": "2026-10-26",
+      "end": "2026-11-22",
+      "records": 21504
+    }
+  },
+  "models_evaluated": [
+    "HistoricalSeasonalProfile",
+    "SeasonalLastWeek",
+    "StaticTimetable"
+  ],
+  "champion_baseline": "HistoricalSeasonalProfile",
+  "random_seed": 42,
+  "notes": "Strict chronological splits. Zero shuffling. Seasonal profile fitted exclusively on training set."
+}

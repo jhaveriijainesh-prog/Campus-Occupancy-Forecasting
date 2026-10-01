@@ -1,0 +1,53 @@
+# ==============================================================================
+# BDS-06: Machine Learning Model Hyperparameters & Experiment Configurations
+# ==============================================================================
+
+experiment:
+  name: "spatiotemporal_forecasting_v1"
+  random_seed: 42
+  tracking_uri: "artifacts/experiments"
+
+data_split:
+  train_weeks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  val_weeks: [11, 12]
+  test_weeks: [13, 14, 15]
+  strict_temporal_split: true
+
+features:
+  cyclical:
+    - "hour"
+    - "day_of_week"
+  calendar:
+    - "is_weekend"
+    - "is_exam_period"
+    - "is_holiday"
+  lags:
+    - 1    # 1 hour
+    - 24   # 1 day
+    - 168  # 1 week
+  rolling_windows:
+    - 4    # 4-hour rolling mean
+    - 24   # 24-hour rolling mean
+
+lightgbm:
+  n_estimators: 300
+  learning_rate: 0.05
+  num_leaves: 31
+  max_depth: 6
+  subsample: 0.8
+  colsample_bytree: 0.8
+  quantiles:
+    p10: 0.10
+    p50: 0.50
+    p90: 0.90
+
+ridge:
+  alpha: 1.0
+  solver: "auto"
+
+evaluation_metrics:
+  - "MAE"
+  - "RMSE"
+  - "MAPE"
+  - "sMAPE"
+  - "WAPE"

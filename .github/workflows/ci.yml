@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Continuous Integration & Test Harness
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Pytest Suite & Leakage Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONUNBUFFERED: '1'
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+      PYTHONPATH: ${{ github.workspace }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends coinor-cbc coinor-libcbc-dev
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install -r requirements.txt
+
+      - name: Verify dependency consistency
+        run: python -m pip check
+
+      - name: Run MVP API integration workflow
+        run: python -m pytest tests/integration/test_api.py -v
+
+      - name: Run Pytest Suite with Coverage
+        run: |
+          python -m pytest tests/ --cov=app --cov-report=term-missing --cov-report=xml
+
+      - name: Run Temporal Leakage Invariant Verification
+        run: |
+          python -m pytest tests/regression/test_leakage.py -v

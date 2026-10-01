@@ -1,0 +1,38 @@
+# ==============================================================================
+# BDS-06: Global System & Domain Configuration
+# ==============================================================================
+
+campus:
+  name: "Campus Spatiotemporal Analytics Center"
+  operational_hours:
+    start_hour: 7
+    end_hour: 21
+  slot_duration_minutes: 60
+  time_zone: "Asia/Kolkata"
+  operating_days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+
+cleaning:
+  outlier_threshold_iqr_multiplier: 1.5
+  max_capacity_multiplier: 1.25
+  missing_forward_fill_limit_slots: 2
+  imputation_strategy: "seasonal_median"
+
+utilization:
+  underutilized_sur_threshold: 0.30
+  overcrowded_sur_threshold: 0.85
+  target_sur: 0.70
+
+optimization:
+  solver_engine: "PULP_CBC_CMD"
+  timeout_seconds: 30.0
+  mip_gap: 0.02
+  weights:
+    wasted_seats: 1.0
+    travel_distance: 0.3
+    inertia_penalty: 0.1
+
+clustering:
+  min_clusters: 2
+  max_clusters: 6
+  algorithm: "kmeans"
+  random_state: 42

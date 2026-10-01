@@ -1,0 +1,21 @@
+model,slice,value,sample_count,MAE,RMSE,R2,WAPE,sMAPE
+xgboost,overall,all,21504,1.2775,4.3961,0.8572,0.5052,155.5725
+xgboost,hour_band,night (00-07),7168,0.2262,0.4644,-0.017,1.4084,189.4827
+xgboost,hour_band,morning (08-11),3584,2.5386,7.1457,0.8597,0.42,129.6174
+xgboost,hour_band,afternoon (12-17),5376,2.3246,6.2018,0.8557,0.4385,115.6743
+xgboost,hour_band,evening (18-23),5376,0.7914,2.1241,-0.0016,1.3886,170.7196
+xgboost,actual_occupancy,idle (0-5),19816,0.6867,2.906,-16.0934,1.8726,163.0237
+xgboost,actual_occupancy,moderate (6-35),1318,8.0446,9.7765,-2.3266,0.5734,87.6199
+xgboost,actual_occupancy,high (36+),370,8.8124,18.1778,0.7662,0.1139,13.2269
+xgboost,schedule_status,scheduled,252,13.1894,25.7562,0.4779,0.3655,52.8289
+xgboost,schedule_status,unscheduled,21252,1.1363,3.4189,0.8921,0.5332,156.8188
+historical_seasonal_baseline,overall,all,21504,2.5975,10.1839,0.2335,1.0272,163.6674
+historical_seasonal_baseline,hour_band,night (00-07),7168,0.2276,0.468,-0.0329,1.4175,191.2142
+historical_seasonal_baseline,hour_band,morning (08-11),3584,6.0427,17.0732,0.1993,0.9997,151.2292
+historical_seasonal_baseline,hour_band,afternoon (12-17),5376,5.2971,14.6875,0.1905,0.9992,140.7872
+historical_seasonal_baseline,hour_band,evening (18-23),5376,0.761,2.1221,0.0003,1.3352,173.1897
+historical_seasonal_baseline,actual_occupancy,idle (0-5),19816,1.0366,3.9752,-30.9857,2.8267,166.3786
+historical_seasonal_baseline,actual_occupancy,moderate (6-35),1318,11.3283,12.3119,-4.2757,0.8075,143.1021
+historical_seasonal_baseline,actual_occupancy,high (36+),370,55.093,68.1272,-2.2836,0.7122,120.5561
+historical_seasonal_baseline,schedule_status,scheduled,252,20.2532,32.3464,0.1765,0.5612,64.7594
+historical_seasonal_baseline,schedule_status,unscheduled,21252,2.3882,9.6195,0.1458,1.1207,165.1067

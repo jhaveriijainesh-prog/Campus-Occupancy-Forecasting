@@ -1,0 +1,721 @@
+{
+  "cases": [
+    {
+      "scenario": "baseline",
+      "parameters": {
+        "occupancy_multiplier": 1.0,
+        "enrollment_multiplier": 1.0
+      },
+      "scenario_id": "e8167f2c5357",
+      "simulation": {
+        "baseline_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "scenario_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "metric_deltas": {
+          "seat_utilization_rate": 0.0,
+          "room_frequency_of_use": 0.0,
+          "wasted_seat_hours": 0.0,
+          "peak_occupancy": 0.0,
+          "observations": 0
+        },
+        "peak_occupancy": 220.0
+      },
+      "optimization": {
+        "milp": {
+          "status": "Optimal",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 187.0,
+          "unused_capacity_recomputed": 187.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 1.1937805000052322,
+          "diagnostic": null
+        },
+        "greedy": {
+          "status": "Greedy",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 187.0,
+          "unused_capacity_recomputed": 187.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.15051829999720212,
+          "diagnostic": null
+        }
+      },
+      "expected_infeasible": false,
+      "observed": "feasible",
+      "passed": true
+    },
+    {
+      "scenario": "occupancy_increase_small",
+      "parameters": {
+        "occupancy_multiplier": 1.05,
+        "enrollment_multiplier": 1.05
+      },
+      "scenario_id": "a91af0978fc9",
+      "simulation": {
+        "baseline_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "scenario_metrics": {
+          "seat_utilization_rate": 0.02643,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 32977.8,
+          "peak_occupancy": 231.0,
+          "observations": 86016
+        },
+        "metric_deltas": {
+          "seat_utilization_rate": 0.001255,
+          "room_frequency_of_use": 0.0,
+          "wasted_seat_hours": 1575.8,
+          "peak_occupancy": 11.0,
+          "observations": 0
+        },
+        "peak_occupancy": 231.0
+      },
+      "optimization": {
+        "milp": {
+          "status": "Optimal",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 174.0,
+          "unused_capacity_recomputed": 174.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 1.1631197999959113,
+          "diagnostic": null
+        },
+        "greedy": {
+          "status": "Greedy",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 174.0,
+          "unused_capacity_recomputed": 174.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.13972139998804778,
+          "diagnostic": null
+        }
+      },
+      "expected_infeasible": false,
+      "observed": "feasible",
+      "passed": true
+    },
+    {
+      "scenario": "occupancy_increase_moderate",
+      "parameters": {
+        "occupancy_multiplier": 1.15,
+        "enrollment_multiplier": 1.15
+      },
+      "scenario_id": "5d529b74e0aa",
+      "simulation": {
+        "baseline_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "scenario_metrics": {
+          "seat_utilization_rate": 0.028915,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 36174.8,
+          "peak_occupancy": 253.0,
+          "observations": 86016
+        },
+        "metric_deltas": {
+          "seat_utilization_rate": 0.00374,
+          "room_frequency_of_use": 0.0,
+          "wasted_seat_hours": 4772.8,
+          "peak_occupancy": 33.0,
+          "observations": 0
+        },
+        "peak_occupancy": 253.0
+      },
+      "optimization": {
+        "milp": {
+          "status": "Infeasible",
+          "feasible": false,
+          "assigned_sessions": 0,
+          "unassigned_sessions": 50,
+          "objective_unused_capacity": null,
+          "unused_capacity_recomputed": null,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.01118470000801608,
+          "diagnostic": "No suitable room for TT-0004"
+        },
+        "greedy": {
+          "status": "GreedyInfeasible",
+          "feasible": false,
+          "assigned_sessions": 1,
+          "unassigned_sessions": 49,
+          "objective_unused_capacity": null,
+          "unused_capacity_recomputed": 4.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.007502000007661991,
+          "diagnostic": "No available room for TT-0046"
+        }
+      },
+      "expected_infeasible": false,
+      "observed": "infeasible",
+      "passed": true
+    },
+    {
+      "scenario": "occupancy_increase_large",
+      "parameters": {
+        "occupancy_multiplier": 1.3,
+        "enrollment_multiplier": 1.3
+      },
+      "scenario_id": "d2057e2d12c5",
+      "simulation": {
+        "baseline_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "scenario_metrics": {
+          "seat_utilization_rate": 0.032577,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 41236.7,
+          "peak_occupancy": 280.0,
+          "observations": 86016
+        },
+        "metric_deltas": {
+          "seat_utilization_rate": 0.007402,
+          "room_frequency_of_use": 0.0,
+          "wasted_seat_hours": 9834.7,
+          "peak_occupancy": 60.0,
+          "observations": 0
+        },
+        "peak_occupancy": 280.0
+      },
+      "optimization": {
+        "milp": {
+          "status": "Infeasible",
+          "feasible": false,
+          "assigned_sessions": 0,
+          "unassigned_sessions": 50,
+          "objective_unused_capacity": null,
+          "unused_capacity_recomputed": null,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.012776000003213994,
+          "diagnostic": "No suitable room for TT-0004"
+        },
+        "greedy": {
+          "status": "GreedyInfeasible",
+          "feasible": false,
+          "assigned_sessions": 0,
+          "unassigned_sessions": 50,
+          "objective_unused_capacity": null,
+          "unused_capacity_recomputed": null,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.004329099989263341,
+          "diagnostic": "No available room for TT-0050"
+        }
+      },
+      "expected_infeasible": false,
+      "observed": "infeasible",
+      "passed": true
+    },
+    {
+      "scenario": "occupancy_decrease_small",
+      "parameters": {
+        "occupancy_multiplier": 0.9,
+        "enrollment_multiplier": 0.9
+      },
+      "scenario_id": "1ba9afcdeec2",
+      "simulation": {
+        "baseline_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "scenario_metrics": {
+          "seat_utilization_rate": 0.022657,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 28261.8,
+          "peak_occupancy": 198.0,
+          "observations": 86016
+        },
+        "metric_deltas": {
+          "seat_utilization_rate": -0.002518,
+          "room_frequency_of_use": 0.0,
+          "wasted_seat_hours": -3140.2,
+          "peak_occupancy": -22.0,
+          "observations": 0
+        },
+        "peak_occupancy": 198.0
+      },
+      "optimization": {
+        "milp": {
+          "status": "Optimal",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 294.0,
+          "unused_capacity_recomputed": 294.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 1.4705640000029234,
+          "diagnostic": null
+        },
+        "greedy": {
+          "status": "Greedy",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 294.0,
+          "unused_capacity_recomputed": 294.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.1519778999936534,
+          "diagnostic": null
+        }
+      },
+      "expected_infeasible": false,
+      "observed": "feasible",
+      "passed": true
+    },
+    {
+      "scenario": "room_closure",
+      "parameters": {
+        "occupancy_multiplier": 1.0,
+        "enrollment_multiplier": 1.0,
+        "closed_rooms": [
+          "B01-L203"
+        ]
+      },
+      "scenario_id": "9b89c083a412",
+      "simulation": {
+        "baseline_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "scenario_metrics": {
+          "seat_utilization_rate": 0.02392,
+          "room_frequency_of_use": 0.276972,
+          "wasted_seat_hours": 29767.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "metric_deltas": {
+          "seat_utilization_rate": -0.001255,
+          "room_frequency_of_use": -0.009812,
+          "wasted_seat_hours": -1635.0,
+          "peak_occupancy": 0.0,
+          "observations": 0
+        },
+        "peak_occupancy": 220.0
+      },
+      "optimization": {
+        "milp": {
+          "status": "Optimal",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 207.0,
+          "unused_capacity_recomputed": 207.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 1.2055472000065492,
+          "diagnostic": null
+        },
+        "greedy": {
+          "status": "Greedy",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 207.0,
+          "unused_capacity_recomputed": 207.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.16796900000190362,
+          "diagnostic": null
+        }
+      },
+      "expected_infeasible": false,
+      "observed": "feasible",
+      "passed": true
+    },
+    {
+      "scenario": "capacity_reduction",
+      "parameters": {
+        "occupancy_multiplier": 1.0,
+        "enrollment_multiplier": 1.0,
+        "capacity_adjustments": {
+          "B01-L203": 40.0
+        }
+      },
+      "scenario_id": "518145ab918a",
+      "simulation": {
+        "baseline_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "scenario_metrics": {
+          "seat_utilization_rate": 0.025487,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31405.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "metric_deltas": {
+          "seat_utilization_rate": 0.000312,
+          "room_frequency_of_use": 0.0,
+          "wasted_seat_hours": 3.0,
+          "peak_occupancy": 0.0,
+          "observations": 0
+        },
+        "peak_occupancy": 220.0
+      },
+      "optimization": {
+        "milp": {
+          "status": "Optimal",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 207.0,
+          "unused_capacity_recomputed": 207.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 1.1722619000065606,
+          "diagnostic": null
+        },
+        "greedy": {
+          "status": "Greedy",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 207.0,
+          "unused_capacity_recomputed": 207.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.15428719999908935,
+          "diagnostic": null
+        }
+      },
+      "expected_infeasible": false,
+      "observed": "feasible",
+      "passed": true
+    },
+    {
+      "scenario": "capacity_increase",
+      "parameters": {
+        "occupancy_multiplier": 1.0,
+        "enrollment_multiplier": 1.0,
+        "capacity_adjustments": {
+          "B01-L203": 60.0
+        }
+      },
+      "scenario_id": "138627d97ebb",
+      "simulation": {
+        "baseline_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "scenario_metrics": {
+          "seat_utilization_rate": 0.024966,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "metric_deltas": {
+          "seat_utilization_rate": -0.000209,
+          "room_frequency_of_use": 0.0,
+          "wasted_seat_hours": 0.0,
+          "peak_occupancy": 0.0,
+          "observations": 0
+        },
+        "peak_occupancy": 220.0
+      },
+      "optimization": {
+        "milp": {
+          "status": "Optimal",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 207.0,
+          "unused_capacity_recomputed": 207.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 1.149378699992667,
+          "diagnostic": null
+        },
+        "greedy": {
+          "status": "Greedy",
+          "feasible": true,
+          "assigned_sessions": 50,
+          "unassigned_sessions": 0,
+          "objective_unused_capacity": 207.0,
+          "unused_capacity_recomputed": 207.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.14640110000618733,
+          "diagnostic": null
+        }
+      },
+      "expected_infeasible": false,
+      "observed": "feasible",
+      "passed": true
+    },
+    {
+      "scenario": "combined_valid_perturbation",
+      "parameters": {
+        "occupancy_multiplier": 1.15,
+        "enrollment_multiplier": 1.1,
+        "closed_rooms": [
+          "B01-L203"
+        ],
+        "capacity_adjustments": {
+          "B01-L303": 32.0
+        }
+      },
+      "scenario_id": "d113fae23d76",
+      "simulation": {
+        "baseline_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "scenario_metrics": {
+          "seat_utilization_rate": 0.027741,
+          "room_frequency_of_use": 0.276972,
+          "wasted_seat_hours": 30926.0,
+          "peak_occupancy": 253.0,
+          "observations": 86016
+        },
+        "metric_deltas": {
+          "seat_utilization_rate": 0.002566,
+          "room_frequency_of_use": -0.009812,
+          "wasted_seat_hours": -476.0,
+          "peak_occupancy": 33.0,
+          "observations": 0
+        },
+        "peak_occupancy": 253.0
+      },
+      "optimization": {
+        "milp": {
+          "status": "Infeasible",
+          "feasible": false,
+          "assigned_sessions": 0,
+          "unassigned_sessions": 50,
+          "objective_unused_capacity": null,
+          "unused_capacity_recomputed": null,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.00698579999152571,
+          "diagnostic": "No suitable room for TT-0004"
+        },
+        "greedy": {
+          "status": "GreedyInfeasible",
+          "feasible": false,
+          "assigned_sessions": 1,
+          "unassigned_sessions": 49,
+          "objective_unused_capacity": null,
+          "unused_capacity_recomputed": 16.0,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.005986999996821396,
+          "diagnostic": "No available room for TT-0046"
+        }
+      },
+      "expected_infeasible": false,
+      "observed": "infeasible",
+      "passed": true
+    },
+    {
+      "scenario": "invalid_negative_multiplier",
+      "parameters": {
+        "occupancy_multiplier": -0.1,
+        "enrollment_multiplier": 1.0
+      },
+      "expected_invalid": true,
+      "observed": "rejected",
+      "passed": true,
+      "error_type": "ValueError",
+      "error": "scenario multipliers must be positive"
+    },
+    {
+      "scenario": "infeasible_demand",
+      "parameters": {
+        "occupancy_multiplier": 1.0,
+        "enrollment_multiplier": 100.0
+      },
+      "scenario_id": "7f0c18631e1d",
+      "simulation": {
+        "baseline_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 31402.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "scenario_metrics": {
+          "seat_utilization_rate": 0.025175,
+          "room_frequency_of_use": 0.286784,
+          "wasted_seat_hours": 7281064.0,
+          "peak_occupancy": 220.0,
+          "observations": 86016
+        },
+        "metric_deltas": {
+          "seat_utilization_rate": 0.0,
+          "room_frequency_of_use": 0.0,
+          "wasted_seat_hours": 7249662.0,
+          "peak_occupancy": 0.0,
+          "observations": 0
+        },
+        "peak_occupancy": 220.0
+      },
+      "optimization": {
+        "milp": {
+          "status": "Infeasible",
+          "feasible": false,
+          "assigned_sessions": 0,
+          "unassigned_sessions": 50,
+          "objective_unused_capacity": null,
+          "unused_capacity_recomputed": null,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.0029547000012826174,
+          "diagnostic": "No suitable room for TT-0001"
+        },
+        "greedy": {
+          "status": "GreedyInfeasible",
+          "feasible": false,
+          "assigned_sessions": 0,
+          "unassigned_sessions": 50,
+          "objective_unused_capacity": null,
+          "unused_capacity_recomputed": null,
+          "constraint_violations": {
+            "capacity": 0,
+            "room_type": 0,
+            "overlap": 0,
+            "duplicate_assignment": 0
+          },
+          "runtime_seconds": 0.003265600011218339,
+          "diagnostic": "No available room for TT-0050"
+        }
+      },
+      "expected_infeasible": true,
+      "observed": "infeasible",
+      "passed": true
+    }
+  ]
+}

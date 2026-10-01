@@ -1,0 +1,36 @@
+{
+  "component": "scenario",
+  "status": "verified",
+  "started_at_utc": "2026-09-27T01:01:29.948254+00:00",
+  "scenario_id": "7d1ec4ea14b6",
+  "parameters": {
+    "occupancy_multiplier": 1.15,
+    "closed_rooms": [
+      "B01-R101"
+    ],
+    "capacity_adjustments": {},
+    "enrollment_multiplier": 1.1
+  },
+  "baseline_metrics": {
+    "seat_utilization_rate": 0.025175,
+    "room_frequency_of_use": 0.286784,
+    "wasted_seat_hours": 31402.0,
+    "peak_occupancy": 220.0,
+    "observations": 86016
+  },
+  "scenario_metrics": {
+    "seat_utilization_rate": 0.02802,
+    "room_frequency_of_use": 0.278309,
+    "wasted_seat_hours": 29858.4,
+    "peak_occupancy": 253.0,
+    "observations": 86016
+  },
+  "metric_deltas": {
+    "seat_utilization_rate": 0.002845,
+    "room_frequency_of_use": -0.008475,
+    "wasted_seat_hours": -1543.6,
+    "peak_occupancy": 33.0,
+    "observations": 0
+  },
+  "scenario_artifact": "experiments/analytics/scenario_data.csv"
+}

@@ -1,0 +1,255 @@
+{
+  "overall_metrics": {
+    "baseline": {
+      "MAE": 2.5975,
+      "RMSE": 10.1839,
+      "R2": 0.2335,
+      "WAPE": 1.0272,
+      "sMAPE": 163.6674
+    },
+    "xgboost": {
+      "MAE": 1.2775,
+      "RMSE": 4.3961,
+      "R2": 0.8572,
+      "WAPE": 0.5052,
+      "sMAPE": 155.5725
+    },
+    "relative_mae_improvement_pct": 50.82,
+    "relative_rmse_improvement_pct": 56.83,
+    "r2_gain": 0.6237
+  },
+  "error_distribution": {
+    "baseline": {
+      "mean_bias": 0.9386,
+      "median_err": -0.1,
+      "std_err": 10.1405,
+      "skewness": 7.4289,
+      "p90_abs_err": 5.97,
+      "p99_abs_err": 51.997
+    },
+    "xgboost": {
+      "mean_bias": 0.1914,
+      "median_err": -0.1173,
+      "std_err": 4.3919,
+      "skewness": -2.0589,
+      "p90_abs_err": 1.946,
+      "p99_abs_err": 15.6383
+    }
+  },
+  "peak_period_slices": {
+    "Day Peak (10-12, 14-16)": {
+      "sample_count": 3584,
+      "baseline_MAE": 10.0153,
+      "baseline_RMSE": 23.4524,
+      "xgboost_MAE": 3.0934,
+      "xgboost_RMSE": 8.4766,
+      "mae_delta": 6.9219,
+      "mae_improvement_pct": 69.11
+    },
+    "Day Regular (08-10, 12-14, 16-18)": {
+      "sample_count": 5376,
+      "baseline_MAE": 2.6487,
+      "baseline_RMSE": 6.5858,
+      "xgboost_MAE": 1.9548,
+      "xgboost_RMSE": 4.9599,
+      "mae_delta": 0.6939,
+      "mae_improvement_pct": 26.2
+    },
+    "Evening (18-22)": {
+      "sample_count": 3584,
+      "baseline_MAE": 1.0498,
+      "baseline_RMSE": 2.5833,
+      "xgboost_MAE": 1.067,
+      "xgboost_RMSE": 2.5848,
+      "mae_delta": -0.0172,
+      "mae_improvement_pct": -1.64
+    },
+    "Night (22-08)": {
+      "sample_count": 8960,
+      "baseline_MAE": 0.2188,
+      "baseline_RMSE": 0.4558,
+      "xgboost_MAE": 0.229,
+      "xgboost_RMSE": 0.4552,
+      "mae_delta": -0.0102,
+      "mae_improvement_pct": -4.66
+    }
+  },
+  "occupancy_bracket_slices": {
+    "High (36+ occupants)": {
+      "sample_count": 370,
+      "baseline_MAE": 55.093,
+      "xgboost_MAE": 8.8124,
+      "mae_improvement_pct": 84.0
+    },
+    "Low / Idle (0-5 occupants)": {
+      "sample_count": 19816,
+      "baseline_MAE": 1.0366,
+      "xgboost_MAE": 0.6867,
+      "mae_improvement_pct": 33.75
+    },
+    "Moderate (6-35 occupants)": {
+      "sample_count": 1318,
+      "baseline_MAE": 11.3283,
+      "xgboost_MAE": 8.0446,
+      "mae_improvement_pct": 28.99
+    }
+  },
+  "day_type_slices": {
+    "Saturday (Half-Day)": {
+      "sample_count": 3072,
+      "baseline_MAE": 2.4165,
+      "baseline_RMSE": 10.2365,
+      "xgboost_MAE": 0.8716,
+      "xgboost_RMSE": 2.5701,
+      "mae_improvement_pct": 63.93
+    },
+    "Sunday (Weekend Idle)": {
+      "sample_count": 3072,
+      "baseline_MAE": 0.5155,
+      "baseline_RMSE": 1.4327,
+      "xgboost_MAE": 0.5621,
+      "xgboost_RMSE": 1.3923,
+      "mae_improvement_pct": -9.04
+    },
+    "Weekday (Mon-Fri)": {
+      "sample_count": 15360,
+      "baseline_MAE": 3.0501,
+      "baseline_RMSE": 11.1278,
+      "xgboost_MAE": 1.5018,
+      "xgboost_RMSE": 5.0346,
+      "mae_improvement_pct": 50.76
+    }
+  },
+  "room_type_slices": {
+    "Auditorium": {
+      "sample_count": 672,
+      "baseline_MAE": 9.2881,
+      "baseline_RMSE": 34.788,
+      "xgboost_MAE": 2.796,
+      "xgboost_RMSE": 14.5225,
+      "mae_improvement_pct": 69.9
+    },
+    "Computer Lab": {
+      "sample_count": 4704,
+      "baseline_MAE": 2.4313,
+      "baseline_RMSE": 5.0475,
+      "xgboost_MAE": 1.6465,
+      "xgboost_RMSE": 3.7536,
+      "mae_improvement_pct": 32.28
+    },
+    "Lecture Hall": {
+      "sample_count": 7392,
+      "baseline_MAE": 3.7394,
+      "baseline_RMSE": 12.7875,
+      "xgboost_MAE": 1.163,
+      "xgboost_RMSE": 4.4637,
+      "mae_improvement_pct": 68.9
+    },
+    "Seminar Room": {
+      "sample_count": 4704,
+      "baseline_MAE": 1.6747,
+      "baseline_RMSE": 4.0939,
+      "xgboost_MAE": 1.436,
+      "xgboost_RMSE": 3.3208,
+      "mae_improvement_pct": 14.25
+    },
+    "Tutorial Room": {
+      "sample_count": 4032,
+      "baseline_MAE": 0.6595,
+      "baseline_RMSE": 1.5368,
+      "xgboost_MAE": 0.619,
+      "xgboost_RMSE": 1.4451,
+      "mae_improvement_pct": 6.14
+    }
+  },
+  "hardest_rooms": [
+    {
+      "room_id": "B04-AUD01",
+      "room_type": "Auditorium",
+      "capacity": 280,
+      "baseline_MAE": 9.2881,
+      "xgboost_MAE": 2.796,
+      "mae_improvement_pct": 69.9
+    },
+    {
+      "room_id": "B02-L102",
+      "room_type": "Computer Lab",
+      "capacity": 60,
+      "baseline_MAE": 3.1688,
+      "xgboost_MAE": 2.1101,
+      "mae_improvement_pct": 33.41
+    },
+    {
+      "room_id": "B02-L101",
+      "room_type": "Computer Lab",
+      "capacity": 60,
+      "baseline_MAE": 3.0009,
+      "xgboost_MAE": 2.0927,
+      "mae_improvement_pct": 30.26
+    },
+    {
+      "room_id": "B04-R102",
+      "room_type": "Lecture Hall",
+      "capacity": 130,
+      "baseline_MAE": 4.9202,
+      "xgboost_MAE": 1.7544,
+      "mae_improvement_pct": 64.34
+    },
+    {
+      "room_id": "B01-L203",
+      "room_type": "Computer Lab",
+      "capacity": 50,
+      "baseline_MAE": 2.656,
+      "xgboost_MAE": 1.7357,
+      "mae_improvement_pct": 34.65
+    }
+  ],
+  "most_improved_rooms": [
+    {
+      "room_id": "B01-R102",
+      "room_type": "Lecture Hall",
+      "capacity": 100,
+      "baseline_MAE": 3.4458,
+      "xgboost_MAE": 0.8541,
+      "mae_improvement_pct": 75.21
+    },
+    {
+      "room_id": "B04-R201",
+      "room_type": "Lecture Hall",
+      "capacity": 100,
+      "baseline_MAE": 3.4884,
+      "xgboost_MAE": 0.9185,
+      "mae_improvement_pct": 73.67
+    },
+    {
+      "room_id": "B01-R101",
+      "room_type": "Lecture Hall",
+      "capacity": 120,
+      "baseline_MAE": 4.6399,
+      "xgboost_MAE": 1.3268,
+      "mae_improvement_pct": 71.4
+    },
+    {
+      "room_id": "B04-R101",
+      "room_type": "Lecture Hall",
+      "capacity": 150,
+      "baseline_MAE": 5.1277,
+      "xgboost_MAE": 1.5206,
+      "mae_improvement_pct": 70.35
+    },
+    {
+      "room_id": "B01-R201",
+      "room_type": "Lecture Hall",
+      "capacity": 80,
+      "baseline_MAE": 3.0399,
+      "xgboost_MAE": 0.9044,
+      "mae_improvement_pct": 70.25
+    }
+  ],
+  "visualizations": [
+    "docs\\assets\\residual_distribution.png",
+    "docs\\assets\\mae_by_hour.png",
+    "docs\\assets\\mae_by_room_type.png",
+    "docs\\assets\\forecast_time_series_sample.png"
+  ]
+}

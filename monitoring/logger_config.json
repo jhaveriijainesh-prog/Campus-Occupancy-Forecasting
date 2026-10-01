@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "json": {
+      "format": "{\"timestamp\": \"%(asctime)s\", \"level\": \"%(levelname)s\", \"logger\": \"%(name)s\", \"message\": \"%(message)s\"}",
+      "datefmt": "%Y-%m-%dT%H:%M:%SZ"
+    },
+    "standard": {
+      "format": "[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s",
+      "datefmt": "%Y-%m-%d %H:%M:%S"
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "level": "INFO",
+      "formatter": "standard",
+      "stream": "ext://sys.stdout"
+    },
+    "file_json": {
+      "class": "logging.FileHandler",
+      "level": "INFO",
+      "formatter": "json",
+      "filename": "logs/app.jsonl",
+      "encoding": "utf-8"
+    }
+  },
+  "root": {
+    "level": "INFO",
+    "handlers": ["console", "file_json"]
+  }
+}

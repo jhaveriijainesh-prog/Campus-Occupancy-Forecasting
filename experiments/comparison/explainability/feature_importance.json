@@ -1,0 +1,68 @@
+{
+  "method": "xgboost_gain",
+  "model_type": "XGBRegressor",
+  "best_iteration": 224,
+  "feature_count": 48,
+  "features": [
+    {
+      "feature": "enrollment_vs_rolling_mean_24h",
+      "normalized_gain": 0.158924
+    },
+    {
+      "feature": "is_scheduled",
+      "normalized_gain": 0.148326
+    },
+    {
+      "feature": "scheduled_enrollment",
+      "normalized_gain": 0.124702
+    },
+    {
+      "feature": "is_exam_period",
+      "normalized_gain": 0.11419
+    },
+    {
+      "feature": "room_type",
+      "normalized_gain": 0.06691
+    },
+    {
+      "feature": "lag_24h",
+      "normalized_gain": 0.064091
+    },
+    {
+      "feature": "has_event",
+      "normalized_gain": 0.059233
+    },
+    {
+      "feature": "capacity",
+      "normalized_gain": 0.048601
+    },
+    {
+      "feature": "lag_24h_utilization",
+      "normalized_gain": 0.033455
+    },
+    {
+      "feature": "is_holiday",
+      "normalized_gain": 0.026251
+    },
+    {
+      "feature": "is_weekend",
+      "normalized_gain": 0.021666
+    },
+    {
+      "feature": "room_id",
+      "normalized_gain": 0.017593
+    },
+    {
+      "feature": "rolling_mean_24h",
+      "normalized_gain": 0.011186
+    },
+    {
+      "feature": "rolling_std_24h",
+      "normalized_gain": 0.011154
+    },
+    {
+      "feature": "lag_168h",
+      "normalized_gain": 0.007912
+    }
+  ]
+}

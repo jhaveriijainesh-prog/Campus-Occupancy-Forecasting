@@ -1,0 +1,71 @@
+{
+  "generated_at_utc": "2026-09-27T01:01:31.763351+00:00",
+  "data_dir": "data/processed",
+  "random_seed": 42,
+  "components": [
+    {
+      "component": "clustering",
+      "status": "verified",
+      "started_at_utc": "2026-09-27T01:01:29.749619+00:00",
+      "selected_clusters": 6,
+      "silhouette_score": 0.4378954459308809,
+      "feature_names": [
+        "capacity",
+        "mean_utilization",
+        "peak_utilization",
+        "occupancy_std",
+        "off_peak_utilization"
+      ],
+      "rooms_profiled": 32,
+      "assignments_artifact": "experiments/analytics/clustering_assignments.csv"
+    },
+    {
+      "component": "scenario",
+      "status": "verified",
+      "started_at_utc": "2026-09-27T01:01:29.948254+00:00",
+      "scenario_id": "7d1ec4ea14b6",
+      "parameters": {
+        "occupancy_multiplier": 1.15,
+        "closed_rooms": [
+          "B01-R101"
+        ],
+        "capacity_adjustments": {},
+        "enrollment_multiplier": 1.1
+      },
+      "baseline_metrics": {
+        "seat_utilization_rate": 0.025175,
+        "room_frequency_of_use": 0.286784,
+        "wasted_seat_hours": 31402.0,
+        "peak_occupancy": 220.0,
+        "observations": 86016
+      },
+      "scenario_metrics": {
+        "seat_utilization_rate": 0.02802,
+        "room_frequency_of_use": 0.278309,
+        "wasted_seat_hours": 29858.4,
+        "peak_occupancy": 253.0,
+        "observations": 86016
+      },
+      "metric_deltas": {
+        "seat_utilization_rate": 0.002845,
+        "room_frequency_of_use": -0.008475,
+        "wasted_seat_hours": -1543.6,
+        "peak_occupancy": 33.0,
+        "observations": 0
+      },
+      "scenario_artifact": "experiments/analytics/scenario_data.csv"
+    },
+    {
+      "component": "optimization",
+      "status": "verified",
+      "started_at_utc": "2026-09-27T01:01:30.562306+00:00",
+      "feasible": true,
+      "solver_status": "Optimal",
+      "objective_value": 187.0,
+      "runtime_seconds": 1.199315,
+      "assignments": 50,
+      "infeasibility_reason": null,
+      "assignments_artifact": "experiments/analytics/optimization_assignments.csv"
+    }
+  ]
+}
