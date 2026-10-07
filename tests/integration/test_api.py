@@ -143,7 +143,7 @@ def test_forecast_uses_campus_local_time_for_timetable_features(monkeypatch):
 			headers={"X-API-Key": API_KEY},
 			params={
 				"horizon_hours": 1,
-				"start_time": "2026-10-08T08:00:00+05:30",
+				"start_time": "2026-10-08T07:00:00+05:30",
 			},
 		)
 
@@ -155,7 +155,7 @@ def test_forecast_uses_campus_local_time_for_timetable_features(monkeypatch):
 		"scheduled_enrollment": 95,
 	}
 	assert observed[1] == {
-		"hour": 8,
+		"hour": 7,
 		"is_scheduled": 0,
 		"scheduled_enrollment": 0,
 	}

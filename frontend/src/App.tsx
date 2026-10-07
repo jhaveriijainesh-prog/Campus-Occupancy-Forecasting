@@ -640,7 +640,7 @@ function OverviewPage() {
   if (error) return <ErrorPanel message={error} />
 
   const utilizationData = [
-    { name: 'Seat utilization', value: metrics?.metrics.seat_utilization_rate },
+    { name: 'Seat use (open hours)', value: metrics?.metrics.seat_utilization_rate },
     { name: 'Room frequency', value: metrics?.metrics.room_frequency_of_use },
   ].filter(
     (item): item is { name: string; value: number } =>
@@ -656,9 +656,9 @@ function OverviewPage() {
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Seats in use"
+          label="Seat use (open hours)"
           value={formatPercent(metrics?.metrics.seat_utilization_rate)}
-          hint="of available seats"
+          hint="of capacity, 7:00 AM–9:00 PM"
         />
         <StatCard
           label="Room use"
@@ -1265,7 +1265,7 @@ function RoomsPage() {
         <>
           <div className="grid gap-4 md:grid-cols-4">
             <StatCard
-              label="Seats in use"
+              label="Seat use (open hours)"
               value={formatPercent(metrics?.metrics.seat_utilization_rate)}
               hint="of available seats"
             />

@@ -54,6 +54,45 @@ def test_aggregate_sur_weights_occupancy_by_capacity():
 	assert calculate_utilization_metrics(frame)["seat_utilization_rate"] == round(100 / 110, 6)
 
 
+def test_utilization_and_wasted_seat_hours_exclude_closed_hours():
+	frame = pd.DataFrame(
+		[
+			{"room_id": "B01-R101", "capacity": 100, "actual_headcount": 40, "is_scheduled": True, "scheduled_enrollment": 50, "hour": 10},
+			{"room_id": "B01-R101", "capacity": 100, "actual_headcount": 100, "is_scheduled": True, "scheduled_enrollment": 100, "hour": 23},
+		]
+	)
+
+	result = calculate_utilization_metrics(
+		frame,
+		operating_hours_start=7,
+		operating_hours_end=21,
+		available_slot_hours=14,
+	)
+
+	assert result["seat_utilization_rate"] == 0.4
+	assert result["wasted_seat_hours"] == 10.0
+	assert result["peak_occupancy"] == 40.0
+
+
+def test_metrics_return_zero_when_filtered_rows_have_no_open_hours():
+	frame = pd.DataFrame(
+		[
+			{"room_id": "B01-R101", "capacity": 100, "actual_headcount": 25, "is_scheduled": False, "scheduled_enrollment": 0, "hour": 0},
+		]
+	)
+
+	result = calculate_utilization_metrics(
+		frame,
+		operating_hours_start=7,
+		operating_hours_end=21,
+		available_slot_hours=0,
+	)
+
+	assert result["seat_utilization_rate"] == 0.0
+	assert result["room_frequency_of_use"] == 0.0
+	assert result["peak_occupancy"] == 0.0
+
+
 def test_wasted_seat_hours_ignore_unscheduled_enrollment():
 	frame = pd.DataFrame(
 		[

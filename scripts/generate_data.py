@@ -183,26 +183,33 @@ def generate_timetable(rooms_df: pd.DataFrame, rng: np.random.Generator) -> pd.D
                 timetable_counter += 1
                 scheduled_count += 1
 
-    scheduled_room_ids = {record["room_id"] for record in timetable_records}
+    minimum_weekly_hours = 15
     for room in rooms_df.to_dict(orient="records"):
         room_id = room["room_id"]
-        if room_id in scheduled_room_ids:
+        scheduled_hours = sum(
+            record["duration_hours"]
+            for record in timetable_records
+            if record["room_id"] == room_id
+        )
+        hours_to_fill = max(0, minimum_weekly_hours - scheduled_hours)
+        if not hours_to_fill:
             continue
-
         enrollment = max(1, int(round(room["capacity"] * 0.7)))
         available_slots = [
             (day, hour)
-            for day in days
-            for hour in (operating_hours if day != "Saturday" else [9, 10, 11])
+            for day in days[:5]
+            for hour in operating_hours
             if (room_id, day, hour) not in occupied_slots
         ]
-        chosen_indices = rng.choice(len(available_slots), size=3, replace=False)
+        if len(available_slots) < hours_to_fill:
+            raise ValueError(f"Unable to fill the weekly demo schedule for room {room_id}")
+        chosen_indices = rng.choice(len(available_slots), size=hours_to_fill, replace=False)
         for day, start_hour in (available_slots[int(index)] for index in chosen_indices):
             occupied_slots.add((room_id, day, start_hour))
             timetable_records.append({
                 "timetable_id": f"TT-{timetable_counter:04d}",
                 "course_code": f"SYN-{room_id}",
-                "course_name": f"Synthetic {room['room_type']} session",
+                "course_name": f"Synthetic {room['room_type']} demo session",
                 "instructor_id": f"INST-SYN-{room_id}",
                 "enrolled_count": enrollment,
                 "day_of_week": day,

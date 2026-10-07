@@ -76,12 +76,13 @@ Captures weekly recurrent scheduled course sessions across programs.
 | `room_type_required`| `VARCHAR(32)`| No | `Lecture Hall` | Required pedagogical room facility |
 | `academic_term`| `VARCHAR(32)` | No | `Semester V - Fall 2026` | Academic semester and term |
 
-The catalog-generated timetable may not naturally assign a course to every room. To
-make the forecast demo useful for every selectable room, the generator adds three
-weekly `SYN-` demonstration sessions to each otherwise-unscheduled room, with
-enrollment set to 70% of that room's capacity. These are explicitly synthetic
-examples, not real course registrations or institutional timetable data. With
-seed 42, the resulting 101 timetable entries cover all 32 rooms.
+The catalog-generated timetable may leave rooms underused. To give every room a
+useful forecast example, the generator fills each room to at least 15 scheduled
+room-hours per Monday–Friday week. Added one-hour `SYN-` sessions use enrollment
+set to 70% of room capacity. These are synthetic demonstration assumptions, not
+real course registrations or institutional timetable data. With seed 42, the
+resulting timetable has 467 entries (417 synthetic), covers all 32 rooms, and
+contains 480 scheduled room-hours per week.
 
 ### 3.3 `data/raw/events.csv` (Academic Calendar Events)
 Documents calendar interruptions that modulate regular campus operations.
@@ -195,25 +196,30 @@ Running the generator with `--seed 42` yields the following verified empirical d
 |                             STATISTICAL BENCHMARKS (SEED = 42)                                |
 +-------------------------------+---------------------------------------------------------------+
 | Total Hourly Observations     | 86,016 rows (32 rooms * 112 days * 24 hours)                  |
-| Scheduled Class Observations  | 1,824 hours (2.12% of total campus-room hours)                |
-| Mean Scheduled Occupancy      | 30.49 occupants (std: 30.58, max: 216 in Auditorium)          |
-| Mean Unscheduled Occupancy    | 1.25 occupants (std: 7.46, median: 0.0)                       |
+| Scheduled Class Observations  | 7,680 hours (8.93% of total campus-room hours)                |
+| Mean Scheduled Occupancy      | 28.59 occupants (std: 30.78, max: 225 in Auditorium)          |
+| Mean Unscheduled Occupancy    | 1.10 occupants (std: 6.76, median: 0.0)                       |
 | Deep Night Mean (00:00-06:00) | 0.08 occupants (Idle baseline verified)                       |
-| Midday Peak Mean (10:00-11:00)| 6.69 occupants across all campus rooms                        |
-| Afternoon Peak (14:00-15:00)  | 6.45 occupants across all campus rooms                        |
-| Sunday Mean Headcount         | 0.34 occupants (Near-zero weekend idle verified)              |
+| Midday Peak Mean (10:00-11:00)| 11.61 occupants across all campus rooms                       |
+| Afternoon Peak (14:00-15:00)  | 12.13 occupants across all campus rooms                       |
+| Sunday Mean Headcount         | 0.35 occupants (Near-zero weekend idle verified)              |
 +-------------------------------+---------------------------------------------------------------+
 ```
 
+Seed 42 produces 5.23% seat utilization across all 24-hour observations and
+8.82% during the configured 07:00–21:00 campus operating hours. The dashboard's
+"Seat use (open hours)" KPI uses the latter denominator so closed-night hours do
+not make the campus appear less occupied than it is while open.
+
 ### Anomaly Distribution Verification
 The generator produced realistic, calibrated anomalies across the semester:
-- **`none` (Normal operation):** 84,707 records (98.48%)
-- **`unscheduled_group` (Informal student gatherings):** 694 records (0.81%)
-- **`weekend_activity` (Weekend labs/hackathons):** 353 records (0.41%)
-- **`evening_club_activity` (Late-night lab work):** 226 records (0.26%)
-- **`class_cancellation` (Sudden faculty cancellation):** 19 records (0.02%)
-- **`sensor_dropout_glitch` (Hardware sensor dropout):** 9 records (0.01%)
-- **`overcrowding_surge` (Guest lecture / joint section):** 8 records (0.01%)
+- **`none` (Normal operation):** 84,675 records (98.44%)
+- **`unscheduled_group` (Informal student gatherings):** 538 records (0.63%)
+- **`weekend_activity` (Weekend labs/hackathons):** 379 records (0.44%)
+- **`evening_club_activity` (Late-night lab work):** 252 records (0.29%)
+- **`class_cancellation` (Sudden faculty cancellation):** 82 records (0.10%)
+- **`overcrowding_surge` (Guest lecture / joint section):** 54 records (0.06%)
+- **`sensor_dropout_glitch` (Hardware sensor dropout):** 36 records (0.04%)
 
 ---
 

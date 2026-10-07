@@ -47,7 +47,6 @@ def calculate_utilization_metrics(
 	scheduled = pd.to_numeric(frame["scheduled_enrollment"], errors="coerce").fillna(0).clip(lower=0)
 	scheduled = scheduled.where(frame["is_scheduled"].fillna(False).astype(bool), 0)
 	valid_capacity = capacity > 0
-	utilization = (actual[valid_capacity] / capacity[valid_capacity]).clip(lower=0)
 	if "hour" in frame.columns and operating_hours_start is not None and operating_hours_end is not None:
 		hours = pd.to_numeric(frame["hour"], errors="coerce")
 		operating_slots = hours.ge(operating_hours_start) & hours.lt(operating_hours_end)
@@ -59,12 +58,14 @@ def calculate_utilization_metrics(
 		operating_slots = pd.Series(True, index=frame.index)
 	occupied_slots = int(((actual > 0) & operating_slots).sum())
 	total_slots = available_slot_hours if available_slot_hours is not None else int(operating_slots.sum())
+	valid_operating_slots = valid_capacity & operating_slots
+	operating_actual = actual[operating_slots]
 
 	return {
-		"seat_utilization_rate": round(float(actual[valid_capacity].sum() / capacity[valid_capacity].sum()) if not utilization.empty else 0.0, 6),
+		"seat_utilization_rate": round(float(actual[valid_operating_slots].sum() / capacity[valid_operating_slots].sum()) if capacity[valid_operating_slots].sum() > 0 else 0.0, 6),
 		"room_frequency_of_use": round(occupied_slots / total_slots if total_slots else 0.0, 6),
-		"wasted_seat_hours": round(float((scheduled.sub(actual).clip(lower=0) * slot_duration_hours).sum()), 6),
-		"peak_occupancy": round(float(actual.max()), 6),
+		"wasted_seat_hours": round(float((scheduled.sub(actual).clip(lower=0) * slot_duration_hours).where(operating_slots, 0).sum()), 6),
+		"peak_occupancy": round(float(operating_actual.max()), 6) if not operating_actual.empty else 0.0,
 		"observations": total_slots,
 	}
 

@@ -25,8 +25,18 @@ def test_timetable_covers_every_room_with_capacity_safe_non_overlapping_sessions
         )
 
     synthetic_sessions = timetable.loc[timetable["course_code"].str.startswith("SYN-")]
-    catalog_rooms = set(
-        timetable.loc[~timetable["course_code"].str.startswith("SYN-"), "room_id"]
+    catalog_timetable = timetable.loc[~timetable["course_code"].str.startswith("SYN-")]
+    catalog_hours = catalog_timetable.groupby("room_id")["duration_hours"].sum()
+    catalog_hours = catalog_hours.reindex(rooms["room_id"], fill_value=0)
+    expected_synthetic_rooms = set(
+        catalog_hours[catalog_hours < 15].index
     )
-    assert set(synthetic_sessions["room_id"]) == set(rooms["room_id"]) - catalog_rooms
-    assert synthetic_sessions["room_id"].value_counts().eq(3).all()
+    assert set(synthetic_sessions["room_id"]) == expected_synthetic_rooms
+    weekly_room_hours = timetable.groupby("room_id")["duration_hours"].sum()
+    assert weekly_room_hours.ge(15).all()
+
+    synthetic_capacities = synthetic_sessions["room_id"].map(capacities)
+    expected_enrollment = synthetic_capacities.mul(0.7).round().clip(lower=1)
+    assert synthetic_sessions["enrolled_count"].reset_index(drop=True).equals(
+        expected_enrollment.reset_index(drop=True).astype(int)
+    )
