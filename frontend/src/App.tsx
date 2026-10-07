@@ -1,9 +1,14 @@
 import {
+  ArrowRight,
   BarChart3,
   Building2,
+  CalendarDays,
+  CircleHelp,
   HeartPulse,
   LayoutDashboard,
+  Map,
   ShieldCheck,
+  Sparkles,
   TrendingUp,
   Workflow,
 } from 'lucide-react'
@@ -19,7 +24,14 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { NavLink, Route, Routes, useLocation } from 'react-router-dom'
+import {
+  Link,
+  Navigate,
+  NavLink,
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom'
 import { ApiError, api } from './api/client'
 import type {
   ClusterResponse,
@@ -56,6 +68,15 @@ function errorMessage(error: unknown): string {
 }
 
 function StatusBadge({ status }: { status: string }) {
+  const labels: Record<string, string> = {
+    ready: 'Ready',
+    healthy: 'Connected',
+    degraded: 'Limited',
+    unavailable: 'Offline',
+    missing: 'Missing',
+    not_ready: 'Needs attention',
+    checking: 'Checking',
+  }
   const palette = {
     ready: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/40',
     healthy: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/40',
@@ -70,7 +91,7 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${palette[status as keyof typeof palette] ?? palette.default}`}
     >
-      {status}
+      {labels[status] ?? status}
     </span>
   )
 }
@@ -122,13 +143,13 @@ function AppShell() {
   const pageTitle =
     (
       {
-        '/': 'Overview',
-        '/forecast': 'Forecast Explorer',
-        '/rooms': 'Room Intelligence',
-        '/optimization': 'What-if Planner',
-        '/health': 'System Health',
+        '/dashboard': 'Campus overview',
+        '/forecast': 'Room forecast',
+        '/rooms': 'Explore rooms',
+        '/optimization': 'Scenario planner',
+        '/health': 'System status',
       } as Record<string, string>
-    )[location.pathname] ?? 'Overview'
+    )[location.pathname] ?? 'Campus overview'
 
   useEffect(() => {
     let active = true
@@ -152,11 +173,11 @@ function AppShell() {
   }, [])
 
   const navItems = [
-    { to: '/', label: 'Overview', icon: LayoutDashboard },
-    { to: '/forecast', label: 'Forecast Explorer', icon: TrendingUp },
-    { to: '/rooms', label: 'Room Intelligence', icon: Building2 },
-    { to: '/optimization', label: 'What-if Planner', icon: Workflow },
-    { to: '/health', label: 'System Health', icon: HeartPulse },
+    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/forecast', label: 'Forecast a room', icon: TrendingUp },
+    { to: '/rooms', label: 'Explore rooms', icon: Building2 },
+    { to: '/optimization', label: 'Try a scenario', icon: Workflow },
+    { to: '/health', label: 'System status', icon: HeartPulse },
   ]
 
   return (
@@ -172,9 +193,7 @@ function AppShell() {
                 BDS-06
               </div>
               <div className="text-base font-semibold leading-tight text-white">
-                Campus Occupancy
-                <br />
-                Intelligence
+                Campus insights
               </div>
             </div>
           </div>
@@ -203,11 +222,9 @@ function AppShell() {
               <ShieldCheck className="h-3.5 w-3.5" />
               Demo environment
             </div>
-            <div className="font-medium text-emerald-300">
-              Synthetic demo data
-            </div>
+            <div className="font-medium text-emerald-300">Demo workspace</div>
             <div className="mt-1 text-xs text-slate-400">
-              Interactive analytics · synthetic data
+              Uses synthetic demonstration data
             </div>
           </div>
         </aside>
@@ -217,7 +234,7 @@ function AppShell() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.18em] text-cyan-300">
-                  BDS-06 · Campus Occupancy Intelligence
+                  BDS-06 · Campus insights
                 </div>
                 <div className="mt-1 text-xl font-semibold text-white">
                   {pageTitle}
@@ -226,8 +243,14 @@ function AppShell() {
               <div className="flex items-center gap-3">
                 <StatusBadge status={apiStatus} />
                 <div className="hidden text-xs text-slate-400 sm:block">
-                  Live API
+                  API connection
                 </div>
+                <Link
+                  to="/"
+                  className="hidden rounded-xl border border-slate-700 px-3 py-2 text-xs font-medium text-slate-300 transition hover:bg-slate-800/80 sm:inline-flex"
+                >
+                  Demo home
+                </Link>
               </div>
             </div>
           </header>
@@ -237,7 +260,7 @@ function AppShell() {
               <NavLink
                 key={to}
                 to={to}
-                end={to === '/'}
+                end={to === '/dashboard'}
                 className={({ isActive }) =>
                   isActive ? 'mobile-nav-link active' : 'mobile-nav-link'
                 }
@@ -250,11 +273,12 @@ function AppShell() {
 
           <main className="mx-auto w-full max-w-[1500px] flex-1 p-4 sm:p-6">
             <Routes>
-              <Route path="/" element={<OverviewPage />} />
+              <Route path="/dashboard" element={<OverviewPage />} />
               <Route path="/forecast" element={<ForecastPage />} />
               <Route path="/rooms" element={<RoomsPage />} />
               <Route path="/optimization" element={<OptimizationPage />} />
               <Route path="/health" element={<HealthPage />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </main>
         </div>
@@ -272,12 +296,160 @@ function PageIntro({
 }) {
   return (
     <div className="mb-6">
-      <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-300">
-        Campus operations / BDS-06
-      </div>
       <h1 className="text-3xl font-semibold text-white">{title}</h1>
       <p className="mt-2 text-sm text-slate-300">{description}</p>
     </div>
+  )
+}
+
+function WelcomePage() {
+  return (
+    <main className="welcome-screen">
+      <div className="welcome-container">
+        <header className="welcome-header">
+          <Link
+            to="/"
+            className="welcome-brand"
+            aria-label="Campus insights home"
+          >
+            <span className="welcome-brand-icon">
+              <BarChart3 aria-hidden="true" />
+            </span>
+            <span>
+              <span className="welcome-brand-kicker">BDS-06 CAPSTONE</span>
+              <span className="welcome-brand-name">Campus insights</span>
+            </span>
+          </Link>
+          <span className="demo-label">
+            <span className="demo-dot" />
+            Interactive demo
+          </span>
+        </header>
+
+        <section className="welcome-hero">
+          <div className="welcome-copy">
+            <div className="welcome-eyebrow">
+              <Sparkles aria-hidden="true" />A clearer view of campus space
+            </div>
+            <h1>
+              Make every
+              <br />
+              campus space
+              <br />
+              <span>work smarter.</span>
+            </h1>
+            <p>
+              See how rooms are used, explore upcoming occupancy, and compare
+              simple planning scenarios — all in one place.
+            </p>
+            <Link to="/dashboard" className="welcome-primary-button">
+              Open the demo workspace
+              <ArrowRight aria-hidden="true" />
+            </Link>
+            <div className="welcome-note">
+              <ShieldCheck aria-hidden="true" />
+              No account needed · Synthetic demo data only
+            </div>
+          </div>
+
+          <div className="welcome-preview" aria-label="Workspace preview">
+            <div className="preview-topline">
+              <div>
+                <span className="preview-kicker">YOUR CAMPUS, AT A GLANCE</span>
+                <h2>From questions to decisions</h2>
+              </div>
+              <span className="preview-mark">
+                <Map aria-hidden="true" />
+              </span>
+            </div>
+            <div className="preview-flow">
+              <div className="preview-step">
+                <span className="preview-step-number">01</span>
+                <span className="preview-step-icon">
+                  <LayoutDashboard aria-hidden="true" />
+                </span>
+                <span>
+                  <strong>See the big picture</strong>
+                  <small>Start with a campus snapshot</small>
+                </span>
+              </div>
+              <div className="preview-connector" />
+              <div className="preview-step">
+                <span className="preview-step-number">02</span>
+                <span className="preview-step-icon">
+                  <CalendarDays aria-hidden="true" />
+                </span>
+                <span>
+                  <strong>Explore what’s next</strong>
+                  <small>Choose a room and forecast time</small>
+                </span>
+              </div>
+              <div className="preview-connector" />
+              <div className="preview-step">
+                <span className="preview-step-number">03</span>
+                <span className="preview-step-icon">
+                  <Workflow aria-hidden="true" />
+                </span>
+                <span>
+                  <strong>Compare a plan</strong>
+                  <small>Change a few options, then review</small>
+                </span>
+              </div>
+            </div>
+            <div className="preview-footnote">
+              <CircleHelp aria-hidden="true" />
+              Every result is explained in plain language.
+            </div>
+          </div>
+        </section>
+
+        <section className="welcome-shortcuts">
+          <div className="shortcuts-heading">
+            <div>
+              <span className="preview-kicker">PICK UP WHERE YOU NEED</span>
+              <h2>What would you like to do?</h2>
+            </div>
+            <span className="shortcuts-hint">Choose one to get started</span>
+          </div>
+          <div className="shortcut-grid">
+            <Link to="/dashboard" className="shortcut-card">
+              <span className="shortcut-icon">
+                <LayoutDashboard aria-hidden="true" />
+              </span>
+              <span>
+                <strong>See the campus overview</strong>
+                <small>Key space-use measures in one view</small>
+              </span>
+              <ArrowRight aria-hidden="true" className="shortcut-arrow" />
+            </Link>
+            <Link to="/forecast" className="shortcut-card">
+              <span className="shortcut-icon">
+                <TrendingUp aria-hidden="true" />
+              </span>
+              <span>
+                <strong>Forecast a room</strong>
+                <small>Get an occupancy estimate for a time</small>
+              </span>
+              <ArrowRight aria-hidden="true" className="shortcut-arrow" />
+            </Link>
+            <Link to="/optimization" className="shortcut-card">
+              <span className="shortcut-icon">
+                <Workflow aria-hidden="true" />
+              </span>
+              <span>
+                <strong>Try a planning scenario</strong>
+                <small>Compare a change with the baseline</small>
+              </span>
+              <ArrowRight aria-hidden="true" className="shortcut-arrow" />
+            </Link>
+          </div>
+          <footer className="welcome-footer">
+            <span>Campus Occupancy Forecasting · Capstone demonstration</span>
+            <span>Synthetic data · Not live campus telemetry</span>
+          </footer>
+        </section>
+      </div>
+    </main>
   )
 }
 
@@ -332,35 +504,35 @@ function OverviewPage() {
   return (
     <>
       <PageIntro
-        title="Overview"
-        description="Campus-level operational snapshot using the verified FastAPI metrics contract."
+        title="Campus overview"
+        description="A quick, clear look at how campus spaces are being used."
       />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Seat utilization rate"
+          label="Seats in use"
           value={formatPercent(metrics?.metrics.seat_utilization_rate)}
-          hint="SUR"
+          hint="of available seats"
         />
         <StatCard
-          label="Room frequency of use"
+          label="Room use"
           value={formatPercent(metrics?.metrics.room_frequency_of_use)}
-          hint="RFU"
+          hint="how often rooms are used"
         />
         <StatCard
-          label="Wasted seat-hours"
+          label="Unused seat-hours"
           value={formatNumber(metrics?.metrics.wasted_seat_hours)}
-          hint="WSH"
+          hint="available capacity not used"
         />
         <StatCard
-          label="Peak occupancy"
+          label="Busiest occupancy"
           value={formatNumber(metrics?.metrics.peak_occupancy)}
           hint="people"
         />
       </div>
 
       <div className="mb-6 grid gap-3 md:grid-cols-3">
-        <Card title="API status">
+        <Card title="Connection">
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-2xl font-semibold text-white">
@@ -374,7 +546,7 @@ function OverviewPage() {
           </div>
         </Card>
 
-        <Card title="Readiness">
+        <Card title="Service readiness">
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-2xl font-semibold text-white">
@@ -389,7 +561,7 @@ function OverviewPage() {
           </div>
         </Card>
 
-        <Card title="Source timestamp">
+        <Card title="Data updated">
           <div className="text-2xl font-semibold text-white">
             {formatTimestamp(metrics?.source_timestamp)}
           </div>
@@ -400,7 +572,7 @@ function OverviewPage() {
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <Card title="Utilization rates">
+        <Card title="Campus space use">
           {utilizationData.length > 0 ? (
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
@@ -441,11 +613,11 @@ function OverviewPage() {
           )}
         </Card>
 
-        <Card title="Operational context">
+        <Card title="About this snapshot">
           <div className="space-y-3">
             <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
               <div className="text-xs uppercase tracking-[0.12em] text-slate-400">
-                Scope
+                View
               </div>
               <div className="mt-1 text-lg font-medium text-white">
                 {metrics?.scope ?? 'campus'}
@@ -453,7 +625,7 @@ function OverviewPage() {
             </div>
             <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
               <div className="text-xs uppercase tracking-[0.12em] text-slate-400">
-                Observations
+                Records analyzed
               </div>
               <div className="mt-1 text-lg font-medium text-white">
                 {formatNumber(metrics?.metrics.observations)}
@@ -461,7 +633,7 @@ function OverviewPage() {
             </div>
             <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
               <div className="text-xs uppercase tracking-[0.12em] text-slate-400">
-                Latest data
+                Most recent data
               </div>
               <div className="mt-1 text-sm text-slate-200">
                 {formatTimestamp(metrics?.source_timestamp)}
@@ -476,6 +648,8 @@ function OverviewPage() {
 
 function ForecastPage() {
   const [roomId, setRoomId] = useState('B01-R101')
+  const [roomOptions, setRoomOptions] = useState<string[]>([])
+  const [roomListError, setRoomListError] = useState<string | null>(null)
   const [forecastTime, setForecastTime] = useState(() => {
     const target = new Date(Date.now() + 60 * 60 * 1000)
     target.setMinutes(0, 0, 0)
@@ -492,16 +666,31 @@ function ForecastPage() {
   useEffect(() => {
     let active = true
     const load = async () => {
-      try {
-        const modelInfo = await api.modelInfo()
-        if (!active) return
-        setModel(modelInfo)
-      } catch (err) {
-        if (!active) return
-        setError(errorMessage(err))
-      } finally {
-        if (active) setStatusLoading(false)
+      const [modelResult, roomsResult] = await Promise.allSettled([
+        api.modelInfo(),
+        api.clusters(),
+      ])
+      if (!active) return
+
+      if (modelResult.status === 'fulfilled') {
+        setModel(modelResult.value)
+      } else {
+        setError(errorMessage(modelResult.reason))
       }
+
+      if (roomsResult.status === 'fulfilled') {
+        const roomIds = roomsResult.value.rooms.map((room) => room.room_id)
+        setRoomOptions(roomIds)
+        if (roomIds.length) {
+          setRoomId((current) =>
+            roomIds.includes(current) ? current : roomIds[0],
+          )
+        }
+      } else {
+        setRoomListError(errorMessage(roomsResult.reason))
+      }
+
+      setStatusLoading(false)
     }
 
     void load()
@@ -535,27 +724,48 @@ function ForecastPage() {
   return (
     <>
       <PageIntro
-        title="Forecast Explorer"
-        description="Choose a room and target time to get a one-hour occupancy forecast from the trained model."
+        title="Forecast a room"
+        description="Choose a room and time. We’ll estimate how many people may be there one hour later."
       />
 
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <Card title="Forecast controls">
+        <Card title="1. Choose what to forecast">
           <form className="space-y-4" onSubmit={handleForecast}>
             <label className="block text-sm text-slate-300">
-              Room ID
-              <input
-                required
-                aria-label="Room ID"
-                value={roomId}
-                onChange={(event) => setRoomId(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none ring-0 transition focus:border-cyan-400"
-                placeholder="B01-R101"
-              />
+              Room
+              {roomOptions.length ? (
+                <select
+                  required
+                  aria-label="Choose a room"
+                  value={roomId}
+                  onChange={(event) => setRoomId(event.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+                >
+                  {roomOptions.map((room) => (
+                    <option key={room} value={room}>
+                      {room}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  required
+                  aria-label="Room ID"
+                  value={roomId}
+                  onChange={(event) => setRoomId(event.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none ring-0 transition focus:border-cyan-400"
+                  placeholder="For example, B01-R101"
+                />
+              )}
+              {roomListError ? (
+                <span className="mt-1 block text-xs text-slate-400">
+                  Room suggestions could not load. Enter a room ID instead.
+                </span>
+              ) : null}
             </label>
 
             <label className="block text-sm text-slate-300">
-              Forecast target time
+              When should we check?
               <input
                 required
                 type="datetime-local"
@@ -566,9 +776,9 @@ function ForecastPage() {
             </label>
 
             <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-3 text-sm text-slate-300">
-              Supported horizon:{' '}
+              We’ll estimate occupancy for:{' '}
               <span className="font-semibold text-white">
-                {model?.supported_horizon_hours ?? 1} hour
+                one hour after your selected time
               </span>
             </div>
 
@@ -577,7 +787,7 @@ function ForecastPage() {
               disabled={loading || !roomId.trim() || !forecastTime}
               className="w-full rounded-xl bg-cyan-500 px-4 py-2.5 font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
             >
-              {loading ? 'Generating forecast…' : 'Generate forecast'}
+              {loading ? 'Creating estimate…' : 'Show me the estimate'}
             </button>
 
             {model ? (
@@ -594,7 +804,7 @@ function ForecastPage() {
           </form>
         </Card>
 
-        <Card title="Forecast result">
+        <Card title="2. Review the estimate">
           {error ? (
             <ErrorPanel message={error} />
           ) : forecast ? (
@@ -699,15 +909,31 @@ function RoomsPage() {
     let active = true
     const load = async () => {
       try {
-        const [roomMetrics, clusterData] = await Promise.allSettled([
-          api.utilization({ scope: 'room', room_id: 'B01-R101' }),
-          api.clusters(),
-        ])
-        if (!active) return
-        if (roomMetrics.status === 'fulfilled') setMetrics(roomMetrics.value)
-        else setError(errorMessage(roomMetrics.reason))
-        if (clusterData.status === 'fulfilled') setClusters(clusterData.value)
-        else setClusterError(errorMessage(clusterData.reason))
+        let initialRoomId = 'B01-R101'
+        try {
+          const clusterData = await api.clusters()
+          if (!active) return
+          setClusters(clusterData)
+          initialRoomId =
+            clusterData.rooms.find((room) => room.room_id === initialRoomId)
+              ?.room_id ??
+            clusterData.rooms[0]?.room_id ??
+            initialRoomId
+          setRoomId(initialRoomId)
+        } catch (err) {
+          if (!active) return
+          setClusterError(errorMessage(err))
+        }
+
+        try {
+          const roomMetrics = await api.utilization({
+            scope: 'room',
+            room_id: initialRoomId,
+          })
+          if (active) setMetrics(roomMetrics)
+        } catch (err) {
+          if (active) setError(errorMessage(err))
+        }
       } finally {
         if (active) setLoading(false)
       }
@@ -747,37 +973,46 @@ function RoomsPage() {
   return (
     <>
       <PageIntro
-        title="Room Intelligence"
-        description="Enter a room ID to query its utilization, occupancy, and behavioral cluster."
+        title="Explore a room"
+        description="Choose a room to understand its use and how it compares with similar spaces."
       />
 
-      <Card title="Room lookup" className="mb-6">
+      <Card title="1. Choose a room" className="mb-6">
         <form
           className="flex flex-col gap-3 sm:flex-row sm:items-end"
           onSubmit={handleRoomQuery}
         >
           <label className="block flex-1 text-sm text-slate-300">
-            Room ID
-            <input
-              required
-              list="known-room-ids"
-              value={roomId}
-              onChange={(event) => setRoomId(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
-              placeholder="e.g. B01-R101"
-            />
-            <datalist id="known-room-ids">
-              {clusters?.rooms.map((room) => (
-                <option key={room.room_id} value={room.room_id} />
-              ))}
-            </datalist>
+            Room
+            {clusters?.rooms.length ? (
+              <select
+                required
+                value={roomId}
+                onChange={(event) => setRoomId(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+              >
+                {clusters.rooms.map((room) => (
+                  <option key={room.room_id} value={room.room_id}>
+                    {room.room_id}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                required
+                value={roomId}
+                onChange={(event) => setRoomId(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+                placeholder="For example, B01-R101"
+              />
+            )}
           </label>
           <button
             type="submit"
             disabled={queryLoading || !roomId.trim()}
             className="rounded-xl bg-cyan-500 px-5 py-2.5 font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
           >
-            {queryLoading ? 'Loading room…' : 'Get room metrics'}
+            {queryLoading ? 'Loading room…' : 'Show room details'}
           </button>
         </form>
         {clusterError ? (
@@ -798,9 +1033,9 @@ function RoomsPage() {
         <>
           <div className="grid gap-4 md:grid-cols-4">
             <StatCard
-              label="Seat utilization"
+              label="Seats in use"
               value={formatPercent(metrics?.metrics.seat_utilization_rate)}
-              hint="current room"
+              hint="of available seats"
             />
             <StatCard
               label="Peak occupancy"
@@ -808,19 +1043,19 @@ function RoomsPage() {
               hint="people"
             />
             <StatCard
-              label="RFU"
+              label="Room use"
               value={formatPercent(metrics?.metrics.room_frequency_of_use)}
-              hint="room usage rate"
+              hint="how often this room is used"
             />
             <StatCard
-              label="WSH"
+              label="Unused seat-hours"
               value={formatNumber(metrics?.metrics.wasted_seat_hours)}
-              hint="seat-hours"
+              hint="available capacity not used"
             />
           </div>
 
           <div className="mt-6 grid gap-6 xl:grid-cols-2">
-            <Card title="Room metrics">
+            <Card title="Room details">
               <div className="space-y-3 text-sm text-slate-300">
                 <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
                   <span>Room ID</span>
@@ -829,13 +1064,13 @@ function RoomsPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                  <span>Scope</span>
+                  <span>View</span>
                   <span className="font-medium text-white">
                     {metrics?.scope ?? 'room'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                  <span>Source timestamp</span>
+                  <span>Data updated</span>
                   <span className="font-medium text-white">
                     {formatTimestamp(metrics?.source_timestamp)}
                   </span>
@@ -843,7 +1078,7 @@ function RoomsPage() {
               </div>
             </Card>
 
-            <Card title="Room cluster status">
+            <Card title="Similar room group">
               {matchingRoom ? (
                 <div className="space-y-3 text-sm text-slate-300">
                   <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
@@ -946,53 +1181,57 @@ function OptimizationPage() {
   return (
     <>
       <PageIntro
-        title="What-if planner"
-        description="Change occupancy assumptions or close rooms to see how campus utilization indicators would respond. Scenarios do not change source data."
+        title="Try a planning scenario"
+        description="Choose a few simple changes and compare the result with today’s baseline. Your source data will not be changed."
       />
 
       <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
-        <Card title="Scenario inputs">
+        <Card title="1. Choose your changes">
           <form className="space-y-5" onSubmit={handleScenario}>
             <label className="block text-sm text-slate-300">
-              Occupancy change
+              Expected room attendance
               <span className="mt-1 block text-xs text-slate-400">
-                Multiply observed headcounts by this factor (0.1–5).
+                How busy do you expect rooms to be?
               </span>
-              <input
-                required
-                type="number"
-                min="0.1"
-                max="5"
-                step="0.1"
+              <select
                 value={occupancyMultiplier}
                 onChange={(event) => setOccupancyMultiplier(event.target.value)}
                 className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
-              />
+              >
+                <option value="0.8">A little quieter (20% lower)</option>
+                <option value="1">About the same</option>
+                <option value="1.2">A little busier (20% higher)</option>
+                <option value="1.5">Much busier (50% higher)</option>
+                <option value="2">Twice as busy</option>
+              </select>
             </label>
 
             <label className="block text-sm text-slate-300">
-              Enrollment change
+              Student enrollment
               <span className="mt-1 block text-xs text-slate-400">
-                Multiply scheduled enrollment by this factor (0.1–5).
+                How might student numbers change?
               </span>
-              <input
-                required
-                type="number"
-                min="0.1"
-                max="5"
-                step="0.1"
+              <select
                 value={enrollmentMultiplier}
                 onChange={(event) =>
                   setEnrollmentMultiplier(event.target.value)
                 }
                 className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
-              />
+              >
+                <option value="0.8">A little lower (20% fewer)</option>
+                <option value="1">About the same</option>
+                <option value="1.2">A little higher (20% more)</option>
+                <option value="1.5">Much higher (50% more)</option>
+                <option value="2">Twice as many</option>
+              </select>
             </label>
 
             <fieldset>
-              <legend className="text-sm text-slate-300">Rooms to close</legend>
+              <legend className="text-sm text-slate-300">
+                Rooms that won’t be available (optional)
+              </legend>
               <p className="mt-1 text-xs text-slate-400">
-                Closed rooms are excluded from simulated occupancy.
+                Choose any rooms you want to leave out of this comparison.
               </p>
               <div className="mt-2 max-h-48 space-y-2 overflow-y-auto rounded-xl border border-slate-700 bg-slate-950/60 p-3">
                 {roomsLoading ? (
@@ -1034,12 +1273,12 @@ function OptimizationPage() {
               disabled={loading || roomsLoading}
               className="w-full rounded-xl bg-cyan-500 px-4 py-2.5 font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
             >
-              {loading ? 'Running scenario…' : 'Run what-if scenario'}
+              {loading ? 'Comparing options…' : 'Compare this plan'}
             </button>
           </form>
         </Card>
 
-        <Card title="Scenario results">
+        <Card title="2. Compare the results">
           {result ? (
             <div className="space-y-4">
               <p className="text-xs text-slate-400">
@@ -1253,5 +1492,6 @@ function EmptyPanel({ message }: { message: string }) {
 }
 
 export default function App() {
-  return <AppShell />
+  const location = useLocation()
+  return location.pathname === '/' ? <WelcomePage /> : <AppShell />
 }

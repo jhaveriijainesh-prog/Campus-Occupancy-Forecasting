@@ -30,11 +30,12 @@ This mapping records the FastAPI contract consumed by the existing React dashboa
 
 ## React route mapping
 
-- `/` → Overview page
-- `/forecast` → Forecast Explorer page
-- `/rooms` → Room Intelligence page
-- `/optimization` → What-if planner page
-- `/health` → System Health page
+- `/` → Guided demo welcome page with task shortcuts; no authentication is simulated
+- `/dashboard` → Campus overview page
+- `/forecast` → Room forecast page with API-provided room choices and manual-entry fallback
+- `/rooms` → Room metrics page with API-provided room choices and manual-entry fallback
+- `/optimization` → Scenario planner with plain-language occupancy/enrollment choices
+- `/health` → System status page
 
 React calls same-origin `/api` paths. Local Vite attaches the configured read credential to upstream FastAPI requests server-side; the Render Nginx proxy does the same with its platform-managed key. Neither key is compiled into browser assets. The read-only key is sufficient for forecasts, room metrics, clustering, and non-mutating simulations. Only the separate allocation-comparison endpoint requires the elevated `optimize` permission.
 

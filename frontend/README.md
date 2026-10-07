@@ -28,11 +28,14 @@ To deploy, create a Blueprint in Render from this repository and use `render.yam
 
 ## Routes
 
-- `/` - API-driven campus utilization overview and readiness
-- `/forecast` - one room, selected target time, one-hour point estimate
-- `/rooms` - user-selected room metrics and API-returned cluster metadata
-- `/optimization` - interactive occupancy/enrollment what-if simulation and room closures
+- `/` - guided demo welcome page with shortcuts into the workspace; no account or simulated login is required
+- `/dashboard` - API-driven campus utilization overview and service readiness
+- `/forecast` - select a room and time, then review a one-hour point estimate
+- `/rooms` - choose a room and review its metrics and similar-room group
+- `/optimization` - select plain-language occupancy and enrollment changes, optionally exclude rooms, and compare results
 - `/health` - API health, readiness, version, and dependency checks
+
+The welcome screen is an entry point rather than an authentication boundary. All occupancy and timetable values shown are synthetic demonstration data, not live campus telemetry.
 
 ## Checks
 
