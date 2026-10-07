@@ -31,18 +31,20 @@ def test_build_error_slices_has_finite_point_metrics():
 
 
 def test_generate_artifacts_from_checked_in_predictions(tmp_path):
+    metadata_path = ROOT / "experiments/xgboost/feature_metadata.json"
     paths = generate_explainability_artifacts(
-        ROOT / "experiments/xgboost/feature_metadata.json",
+        metadata_path,
         ROOT / "experiments/xgboost/test_predictions.csv",
         tmp_path,
         ROOT / "experiments/baseline/test_predictions.csv",
     )
 
     importance = json.loads(Path(paths["feature_importance"]).read_text(encoding="utf-8"))
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     slices = json.loads(Path(paths["error_slices"]).read_text(encoding="utf-8"))
 
     assert importance["method"] == "xgboost_gain"
-    assert importance["feature_count"] == 48
+    assert importance["feature_count"] == len(metadata["feature_names"])
     assert len(importance["features"]) == 15
     assert {row["model"] for row in slices} == {"xgboost", "historical_seasonal_baseline"}
     assert len(slices) >= 10
