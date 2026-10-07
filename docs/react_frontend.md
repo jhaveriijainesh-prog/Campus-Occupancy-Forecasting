@@ -45,7 +45,7 @@ The public free-tier demo is available at [campus-occupancy-forecasting.onrender
 | `/optimization` | Choose plain-language occupancy/enrollment options, optionally exclude rooms, and compare results |
 | `/health` | API health, readiness, version, and dependency checks |
 
-The welcome screen is a demo entry point, not an authentication boundary. Forecast target times are entered in campus time (Asia/Kolkata); the API translates them to the campus wall clock before joining timetable context, while preserving the requested instant in the response. Forecast output is point-estimate-only; the UI does not present fabricated uncertainty. Missing API values remain unavailable. What-if scenarios run under the read-only credential and compare against the immutable source-data baseline. The separate MILP allocation comparison still requires the `optimize` permission.
+The welcome screen is a demo entry point, not an authentication boundary. Forecast target times are entered in campus time (Asia/Kolkata); the API translates them to the campus wall clock before joining timetable context, while preserving the requested instant in the response. The forecast page opens with the next Friday 9:00 AM class example for B01-R101 and loads its forecast automatically; users can change the room or target time. Forecast output is point-estimate-only; the UI does not present fabricated uncertainty. Missing API values remain unavailable. What-if scenarios run under the read-only credential and compare against the immutable source-data baseline. The separate MILP allocation comparison still requires the `optimize` permission.
 
 ## Quality Checks
 

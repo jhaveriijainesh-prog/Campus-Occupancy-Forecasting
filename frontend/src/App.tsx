@@ -45,6 +45,7 @@ import type {
 } from './types'
 
 const CAMPUS_TIME_ZONE = 'Asia/Kolkata'
+const DEMO_ROOM_ID = 'B01-R101'
 
 function campusDateTimeParts(value: Date) {
   return new Intl.DateTimeFormat('en-CA', {
@@ -63,9 +64,26 @@ function campusDateTimeParts(value: Date) {
     }, {})
 }
 
-function defaultForecastTime(): string {
-  const parts = campusDateTimeParts(new Date(Date.now() + 60 * 60 * 1000))
-  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:00`
+function nextScheduledDemoTime(now = new Date()): string {
+  const parts = campusDateTimeParts(now)
+  const year = Number(parts.year)
+  const month = Number(parts.month)
+  const day = Number(parts.day)
+  const campusDate = new Date(Date.UTC(year, month - 1, day))
+  let daysUntilFriday = (5 - campusDate.getUTCDay() + 7) % 7
+  if (
+    daysUntilFriday === 0 &&
+    (Number(parts.hour) > 9 ||
+      (Number(parts.hour) === 9 && Number(parts.minute) > 0))
+  ) {
+    daysUntilFriday = 7
+  }
+
+  const targetDate = new Date(Date.UTC(year, month - 1, day + daysUntilFriday))
+  const targetYear = targetDate.getUTCFullYear()
+  const targetMonth = String(targetDate.getUTCMonth() + 1).padStart(2, '0')
+  const targetDay = String(targetDate.getUTCDate()).padStart(2, '0')
+  return `${targetYear}-${targetMonth}-${targetDay}T09:00`
 }
 
 function campusDateTimeToIsoString(value: string): string {
@@ -707,10 +725,10 @@ function OverviewPage() {
 }
 
 function ForecastPage() {
-  const [roomId, setRoomId] = useState('B01-R101')
+  const [roomId, setRoomId] = useState(DEMO_ROOM_ID)
   const [roomOptions, setRoomOptions] = useState<string[]>([])
   const [roomListError, setRoomListError] = useState<string | null>(null)
-  const [forecastTime, setForecastTime] = useState(defaultForecastTime)
+  const [forecastTime, setForecastTime] = useState(nextScheduledDemoTime)
   const [model, setModel] = useState<ModelInfoResponse | null>(null)
   const [forecast, setForecast] = useState<ForecastResponse | null>(null)
   const [loading, setLoading] = useState(false)
@@ -732,16 +750,31 @@ function ForecastPage() {
         setError(errorMessage(modelResult.reason))
       }
 
+      let initialRoomId = DEMO_ROOM_ID
       if (roomsResult.status === 'fulfilled') {
         const roomIds = roomsResult.value.rooms.map((room) => room.room_id)
         setRoomOptions(roomIds)
-        if (roomIds.length) {
-          setRoomId((current) =>
-            roomIds.includes(current) ? current : roomIds[0],
-          )
-        }
+        initialRoomId = roomIds.includes(DEMO_ROOM_ID)
+          ? DEMO_ROOM_ID
+          : (roomIds[0] ?? DEMO_ROOM_ID)
       } else {
         setRoomListError(errorMessage(roomsResult.reason))
+      }
+
+      const initialForecastTime = nextScheduledDemoTime()
+      setRoomId(initialRoomId)
+      setForecastTime(initialForecastTime)
+      try {
+        const initialForecast = await api.forecast(
+          initialRoomId,
+          campusDateTimeToIsoString(initialForecastTime),
+          1,
+        )
+        if (!active) return
+        setForecast(initialForecast)
+      } catch (err) {
+        if (!active) return
+        setError(errorMessage(err))
       }
 
       setStatusLoading(false)
@@ -819,7 +852,7 @@ function ForecastPage() {
             </label>
 
             <label className="block text-sm text-slate-300">
-              Forecast target time (Asia/Kolkata)
+              When should we estimate occupancy? (Asia/Kolkata)
               <input
                 required
                 type="datetime-local"
@@ -834,6 +867,10 @@ function ForecastPage() {
               available through the previous hour.{' '}
               <span className="font-semibold text-white">
                 Campus time: Asia/Kolkata
+              </span>
+              <span className="mt-2 block text-xs text-slate-400">
+                Demo example: B01-R101 has a scheduled class Fridays at 9:00 AM
+                (95 enrolled).
               </span>
             </div>
 
@@ -873,7 +910,7 @@ function ForecastPage() {
                 <StatCard
                   label="Horizon"
                   value={`${forecast.horizon_hours}h`}
-                  hint={forecast.horizon_semantics}
+                  hint="one-hour estimate"
                 />
                 <StatCard
                   label="Model version"
@@ -897,6 +934,7 @@ function ForecastPage() {
                       dataKey="timestamp"
                       stroke="#65756d"
                       tick={{ fontSize: 11, fill: '#65756d' }}
+                      tickFormatter={formatTimestamp}
                     />
                     <YAxis stroke="#65756d" tick={{ fill: '#65756d' }} />
                     <Tooltip
