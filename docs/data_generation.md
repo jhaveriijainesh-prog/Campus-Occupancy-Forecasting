@@ -76,6 +76,13 @@ Captures weekly recurrent scheduled course sessions across programs.
 | `room_type_required`| `VARCHAR(32)`| No | `Lecture Hall` | Required pedagogical room facility |
 | `academic_term`| `VARCHAR(32)` | No | `Semester V - Fall 2026` | Academic semester and term |
 
+The catalog-generated timetable may not naturally assign a course to every room. To
+make the forecast demo useful for every selectable room, the generator adds three
+weekly `SYN-` demonstration sessions to each otherwise-unscheduled room, with
+enrollment set to 70% of that room's capacity. These are explicitly synthetic
+examples, not real course registrations or institutional timetable data. With
+seed 42, the resulting 101 timetable entries cover all 32 rooms.
+
 ### 3.3 `data/raw/events.csv` (Academic Calendar Events)
 Documents calendar interruptions that modulate regular campus operations.
 
@@ -188,25 +195,25 @@ Running the generator with `--seed 42` yields the following verified empirical d
 |                             STATISTICAL BENCHMARKS (SEED = 42)                                |
 +-------------------------------+---------------------------------------------------------------+
 | Total Hourly Observations     | 86,016 rows (32 rooms * 112 days * 24 hours)                  |
-| Scheduled Class Observations  | 1,008 hours (1.17% of total campus-room hours)                |
-| Mean Scheduled Occupancy      | 41.80 occupants (std: 36.23, max: 220 in Auditorium)          |
-| Mean Unscheduled Occupancy    | 1.24 occupants (std: 7.45, median: 0.0)                       |
+| Scheduled Class Observations  | 1,824 hours (2.12% of total campus-room hours)                |
+| Mean Scheduled Occupancy      | 30.49 occupants (std: 30.58, max: 216 in Auditorium)          |
+| Mean Unscheduled Occupancy    | 1.25 occupants (std: 7.46, median: 0.0)                       |
 | Deep Night Mean (00:00-06:00) | 0.08 occupants (Idle baseline verified)                       |
-| Midday Peak Mean (10:00-11:00)| 6.56 occupants across all campus rooms                        |
-| Afternoon Peak (14:00-15:00)  | 6.18 occupants across all campus rooms                        |
-| Sunday Mean Headcount         | 0.30 occupants (Near-zero weekend idle verified)              |
+| Midday Peak Mean (10:00-11:00)| 6.69 occupants across all campus rooms                        |
+| Afternoon Peak (14:00-15:00)  | 6.45 occupants across all campus rooms                        |
+| Sunday Mean Headcount         | 0.34 occupants (Near-zero weekend idle verified)              |
 +-------------------------------+---------------------------------------------------------------+
 ```
 
 ### Anomaly Distribution Verification
 The generator produced realistic, calibrated anomalies across the semester:
-- **`none` (Normal operation):** 84,815 records (98.60%)
-- **`unscheduled_group` (Informal student gatherings):** 663 records (0.77%)
-- **`weekend_activity` (Weekend labs/hackathons):** 295 records (0.34%)
-- **`evening_club_activity` (Late-night lab work):** 221 records (0.26%)
-- **`class_cancellation` (Sudden faculty cancellation):** 13 records (0.015%)
-- **`overcrowding_surge` (Guest lecture / joint section):** 7 records (0.008%)
-- **`sensor_dropout_glitch` (Hardware sensor dropout):** 2 records (0.002%)
+- **`none` (Normal operation):** 84,707 records (98.48%)
+- **`unscheduled_group` (Informal student gatherings):** 694 records (0.81%)
+- **`weekend_activity` (Weekend labs/hackathons):** 353 records (0.41%)
+- **`evening_club_activity` (Late-night lab work):** 226 records (0.26%)
+- **`class_cancellation` (Sudden faculty cancellation):** 19 records (0.02%)
+- **`sensor_dropout_glitch` (Hardware sensor dropout):** 9 records (0.01%)
+- **`overcrowding_surge` (Guest lecture / joint section):** 8 records (0.01%)
 
 ---
 

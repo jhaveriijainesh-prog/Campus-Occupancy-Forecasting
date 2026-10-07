@@ -183,6 +183,38 @@ def generate_timetable(rooms_df: pd.DataFrame, rng: np.random.Generator) -> pd.D
                 timetable_counter += 1
                 scheduled_count += 1
 
+    scheduled_room_ids = {record["room_id"] for record in timetable_records}
+    for room in rooms_df.to_dict(orient="records"):
+        room_id = room["room_id"]
+        if room_id in scheduled_room_ids:
+            continue
+
+        enrollment = max(1, int(round(room["capacity"] * 0.7)))
+        available_slots = [
+            (day, hour)
+            for day in days
+            for hour in (operating_hours if day != "Saturday" else [9, 10, 11])
+            if (room_id, day, hour) not in occupied_slots
+        ]
+        chosen_indices = rng.choice(len(available_slots), size=3, replace=False)
+        for day, start_hour in (available_slots[int(index)] for index in chosen_indices):
+            occupied_slots.add((room_id, day, start_hour))
+            timetable_records.append({
+                "timetable_id": f"TT-{timetable_counter:04d}",
+                "course_code": f"SYN-{room_id}",
+                "course_name": f"Synthetic {room['room_type']} session",
+                "instructor_id": f"INST-SYN-{room_id}",
+                "enrolled_count": enrollment,
+                "day_of_week": day,
+                "start_time": f"{start_hour:02d}:00:00",
+                "end_time": f"{start_hour + 1:02d}:00:00",
+                "duration_hours": 1,
+                "room_id": room_id,
+                "room_type_required": room["room_type"],
+                "academic_term": "Semester V - Fall 2026",
+            })
+            timetable_counter += 1
+
     return pd.DataFrame(timetable_records)
 
 
