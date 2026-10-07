@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: campus-occupancy-forecasting
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.render
+    dockerContext: .
+    healthCheckPath: /api/v1/health/ready
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: API_SECRET_KEY
+        generateValue: true
+      - key: API_READ_KEY
+        generateValue: true

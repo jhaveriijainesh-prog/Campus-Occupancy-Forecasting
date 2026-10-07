@@ -68,6 +68,8 @@ Thumbs.db
 desktop.ini
 
 # Application Specific
+node_modules/
+frontend/dist/
 data/raw/*
 !data/raw/.gitkeep
 data/processed/*

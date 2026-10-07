@@ -1,0 +1,46 @@
+FROM node:22-bookworm-slim AS frontend-build
+
+WORKDIR /frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    coinor-cbc \
+    coinor-libcbc-dev \
+    gettext-base \
+    nginx \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app/ app/
+COPY configs/ configs/
+COPY monitoring/ monitoring/
+COPY scripts/ scripts/
+
+RUN python scripts/generate_data.py --seed 42 --output-dir data/raw \
+    && python -c "from app.data.cleaning import CampusDataCleaner; CampusDataCleaner().run_pipeline(raw_dir='data/raw')" \
+    && python scripts/train_forecaster.py --data-dir data/processed --output-dir experiments/xgboost
+
+COPY --from=frontend-build /frontend/dist/ /usr/share/nginx/html/
+COPY deploy/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY deploy/supervisord.conf /etc/supervisor/conf.d/app.conf
+COPY deploy/render-entrypoint.sh /app/deploy/render-entrypoint.sh
+
+EXPOSE 10000
+
+ENTRYPOINT ["/bin/sh", "/app/deploy/render-entrypoint.sh"]

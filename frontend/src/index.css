@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+
+:root {
+  color: #1c3128;
+  background: #edf3ee;
+  color-scheme: light;
+  font-family: 'Aptos', 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #edf3ee;
+  background-image:
+    linear-gradient(rgba(23, 75, 60, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 75, 60, 0.025) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input {
+  font: inherit;
+}

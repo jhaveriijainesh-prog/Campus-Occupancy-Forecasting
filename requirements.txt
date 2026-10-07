@@ -29,7 +29,9 @@ lightgbm>=4.3.0
 shap>=0.45.1
 
 # Operations Research & Constraint Optimization
-pulp>=2.8.0,<4.0
+# PuLP 4.x removed the older binary-variable constructor API used by this project,
+# so pin to the compatibility range still supported by the current solver code.
+pulp>=2.8.0,<3.0
 
 # Data Contract & Schema Enforcement
 pandera[polars,pandas]>=0.20.0
