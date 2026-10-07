@@ -1,6 +1,7 @@
 import type {
   ClusterResponse,
   DetailedHealthResponse,
+  ForecastSchedule,
   ForecastResponse,
   HealthResponse,
   ModelInfoResponse,
@@ -105,6 +106,11 @@ export const api = {
       { method: 'GET' },
     )
   },
+
+  forecastSchedules: () =>
+    request<ForecastSchedule[]>('/api/v1/forecast/schedules', {
+      method: 'GET',
+    }),
 
   clusters: () =>
     request<ClusterResponse>('/api/v1/clustering/rooms', { method: 'GET' }),

@@ -12,7 +12,7 @@ import {
   TrendingUp,
   Workflow,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Bar,
   BarChart,
@@ -36,6 +36,7 @@ import { ApiError, api } from './api/client'
 import type {
   ClusterResponse,
   DetailedHealthResponse,
+  ForecastSchedule,
   ForecastResponse,
   HealthResponse,
   ModelInfoResponse,
@@ -84,6 +85,73 @@ function nextScheduledDemoTime(now = new Date()): string {
   const targetMonth = String(targetDate.getUTCMonth() + 1).padStart(2, '0')
   const targetDay = String(targetDate.getUTCDate()).padStart(2, '0')
   return `${targetYear}-${targetMonth}-${targetDay}T09:00`
+}
+
+function nextScheduledTime(
+  schedules: ForecastSchedule[],
+  roomId: string,
+  now = new Date(),
+): string | null {
+  const parts = campusDateTimeParts(now)
+  const weekdays: Record<string, number> = {
+    Sunday: 0,
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6,
+  }
+  const currentDate = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+  )
+  const currentWallClock = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour),
+    Number(parts.minute),
+  )
+  const options = schedules.flatMap((schedule) => {
+    if (schedule.room_id !== roomId) return []
+    const weekday = weekdays[schedule.day_of_week]
+    const time = /^(\d{2}):(\d{2})/.exec(schedule.start_time)
+    if (weekday === undefined || !time) return []
+
+    let daysUntil = (weekday - new Date(currentDate).getUTCDay() + 7) % 7
+    const [hour, minute] = time.slice(1).map(Number)
+    let candidate = Date.UTC(
+      Number(parts.year),
+      Number(parts.month) - 1,
+      Number(parts.day) + daysUntil,
+      hour,
+      minute,
+    )
+    if (candidate <= currentWallClock) {
+      daysUntil += 7
+      candidate = Date.UTC(
+        Number(parts.year),
+        Number(parts.month) - 1,
+        Number(parts.day) + daysUntil,
+        hour,
+        minute,
+      )
+    }
+    const targetDate = new Date(candidate)
+    const targetTime = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+    return [
+      {
+        timestamp: candidate,
+        value: `${targetDate.toISOString().slice(0, 10)}T${targetTime}`,
+      },
+    ]
+  })
+  return (
+    options.sort((left, right) => left.timestamp - right.timestamp)[0]?.value ??
+    null
+  )
 }
 
 function campusDateTimeToIsoString(value: string): string {
@@ -727,7 +795,9 @@ function OverviewPage() {
 function ForecastPage() {
   const [roomId, setRoomId] = useState(DEMO_ROOM_ID)
   const [roomOptions, setRoomOptions] = useState<string[]>([])
+  const [schedules, setSchedules] = useState<ForecastSchedule[]>([])
   const [roomListError, setRoomListError] = useState<string | null>(null)
+  const [scheduleNotice, setScheduleNotice] = useState<string | null>(null)
   const [forecastTime, setForecastTime] = useState(nextScheduledDemoTime)
   const [model, setModel] = useState<ModelInfoResponse | null>(null)
   const [forecast, setForecast] = useState<ForecastResponse | null>(null)
@@ -735,13 +805,37 @@ function ForecastPage() {
   const [statusLoading, setStatusLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const requestForecast = useCallback(
+    async (selectedRoomId: string, selectedTime: string) => {
+      if (!selectedRoomId.trim() || !selectedTime) return
+      setLoading(true)
+      setError(null)
+      setForecast(null)
+      try {
+        const result = await api.forecast(
+          selectedRoomId.trim(),
+          campusDateTimeToIsoString(selectedTime),
+          1,
+        )
+        setForecast(result)
+      } catch (err) {
+        setError(errorMessage(err))
+      } finally {
+        setLoading(false)
+      }
+    },
+    [],
+  )
+
   useEffect(() => {
     let active = true
     const load = async () => {
-      const [modelResult, roomsResult] = await Promise.allSettled([
-        api.modelInfo(),
-        api.clusters(),
-      ])
+      const [modelResult, roomsResult, schedulesResult] =
+        await Promise.allSettled([
+          api.modelInfo(),
+          api.clusters(),
+          api.forecastSchedules(),
+        ])
       if (!active) return
 
       if (modelResult.status === 'fulfilled') {
@@ -761,21 +855,23 @@ function ForecastPage() {
         setRoomListError(errorMessage(roomsResult.reason))
       }
 
-      const initialForecastTime = nextScheduledDemoTime()
+      const availableSchedules =
+        schedulesResult.status === 'fulfilled' ? schedulesResult.value : []
+      if (schedulesResult.status === 'fulfilled') {
+        setSchedules(availableSchedules)
+      } else {
+        setScheduleNotice(
+          'Class times could not be loaded. Choose a time manually to forecast.',
+        )
+      }
+
+      const initialForecastTime =
+        nextScheduledTime(availableSchedules, initialRoomId) ??
+        nextScheduledDemoTime()
       setRoomId(initialRoomId)
       setForecastTime(initialForecastTime)
-      try {
-        const initialForecast = await api.forecast(
-          initialRoomId,
-          campusDateTimeToIsoString(initialForecastTime),
-          1,
-        )
-        if (!active) return
-        setForecast(initialForecast)
-      } catch (err) {
-        if (!active) return
-        setError(errorMessage(err))
-      }
+      await requestForecast(initialRoomId, initialForecastTime)
+      if (!active) return
 
       setStatusLoading(false)
     }
@@ -784,26 +880,29 @@ function ForecastPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [requestForecast])
 
   const handleForecast = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!roomId.trim() || !forecastTime) return
-    setLoading(true)
+    await requestForecast(roomId, forecastTime)
+  }
+
+  const handleRoomChange = (selectedRoomId: string) => {
+    setRoomId(selectedRoomId)
     setError(null)
-    setForecast(null)
-    try {
-      const result = await api.forecast(
-        roomId.trim(),
-        campusDateTimeToIsoString(forecastTime),
-        1,
+    const selectedScheduleTime = nextScheduledTime(schedules, selectedRoomId)
+    if (!selectedScheduleTime) {
+      setForecast(null)
+      setScheduleNotice(
+        'No class time was found for this room. Choose a time to estimate occupancy; low values may be expected outside scheduled classes.',
       )
-      setForecast(result)
-    } catch (err) {
-      setError(errorMessage(err))
-    } finally {
-      setLoading(false)
+      return
     }
+    setScheduleNotice(
+      'Showing this room’s next scheduled class. You can choose another time above.',
+    )
+    setForecastTime(selectedScheduleTime)
+    void requestForecast(selectedRoomId, selectedScheduleTime)
   }
 
   if (statusLoading) return <LoadingPanel label="Checking forecast readiness" />
@@ -825,7 +924,8 @@ function ForecastPage() {
                   required
                   aria-label="Choose a room"
                   value={roomId}
-                  onChange={(event) => setRoomId(event.target.value)}
+                  disabled={loading}
+                  onChange={(event) => handleRoomChange(event.target.value)}
                   className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
                 >
                   {roomOptions.map((room) => (
@@ -857,7 +957,15 @@ function ForecastPage() {
                 required
                 type="datetime-local"
                 value={forecastTime}
-                onChange={(event) => setForecastTime(event.target.value)}
+                disabled={loading}
+                onChange={(event) => {
+                  setForecastTime(event.target.value)
+                  setForecast(null)
+                  setError(null)
+                  setScheduleNotice(
+                    'Time changed. Select “Show me the estimate” to update the forecast.',
+                  )
+                }}
                 className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
               />
             </label>
@@ -869,10 +977,16 @@ function ForecastPage() {
                 Campus time: Asia/Kolkata
               </span>
               <span className="mt-2 block text-xs text-slate-400">
-                Demo example: B01-R101 has a scheduled class Fridays at 9:00 AM
-                (95 enrolled).
+                Changing rooms selects that room’s next scheduled class when
+                available. Enrollment is the class size; the estimate predicts
+                attendance.
               </span>
             </div>
+            {scheduleNotice ? (
+              <div className="text-xs text-slate-400" role="status">
+                {scheduleNotice}
+              </div>
+            ) : null}
 
             <button
               type="submit"
@@ -978,6 +1092,31 @@ function ForecastPage() {
                     {forecast.interval_method}
                   </span>
                 </div>
+              </div>
+              <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-3 text-sm text-slate-300">
+                {forecast.is_scheduled ? (
+                  <>
+                    <span className="font-medium text-white">
+                      {forecast.scheduled_course_code
+                        ? `${forecast.scheduled_course_code} class`
+                        : 'Class'}{' '}
+                      scheduled
+                    </span>
+                    {forecast.scheduled_enrollment > 0
+                      ? ` · ${forecast.scheduled_enrollment} enrolled`
+                      : ''}
+                    . The estimate predicts attendance, which may be lower than
+                    enrollment.
+                  </>
+                ) : (
+                  <>
+                    <span className="font-medium text-white">
+                      No class is scheduled at this time.
+                    </span>{' '}
+                    A low estimate can be expected outside class hours. Choose
+                    the room’s next scheduled class to see an in-class example.
+                  </>
+                )}
               </div>
             </div>
           ) : (

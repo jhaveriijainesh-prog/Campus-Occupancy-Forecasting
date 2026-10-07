@@ -58,11 +58,24 @@ export type ForecastResponse = {
   timestamp: string
   horizon_hours: number
   predicted_headcount: number
+  is_scheduled: boolean
+  scheduled_enrollment: number
+  scheduled_course_code?: string | null
   prediction_interval: Record<string, number>
   confidence_levels: number[]
   interval_method: string
   horizon_semantics: string
   model_version: string
+}
+
+export type ForecastSchedule = {
+  room_id: string
+  day_of_week: string
+  start_time: string
+  end_time: string
+  enrolled_count: number
+  course_code?: string | null
+  course_name?: string | null
 }
 
 export type ModelInfoResponse = {

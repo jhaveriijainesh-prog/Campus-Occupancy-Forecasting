@@ -43,11 +43,26 @@ class ForecastResponse(BaseModel):
     timestamp: str
     horizon_hours: int
     predicted_headcount: float
+    is_scheduled: bool = False
+    scheduled_enrollment: int = 0
+    scheduled_course_code: str | None = None
     prediction_interval: dict
     confidence_levels: List[float]
     interval_method: str = "point_estimate_only"
     horizon_semantics: str = "one_step_ahead_hourly"
     model_version: str
+
+
+class ForecastSchedule(BaseModel):
+    """A timetable entry available as a forecast example."""
+
+    room_id: str
+    day_of_week: str
+    start_time: str
+    end_time: str
+    enrolled_count: int
+    course_code: str | None = None
+    course_name: str | None = None
 
 
 class BatchForecastResponse(BaseModel):

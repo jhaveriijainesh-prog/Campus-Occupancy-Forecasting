@@ -59,6 +59,24 @@ def test_typed_client_read_workflow_uses_real_fastapi_testclient(monkeypatch):
 		assert forecast.horizon_semantics == "one_step_ahead_hourly"
 		assert forecast.interval_method == "point_estimate_only"
 		assert 0 <= forecast.predicted_headcount <= 120
+		assert isinstance(forecast.is_scheduled, bool)
+		assert forecast.scheduled_enrollment >= 0
+		schedules_without_key = test_client.get("/api/v1/forecast/schedules")
+		schedules = test_client.get(
+			"/api/v1/forecast/schedules",
+			headers={"X-API-Key": API_KEY},
+		)
+		assert schedules_without_key.status_code == 401
+		assert schedules.status_code == 200
+		assert {
+			"room_id": "B01-R101",
+			"day_of_week": "Friday",
+			"start_time": "09:00:00",
+			"end_time": "10:00:00",
+			"enrolled_count": 95,
+			"course_code": "DS101",
+			"course_name": "Intro to Data Science",
+		} in schedules.json()
 		assert all(method == "GET" for method, _, _, _ in calls)
 		assert all(response.headers.get("X-Request-ID") for _, _, _, response in calls)
 		assert all("actual_headcount" not in response.text for _, _, _, response in calls)
@@ -93,14 +111,16 @@ def test_typed_client_read_workflow_uses_real_fastapi_testclient(monkeypatch):
 
 
 def test_forecast_uses_campus_local_time_for_timetable_features(monkeypatch):
-	observed = {}
+	observed = []
 
 	class CapturingForecaster:
 		def predict(self, features):
 			row = features.iloc[0]
-			observed["hour"] = int(row["hour"])
-			observed["is_scheduled"] = int(row["is_scheduled"])
-			observed["scheduled_enrollment"] = int(row["scheduled_enrollment"])
+			observed.append({
+				"hour": int(row["hour"]),
+				"is_scheduled": int(row["is_scheduled"]),
+				"scheduled_enrollment": int(row["scheduled_enrollment"]),
+			})
 			return [float(row["scheduled_enrollment"])]
 
 	monkeypatch.setattr(
@@ -118,16 +138,37 @@ def test_forecast_uses_campus_local_time_for_timetable_features(monkeypatch):
 				"start_time": "2026-10-09T09:00:00+05:30",
 			},
 		)
+		unscheduled_response = test_client.get(
+			"/api/v1/forecast/predict/B01-R101",
+			headers={"X-API-Key": API_KEY},
+			params={
+				"horizon_hours": 1,
+				"start_time": "2026-10-08T08:00:00+05:30",
+			},
+		)
 
 	assert response.status_code == 200, response.text
-	assert observed == {
+	assert unscheduled_response.status_code == 200, unscheduled_response.text
+	assert observed[0] == {
 		"hour": 9,
 		"is_scheduled": 1,
 		"scheduled_enrollment": 95,
 	}
+	assert observed[1] == {
+		"hour": 8,
+		"is_scheduled": 0,
+		"scheduled_enrollment": 0,
+	}
 	result = response.json()
 	assert result["timestamp"] == "2026-10-09T03:30:00+00:00"
 	assert result["predicted_headcount"] == 95
+	assert result["is_scheduled"] is True
+	assert result["scheduled_enrollment"] == 95
+	assert result["scheduled_course_code"] == "DS101"
+	unscheduled = unscheduled_response.json()
+	assert unscheduled["is_scheduled"] is False
+	assert unscheduled["scheduled_enrollment"] == 0
+	assert unscheduled["scheduled_course_code"] is None
 
 
 def test_dashboard_overview_to_forecast_uses_real_fastapi_and_selected_room(monkeypatch):

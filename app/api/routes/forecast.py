@@ -26,6 +26,7 @@ from app.forecasting.model import OccupancyForecaster
 from app.features.engineering import FeatureEngineer
 from app.schemas.forecast import (
     BatchForecastResponse,
+    ForecastSchedule,
     ForecastRequest,
     ForecastResponse,
     ModelInfoResponse,
@@ -41,6 +42,43 @@ HORIZON_SEMANTICS = "one_step_ahead_hourly"
 # Global model cache
 _forecaster: Optional[OccupancyForecaster] = None
 _feature_engineer: Optional[FeatureEngineer] = None
+
+
+@router.get(
+    "/schedules",
+    response_model=List[ForecastSchedule],
+    summary="List scheduled class times for forecast examples",
+)
+async def list_forecast_schedules(_: str = Depends(require_forecast)):
+    """Return the timetable entries used to choose meaningful forecast examples."""
+    try:
+        timetable_df = _read_processed_frame("timetable")
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Processed timetable data is unavailable: {exc}") from exc
+
+    required_columns = {"room_id", "day_of_week", "start_time", "end_time", "enrolled_count"}
+    missing = sorted(required_columns.difference(timetable_df.columns))
+    if missing:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Processed timetable data is missing required columns: {missing}",
+        )
+
+    optional_columns = ["course_code", "course_name"]
+    columns = [
+        "room_id",
+        "day_of_week",
+        "start_time",
+        "end_time",
+        "enrolled_count",
+        *[column for column in optional_columns if column in timetable_df.columns],
+    ]
+    schedules = timetable_df[columns].copy()
+    schedules["enrolled_count"] = pd.to_numeric(schedules["enrolled_count"], errors="coerce")
+    schedules = schedules.dropna(subset=["room_id", "day_of_week", "start_time", "end_time", "enrolled_count"])
+    schedules["enrolled_count"] = schedules["enrolled_count"].astype(int)
+    schedules = schedules.sort_values(["day_of_week", "start_time", "room_id"])
+    return schedules.astype(object).where(pd.notna(schedules), None).to_dict(orient="records")
 
 
 def _read_processed_frame(name: str):
@@ -270,6 +308,13 @@ async def predict_occupancy(
             timestamp=start_time.isoformat(),
             horizon_hours=request.horizon_hours,
             predicted_headcount=predicted_headcount,
+            is_scheduled=bool(row.get("is_scheduled", 0)),
+            scheduled_enrollment=int(row.get("scheduled_enrollment", 0)),
+            scheduled_course_code=(
+                None
+                if pd.isna(row.get("scheduled_course_code"))
+                else str(row.get("scheduled_course_code"))
+            ),
             prediction_interval=intervals,
             confidence_levels=request.confidence_levels,
             interval_method="point_estimate_only",

@@ -26,6 +26,8 @@ def test_forecast_response_schema_supports_batch_contract():
                 timestamp="2026-08-03T09:00:00Z",
                 horizon_hours=1,
                 predicted_headcount=20.0,
+                is_scheduled=False,
+                scheduled_enrollment=0,
                 prediction_interval={"p10": 18.0, "p50": 20.0, "p90": 22.0},
                 confidence_levels=[0.1, 0.5, 0.9],
                 model_version="xgboost-v1",
