@@ -8,6 +8,7 @@ import streamlit as st
 from fastapi.testclient import TestClient
 from streamlit.testing.v1 import AppTest
 from app.api.main import app as api_app
+from app.api.routes import forecast as forecast_routes
 from app.core.config import get_settings
 from app.dashboard.api_client import APIClient, APIClientError, APIErrorCategory
 
@@ -89,6 +90,44 @@ def test_typed_client_read_workflow_uses_real_fastapi_testclient(monkeypatch):
 			APIClient(TEST_SERVER, "invalid-key").metrics()
 		assert error.value.category is APIErrorCategory.AUTHENTICATION
 		assert "invalid-key" not in str(error.value)
+
+
+def test_forecast_uses_campus_local_time_for_timetable_features(monkeypatch):
+	observed = {}
+
+	class CapturingForecaster:
+		def predict(self, features):
+			row = features.iloc[0]
+			observed["hour"] = int(row["hour"])
+			observed["is_scheduled"] = int(row["is_scheduled"])
+			observed["scheduled_enrollment"] = int(row["scheduled_enrollment"])
+			return [float(row["scheduled_enrollment"])]
+
+	monkeypatch.setattr(
+		forecast_routes,
+		"get_forecaster",
+		lambda: CapturingForecaster(),
+	)
+
+	with TestClient(api_app) as test_client:
+		response = test_client.get(
+			"/api/v1/forecast/predict/B01-R101",
+			headers={"X-API-Key": API_KEY},
+			params={
+				"horizon_hours": 1,
+				"start_time": "2026-10-09T09:00:00+05:30",
+			},
+		)
+
+	assert response.status_code == 200, response.text
+	assert observed == {
+		"hour": 9,
+		"is_scheduled": 1,
+		"scheduled_enrollment": 95,
+	}
+	result = response.json()
+	assert result["timestamp"] == "2026-10-09T03:30:00+00:00"
+	assert result["predicted_headcount"] == 95
 
 
 def test_dashboard_overview_to_forecast_uses_real_fastapi_and_selected_room(monkeypatch):

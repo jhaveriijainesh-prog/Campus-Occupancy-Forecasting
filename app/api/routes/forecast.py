@@ -139,15 +139,21 @@ async def predict_occupancy(
     except Exception as exc:
         raise HTTPException(status_code=503, detail=f"Processed forecast data is unavailable: {exc}") from exc
 
-    # Determine forecast start time
+    # Keep the requested instant for the response, but align inference features
+    # to the campus wall clock used by the generated occupancy/timetable data.
     try:
         if request.start_time:
             start_time = pd.Timestamp(request.start_time)
             start_time = start_time.tz_localize("UTC") if start_time.tzinfo is None else start_time.tz_convert("UTC")
         else:
             start_time = pd.Timestamp.now(tz="UTC")
+        campus_start_time = start_time.tz_convert(settings.time_zone)
+        model_start_time = campus_start_time.tz_localize(None).tz_localize("UTC")
     except (TypeError, ValueError) as exc:
-        raise HTTPException(status_code=422, detail="start_time must be a valid ISO 8601 timestamp") from exc
+        raise HTTPException(
+            status_code=422,
+            detail="start_time or configured campus timezone is invalid",
+        ) from exc
 
     required_columns = {"room_id", "timestamp", "capacity", "actual_headcount"}
     for name, frame in (
@@ -180,7 +186,7 @@ async def predict_occupancy(
     occupancy_timestamps = pd.to_datetime(requested_occupancy["timestamp"], utc=True, errors="coerce")
     if occupancy_timestamps.isna().any():
         raise HTTPException(status_code=503, detail="Processed occupancy data contains invalid timestamps")
-    history_cutoff = start_time - pd.Timedelta(hours=request.horizon_hours)
+    history_cutoff = model_start_time - pd.Timedelta(hours=request.horizon_hours)
     history_mask = occupancy_timestamps.le(history_cutoff)
     available_history = requested_occupancy.loc[history_mask].copy()
     available_history["timestamp"] = occupancy_timestamps.loc[history_mask]
@@ -208,7 +214,7 @@ async def predict_occupancy(
         .copy()
     )
     target_rows = latest_history.copy()
-    target_rows["timestamp"] = start_time
+    target_rows["timestamp"] = model_start_time
     target_rows["actual_headcount"] = float("nan")
     target_rows["observation_id"] = target_rows["room_id"].map(lambda room_id: f"forecast-{room_id}")
     target_rows["is_imputed"] = 0
@@ -218,9 +224,8 @@ async def predict_occupancy(
         errors="ignore",
     )
 
-    settings = get_settings()
     semester_start = pd.Timestamp(settings.semester_start_date, tz="UTC").date()
-    target_date = start_time.date()
+    target_date = model_start_time.date()
     target_rows["week_number"] = ((target_date - semester_start).days // 7) + 1
 
     try:

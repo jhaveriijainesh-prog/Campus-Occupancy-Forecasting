@@ -44,6 +44,64 @@ import type {
   UtilizationResponse,
 } from './types'
 
+const CAMPUS_TIME_ZONE = 'Asia/Kolkata'
+
+function campusDateTimeParts(value: Date) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: CAMPUS_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  })
+    .formatToParts(value)
+    .reduce<Record<string, string>>((parts, part) => {
+      if (part.type !== 'literal') parts[part.type] = part.value
+      return parts
+    }, {})
+}
+
+function defaultForecastTime(): string {
+  const parts = campusDateTimeParts(new Date(Date.now() + 60 * 60 * 1000))
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:00`
+}
+
+function campusDateTimeToIsoString(value: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value)
+  if (!match) throw new Error('Choose a valid campus date and time.')
+
+  const [, year, month, day, hour, minute] = match
+  const wallClock = Date.UTC(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+  )
+  const date = new Date(wallClock)
+  if (
+    date.getUTCFullYear() !== Number(year) ||
+    date.getUTCMonth() !== Number(month) - 1 ||
+    date.getUTCDate() !== Number(day) ||
+    date.getUTCHours() !== Number(hour) ||
+    date.getUTCMinutes() !== Number(minute)
+  ) {
+    throw new Error('Choose a valid campus date and time.')
+  }
+
+  const campusParts = campusDateTimeParts(date)
+  const campusWallClock = Date.UTC(
+    Number(campusParts.year),
+    Number(campusParts.month) - 1,
+    Number(campusParts.day),
+    Number(campusParts.hour),
+    Number(campusParts.minute),
+  )
+  return new Date(wallClock - (campusWallClock - wallClock)).toISOString()
+}
+
 function formatPercent(value: number | undefined): string {
   if (value === undefined || Number.isNaN(value)) return 'n/a'
   return `${(value * 100).toFixed(1)}%`
@@ -57,7 +115,9 @@ function formatNumber(value: number | undefined): string {
 function formatTimestamp(value?: string | null): string {
   if (!value) return 'Not available'
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleString()
+  return Number.isNaN(date.getTime())
+    ? value
+    : date.toLocaleString(undefined, { timeZone: CAMPUS_TIME_ZONE })
 }
 
 function errorMessage(error: unknown): string {
@@ -650,13 +710,7 @@ function ForecastPage() {
   const [roomId, setRoomId] = useState('B01-R101')
   const [roomOptions, setRoomOptions] = useState<string[]>([])
   const [roomListError, setRoomListError] = useState<string | null>(null)
-  const [forecastTime, setForecastTime] = useState(() => {
-    const target = new Date(Date.now() + 60 * 60 * 1000)
-    target.setMinutes(0, 0, 0)
-    return new Date(target.getTime() - target.getTimezoneOffset() * 60_000)
-      .toISOString()
-      .slice(0, 16)
-  })
+  const [forecastTime, setForecastTime] = useState(defaultForecastTime)
   const [model, setModel] = useState<ModelInfoResponse | null>(null)
   const [forecast, setForecast] = useState<ForecastResponse | null>(null)
   const [loading, setLoading] = useState(false)
@@ -708,7 +762,7 @@ function ForecastPage() {
     try {
       const result = await api.forecast(
         roomId.trim(),
-        new Date(forecastTime).toISOString(),
+        campusDateTimeToIsoString(forecastTime),
         1,
       )
       setForecast(result)
@@ -725,7 +779,7 @@ function ForecastPage() {
     <>
       <PageIntro
         title="Forecast a room"
-        description="Choose a room and time. We’ll estimate how many people may be there one hour later."
+        description="Choose a room and the campus-local time you want to forecast."
       />
 
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
@@ -765,7 +819,7 @@ function ForecastPage() {
             </label>
 
             <label className="block text-sm text-slate-300">
-              When should we check?
+              Forecast target time (Asia/Kolkata)
               <input
                 required
                 type="datetime-local"
@@ -776,9 +830,10 @@ function ForecastPage() {
             </label>
 
             <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-3 text-sm text-slate-300">
-              We’ll estimate occupancy for:{' '}
+              We’ll estimate occupancy at the selected time, using history
+              available through the previous hour.{' '}
               <span className="font-semibold text-white">
-                one hour after your selected time
+                Campus time: Asia/Kolkata
               </span>
             </div>
 

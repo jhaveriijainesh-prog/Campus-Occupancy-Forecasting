@@ -24,6 +24,7 @@ This mapping records the FastAPI contract consumed by the existing React dashboa
 
 - The React product accepts analytical inputs but does not mutate source data. Existing Streamlit workflows remain unchanged.
 - Occupancy values come from the project's synthetic demonstration dataset, not live campus sensors.
+- Forecast target instants are converted to the configured campus timezone before constructing timestamp and timetable features; response timestamps preserve the requested instant.
 - The verified forecast contract is strictly one room and one hour: `horizon_hours = 1` and point-estimate-only output.
 - The UI must not claim support for multi-hour, interval-heavy, or probabilistic forecasting unless the backend contract explicitly provides it.
 - MILP allocation comparison remains a privileged backend capability. Room clustering and what-if simulation are exposed in the React demo.
@@ -32,7 +33,7 @@ This mapping records the FastAPI contract consumed by the existing React dashboa
 
 - `/` → Guided demo welcome page with task shortcuts; no authentication is simulated
 - `/dashboard` → Campus overview page
-- `/forecast` → Room forecast page with API-provided room choices and manual-entry fallback
+- `/forecast` → Room forecast page with API-provided room choices, manual-entry fallback, and campus-local target times
 - `/rooms` → Room metrics page with API-provided room choices and manual-entry fallback
 - `/optimization` → Scenario planner with plain-language occupancy/enrollment choices
 - `/health` → System status page
