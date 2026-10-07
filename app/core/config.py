@@ -42,7 +42,14 @@ class Settings(BaseSettings):
         description="Least-privilege dashboard credential for read and forecast routes. In production, supply in .env or a platform secret store; default values are only permitted for development/test.",
     )
     api_cors_origins: List[str] = Field(
-        default_factory=lambda: ["http://localhost:8501", "http://localhost:3000"],
+        default_factory=lambda: [
+            "http://localhost:8501",
+            "http://127.0.0.1:8501",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+        ],
         description="Allowed CORS origins. Keep this environment-configurable for future hosted deployments.",
     )
     rate_limit_requests: int = Field(default=100, ge=1, description="Maximum requests per rate-limit window")

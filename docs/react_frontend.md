@@ -1,18 +1,16 @@
-# BDS-06 React Frontend
+# BDS-06 React Dashboard
 
-## Purpose
+## Purpose and Architecture
 
-This is a post-capstone, local product enhancement to the existing BDS-06 project. It continues the existing React application; it does not replace the Streamlit dashboard or change the official capstone sequence. Occupancy and schedule data are synthetic demonstration data, not live campus telemetry.
-
-## Architecture
+This is a read-only React dashboard for the BDS-06 FastAPI service. Occupancy and schedule data are synthetic demonstration data, not live campus telemetry.
 
 - React 19, TypeScript, Vite, React Router, Tailwind CSS, Recharts, and Lucide icons.
-- `frontend/src/App.tsx` owns the five route views and application shell.
-- `frontend/src/api/client.ts` contains the API calls and HTTP error status handling.
-- Local Vite proxies same-origin `/api` requests to FastAPI and attaches the read-only credential server-side. It is not compiled into browser assets.
-- FastAPI remains the source for utilization, forecast, room-cluster, authorization, and health results. React does not fabricate those results.
+- `frontend/src/App.tsx` owns the route views and application shell.
+- `frontend/src/api/client.ts` makes same-origin API calls and handles HTTP errors.
+- FastAPI remains the source for utilization, forecast, room-cluster, authorization, and health results.
+- Local Vite and the Render Nginx proxy attach the read-only API credential server-side. Credentials are never compiled into browser assets.
 
-## Local Startup
+## Run Locally
 
 Start FastAPI from the repository root:
 
@@ -20,7 +18,7 @@ Start FastAPI from the repository root:
 python -m uvicorn app.api.main:app --host 127.0.0.1 --port 8000
 ```
 
-Start React in a second terminal:
+In a second terminal:
 
 ```powershell
 cd frontend
@@ -28,21 +26,29 @@ npm ci
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173`. The Vite proxy target is fixed to `http://127.0.0.1:8000` and cannot forward the read credential to a remote host. It reads `API_READ_KEY` or `FASTAPI_API_KEY` from local configuration, then uses repository Python settings when neither is set. Do not put credentials in `VITE_*` variables.
+Open `http://127.0.0.1:5173`. Vite proxies `/api` to `http://127.0.0.1:8000`. It reads `API_READ_KEY` or `FASTAPI_API_KEY` from local configuration, then uses repository Python settings when neither is set. Never put credentials in `VITE_*` variables.
 
-## Routes And Capabilities
+## Deploy to Render
 
-| Route           | Live capability                                                                                                       |
-| --------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `/`             | Campus utilization KPIs, percentage-only utilization chart, health/readiness, source timestamp, and observation count |
-| `/forecast`     | One room, one hour, one API point estimate; defaults to `B01-R101`                                                    |
-| `/rooms`        | Room-level API metrics and returned cluster ID, label, and feature names                                              |
-| `/optimization` | Displays comparison output only if the caller is authorized; otherwise shows the real permission boundary             |
-| `/health`       | API health, readiness, service version, and dependency checks                                                         |
+The root `render.yaml` defines one Docker web service for React and FastAPI. `Dockerfile.render` builds the frontend and creates the deterministic synthetic dataset and one-hour forecast model from the checked-in generator/training scripts. Nginx serves the SPA and injects the Render-managed read-only key into same-origin `/api/` requests; Render generates separate production API keys.
 
-The forecast response identifies its interval as `point_estimate_only`; the UI does not present fabricated uncertainty. Missing API values remain unavailable. The UI does not display environment values or credentials. Optimization comparison requires `optimize`; the read-only dashboard credential receives `403`, and no privileged credential is present in the frontend.
+Create a Blueprint in Render from this repository and deploy `render.yaml`. The configured free plan may spin down while idle; the first request afterward may take longer. Occupancy remains synthetic demonstration data. This is a public demo setup, not an institutional production service. A live URL and successful remote container build are not established by the repository alone.
+
+## Routes and Capabilities
+
+| Route | Capability |
+| --- | --- |
+| `/` | Campus utilization KPIs, chart, API status, and readiness |
+| `/forecast` | One-room, one-hour point forecast |
+| `/rooms` | Room metrics and returned cluster metadata |
+| `/optimization` | Displays the actual `403` permission boundary for read-only access |
+| `/health` | API health, readiness, version, and dependency checks |
+
+Forecast output is point-estimate-only; the UI does not present fabricated uncertainty. Missing API values remain unavailable. Optimization comparison requires the `optimize` permission, which is not granted to the dashboard's read-only key.
 
 ## Quality Checks
+
+Run in `frontend/`:
 
 ```powershell
 npm run format:check
@@ -50,14 +56,10 @@ npm run lint
 npm run build
 ```
 
-ESLint covers TypeScript, React Hooks, and React Refresh. Vite may warn that the production JavaScript chunk exceeds 500 kB; the advisory is not suppressed.
+Vite may report a JavaScript bundle-size advisory; it is not suppressed.
 
-## Render Deployment
+## Docker and Streamlit
 
-The root `render.yaml` defines a single Docker web service for the React dashboard and FastAPI. `Dockerfile.render` builds the frontend, generates deterministic synthetic data and its forecast model, then starts Nginx and Uvicorn. Nginx serves the SPA and injects the Render-managed read-only API key into same-origin `/api/` requests; the key is not included in browser assets. Render generates separate production API keys and checks `/api/v1/health/ready` before routing traffic. The existing `docker-compose.yml` remains unchanged and continues to define FastAPI and Streamlit; React is not represented as a Compose service. Streamlit remains the existing fallback on port `8501`.
+The existing `docker-compose.yml` remains the local FastAPI and Streamlit setup. React is built into the separate Render image; Streamlit remains available as the local fallback at port `8501`.
 
-Deploy the `render.yaml` blueprint from the repository in Render. The configured free plan can spin down while idle, and the first request after inactivity may take longer. Occupancy remains synthetic demonstration data, not live campus telemetry. This is a public demo, not an institutional production service. The existing `docker-compose.yml` remains unchanged and continues to define FastAPI and Streamlit; React is not represented as a Compose service. Streamlit remains the existing fallback on port `8501`.
-
-## Screenshots
-
-See [the React screenshot index](react_dashboard_screenshots.md) for real desktop route captures, a 390px responsive Overview, and their demo/report usage.
+See [the API mapping](react_dashboard_mapping.md) and [the React screenshot index](react_dashboard_screenshots.md) for route contracts and real browser captures.

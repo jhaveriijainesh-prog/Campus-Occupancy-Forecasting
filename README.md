@@ -1,8 +1,46 @@
-# BDS-06: Campus Occupancy Forecasting with Spatiotemporal Analytics and Capacity Optimization
+# CAMPUS OPERATIONS
+## Campus Occupancy Forecasting
+### Spatiotemporal Analytics + Capacity Optimization
 
 **Academic Level:** Third Year B.Sc. Data Science (T.Y. B.Sc. DS) – Semester V Capstone Project  
-**System Architecture:** Modular Python application with FastAPI, Streamlit, and Docker Compose  
-**Verified MVP:** Synthetic-data utilization analytics, a one-hour XGBoost point forecast, API-backed Overview and Forecast Explorer, and local Compose deployment  
+**System Architecture:** FastAPI + Streamlit + Docker Compose for local use; React + FastAPI in the Render web-service image
+
+**Verified MVP:** Synthetic-data utilization analytics, a one-hour XGBoost room forecast, read-only dashboards, and a reproducible local Docker demo; a Render deployment blueprint is included
+
+### Problem
+Campus planning often depends on nominal schedules rather than observed room use. The project explores whether short-term occupancy analytics and simple capacity-aware reasoning can help identify underused and overused spaces using a synthetic, reproducible campus dataset.
+
+### Solution
+The project combines a validated data pipeline, explicit leakage controls, a one-hour forecast, utilization metrics, and analytical optimization evidence. The system exposes a read-only dashboard and supporting API routes for local demonstration and review.
+
+### Architecture
+The solution is a modular Python monolith with a FastAPI backend, a Streamlit dashboard, and Docker Compose orchestration for local use. A React dashboard is also included. The Render image serves React and FastAPI together, with a same-origin Nginx proxy so the read-only API key stays server-side. The dashboards consume API responses rather than reaching into model files or processed data directly.
+
+### Technical contribution
+The project contributes a rigorous, evidence-based capstone implementation with: dataset validation and cleaning, causal feature engineering, chronological forecasting, utilization metrics (SUR/RFU/WSH), room clustering analysis, what-if simulation, and a greedy-vs-MILP allocation comparison on synthetic data.
+
+### Key features
+- Overview dashboards with readiness and operational KPIs
+- Forecast Explorer with one-room, one-hour point forecast
+- API-level security and least-privilege key checks
+- Local health/readiness validation
+- Leakage-prevention regression tests
+- Optimization and clustering as analytical capability, not a separate dashboard page
+
+### Testing
+The checked-in test suite includes dashboard smoke tests, API checks, simulation/optimization tests, and strict temporal leakage validation.
+
+### Security
+The project uses API keys with permission checks and sanitizes sensitive details in user-facing error output. Render generates distinct production API keys for its demo service; this is not an institutional identity or secret-management integration.
+
+### Reproducibility
+Docker Compose remains the supported local demonstration path. The root `render.yaml` and `Dockerfile.render` provide an optional public demo deployment path; a live service URL and production-readiness claim are not established by this repository alone.
+
+### Limitations
+The repository uses synthetic data, the served forecast is one hour and point-based, and the optimization evidence is bounded to the checked-in academic scenario. Render's free web-service plan may spin down while idle. This is a demo, not a live institutional deployment or production service.
+
+### Local demo
+For local use, follow the Docker Compose runbook. For an optional hosted demo, deploy the root `render.yaml` Blueprint in Render; see [the React deployment guide](docs/react_frontend.md). Occupancy remains synthetic demonstration data.
 
 ---
 
@@ -202,4 +240,4 @@ pytest tests/optimization/test_solver.py -v
 - [Model and system card](docs/model_system_card.md) documents intended use, assumptions, limitations, and reproducibility.
 - [Security review](docs/security_review.md) records verified controls and remaining risks.
 - [BDS-06 evidence matrix](docs/bds06_evidence_matrix.md) maps requirements to implementation and evidence.
-- Docker Compose runtime is locally verified as recorded in `docs/release_notes.md`; public hosting and production hardening are not claimed.
+- Docker Compose runtime is locally verified as recorded in `docs/release_notes.md`. Render deployment files are provided, but a public live URL and production hardening are not claimed until separately deployed and verified.

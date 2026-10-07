@@ -40,6 +40,12 @@ jobs:
       - name: Verify dependency consistency
         run: python -m pip check
 
+      - name: Generate reproducible demo data and forecast model
+        run: |
+          python scripts/generate_data.py --seed 42 --output-dir data/raw
+          python -c "from app.data.cleaning import CampusDataCleaner; CampusDataCleaner().run_pipeline(raw_dir='data/raw')"
+          python scripts/train_forecaster.py --data-dir data/processed --output-dir experiments/xgboost
+
       - name: Run MVP API integration workflow
         run: python -m pytest tests/integration/test_api.py -v
 

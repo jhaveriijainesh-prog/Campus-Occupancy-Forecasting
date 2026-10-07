@@ -207,7 +207,9 @@ class FeatureEngineer:
             "cleaning_notes",
             "anomaly_flag",
             "scheduled_course_code",
+            "timetable_id",
             "event_type",
+            "campus_event_type",
             "building_name",
         }
         return [c for c in df.columns if c not in exclude_cols]

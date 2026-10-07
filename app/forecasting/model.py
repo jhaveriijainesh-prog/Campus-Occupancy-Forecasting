@@ -72,10 +72,15 @@ class OccupancyForecaster:
         """
         X = df[feature_cols].copy()
 
-        # Enforce category dtypes for XGBoost native categorical support
-        for cat_col in self.CATEGORICAL_COLUMNS:
-            if cat_col in X.columns:
-                X[cat_col] = X[cat_col].astype("category")
+        # Convert every string feature to pandas category for native XGBoost support.
+        categorical_columns = set(self.CATEGORICAL_COLUMNS)
+        categorical_columns.update(
+            column
+            for column in X.columns
+            if pd.api.types.is_string_dtype(X[column].dtype)
+        )
+        for cat_col in categorical_columns.intersection(X.columns):
+            X[cat_col] = X[cat_col].astype("category")
 
         # Convert booleans to integers
         for c in X.columns:
@@ -103,7 +108,12 @@ class OccupancyForecaster:
             early_stopping_rounds: Early stopping patience.
         """
         self.feature_names_ = list(feature_cols)
-        self.categorical_features_ = [c for c in self.CATEGORICAL_COLUMNS if c in self.feature_names_]
+        self.categorical_features_ = [
+            column
+            for column in self.feature_names_
+            if column in self.CATEGORICAL_COLUMNS
+            or pd.api.types.is_string_dtype(train_df[column].dtype)
+        ]
 
         X_train = self._prepare_matrix(train_df, self.feature_names_, is_train=True)
         y_train = train_df[target_col].values.astype(np.float64)

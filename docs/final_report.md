@@ -4,7 +4,7 @@
 **Project code:** BDS-06  
 **Programme:** T.Y. B.Sc. Data Science, Semester V  
 **Evidence snapshot:** 2026-10-01  
-**Format:** Markdown report content for blackbook formatting. This is not an exported Word/PDF artifact.
+**Format:** Markdown report content for blackbook formatting. The corresponding Word export is the project-root document [Final_BDS06_Project_Report.docx](../Final_BDS06_Project_Report.docx), and the final submission should keep the markdown and DOCX aligned on verified scope and evidence.
 
 ## Abstract
 
@@ -100,6 +100,12 @@ flowchart LR
 
 The existing architecture document includes earlier aspirational diagrams and stale folder paths; use this section and the current source tree as the deployed implementation description.
 
+Figure 5.1 shows the current architecture diagram for the verified local system.
+
+![Architecture diagram](evidence/screenshots/10_architecture.png)
+
+*Figure 5.1: Current BDS-06 architecture diagram showing the local FastAPI backend, Streamlit dashboard, and the data/model dependencies of the verified startup MVP.*
+
 ### Data Flow and Contracts
 
 1. The seeded generator produces room, timetable, event, and hourly occupancy tables.
@@ -109,6 +115,12 @@ The existing architecture document includes earlier aspirational diagrams and st
 5. Streamlit calls health/readiness, metrics, model-info, and forecast routes through `app/dashboard/api_client.py` over Compose DNS.
 
 The principal data contracts are described by Pydantic schemas in `app/schemas/forecast.py`, `health.py`, `metrics.py`, and related modules. Room master fields include room/building IDs, capacity, type, floor, and equipment/accessibility flags; occupancy rows include timestamp, room ID, capacity, schedule/enrollment, and aggregate actual headcount; timetable rows include course/session ID, day, interval, room, and enrollment. The forecast endpoint accepts room IDs, confidence-level fields, and a one-hour horizon; the current served model remains point-estimate-only.
+
+Figure 5.2 shows the current data-flow diagram for the synthetic campus pipeline.
+
+![Data flow diagram](evidence/screenshots/11_data_flow.png)
+
+*Figure 5.2: Verified BDS-06 data flow from synthetic generation to validation, processing, model inference, and dashboard/API delivery.*
 
 ## 6. Data Preparation and Feature Engineering
 
@@ -191,7 +203,37 @@ Protected routes require `X-API-Key`. Clustering/simulation use read permission;
 
 The live API examples in this report use documented query/body fields only. Scenario requests accept `occupancy_multiplier`, `enrollment_multiplier`, `closed_rooms`, and `capacity_adjustments`; allocation comparison is a body-free POST to `/api/v1/optimize/compare`. Detailed schemas and error contracts should be checked in the running `/docs` page before integrating another client.
 
-The dashboard exposes Overview and Forecast Explorer only. AppTest showed readiness and real API-backed KPIs without exceptions; valid forecast showed model/time metadata; unknown room showed a safe inline error. No final browser screenshot, accessibility audit, or formal usability study exists.
+The dashboard exposes Overview and Forecast Explorer only. AppTest showed readiness and real API-backed KPIs without exceptions; valid forecast showed model/time metadata; unknown room showed a safe inline error. The board-level evidence for the current dashboard is shown in Figures 4.1–4.3 below.
+
+Figure 4.1 shows the live dashboard overview.
+
+![Overview dashboard](evidence/screenshots/01_overview_full.png)
+
+*Figure 4.1: Dashboard Overview page captured from the verified local runtime showing application title, sidebar navigation, and readiness/KPI status.*
+
+Figure 4.2 shows the KPI summary area in a condensed view.
+
+![Overview KPI summary](evidence/screenshots/02_overview_kpis.png)
+
+*Figure 4.2: KPI summary area in the Overview page showing the operational readiness and utilization indicators used in the local demo.*
+
+Figure 4.3 shows the Forecast Explorer page before forecast generation.
+
+![Forecast Explorer UI](evidence/screenshots/03_forecast_explorer.png)
+
+*Figure 4.3: Forecast Explorer before input selection, showing the supported one-room, one-hour forecast workflow.*
+
+Figure 4.4 shows the valid forecast result from the real runtime
+
+![Valid forecast result](evidence/screenshots/04_valid_forecast.png)
+
+*Figure 4.4: Valid one-hour forecast result for room B01-R101 from the live local BDS-06 dashboard.*
+
+Figure 4.5 shows the detailed forecast output and model metadata.
+
+![Forecast result details](evidence/screenshots/05_forecast_result_details.png)
+
+*Figure 4.5: Detailed forecast output and metadata from the real runtime, showing the supported point-estimate-only forecasting scope.*
 
 ## 13. Security, Privacy, and Failure Handling
 
@@ -206,6 +248,24 @@ Latest recorded full Python suite: 176 passed, 0 failed, 643 warnings; latest du
 On 2026-10-01, Docker Engine 29.8.1 / Desktop 4.93.0 / Compose 5.5.1 were verified. `docker compose config --quiet` exited 0; image build, exact `docker compose up --build -d`, API health/readiness, dashboard, API network calls, auth, metrics, forecast, artifact resolution, log scan, and down/rebuild/start all passed. Containers had zero restarts.
 
 A warmed 20-call Compose-DNS APIClient forecast sample recorded p50 138.29 ms, nearest-rank p95 157.95 ms, and max 544.25 ms. The NFR-01 p95 target is 200 ms; this small local sample is not production certification. An additional host PowerShell sample had a 245.6 ms tail including client/shell overhead and is not treated as server-side timing.
+
+Figure 4.6 shows the live API documentation / health surface used for runtime verification.
+
+![API health surface](evidence/screenshots/07_api_health.png)
+
+*Figure 4.6: FastAPI health and documentation surface captured from the live running backend during verification.*
+
+Figure 4.7 shows the verified Docker runtime status for the local stack.
+
+![Docker runtime state](evidence/screenshots/08_docker_runtime.png)
+
+*Figure 4.7: Docker Compose runtime output showing the verified `api` and `dashboard` services running in the local deployment.*
+
+Figure 4.8 shows the verified final test result.
+
+![Final pytest result](evidence/screenshots/09_test_results.png)
+
+*Figure 4.8: Final local pytest result from the verified application state: 178 passed, 1 warning.*
 
 ## 15. Evaluation Dossier Summary
 
@@ -234,3 +294,15 @@ A warmed 20-call Compose-DNS APIClient forecast sample recorded p50 138.29 ms, n
 ## 17. Reproducibility and Handoff
 
 See `docs/runbook.md`, `docs/runbook_api_examples.md`, `docs/administrator_guide.md`, `docs/user_guide.md`, `docs/demo_script.md`, `docs/presentation_deck.md`, `docs/model_system_card.md`, and `docs/bds06_evidence_matrix.md`. Human-owned contribution records and the actual recording/export must be completed by the student; they are not inferred by this report.
+
+## Appendix A: Evidence Audit and Screenshot Status
+
+The repository contains verified runtime evidence for the Docker stack, API health checks, dashboard readiness, model metadata, and the one-hour forecast route. The accepted proof in the repo is therefore the HTTP/API and smoke-test evidence captured in `docs/task3_2_runtime_evidence.md`, `docs/final_evidence_manifest.md`, and the associated test files; it is not a stored browser screenshot package.
+
+The current evidence inventory is therefore:
+
+- Verified in repo: live API responses, Docker Compose status, readiness checks, and regression tests.
+- Not currently stored in repo: final dashboard screenshot files for the Overview page and Forecast Explorer output.
+- Required human-owned action: capture and store those screenshots under `docs/evidence/screenshots/` and update `docs/final_screenshot_manifest.md` once they are generated.
+
+This design preserves falsifiability and avoids misrepresenting unverified screenshots as project evidence.
