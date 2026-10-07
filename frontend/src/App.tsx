@@ -707,12 +707,12 @@ function OverviewPage() {
           </div>
         </Card>
 
-        <Card title="Data updated">
+        <Card title="Latest sample time">
           <div className="text-2xl font-semibold text-white">
             {formatTimestamp(metrics?.source_timestamp)}
           </div>
           <div className="mt-2 text-xs text-slate-400">
-            {metrics?.scope ?? 'campus'} scope
+            Latest record in the {metrics?.scope ?? 'campus'} dataset
           </div>
         </Card>
       </div>
@@ -779,7 +779,7 @@ function OverviewPage() {
             </div>
             <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
               <div className="text-xs uppercase tracking-[0.12em] text-slate-400">
-                Most recent data
+                Latest sample time
               </div>
               <div className="mt-1 text-sm text-slate-200">
                 {formatTimestamp(metrics?.source_timestamp)}
@@ -1302,7 +1302,7 @@ function RoomsPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                  <span>Data updated</span>
+                  <span>Latest sample time</span>
                   <span className="font-medium text-white">
                     {formatTimestamp(metrics?.source_timestamp)}
                   </span>
