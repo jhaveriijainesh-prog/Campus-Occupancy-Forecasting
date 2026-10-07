@@ -293,12 +293,12 @@ def test_forecast_uses_only_causal_history_before_requested_timestamp(monkeypatc
         json={
             "room_ids": ["B01-R101"],
             "horizon_hours": 1,
-            "start_time": "2026-08-03T04:00:00Z",
+            "start_time": "2026-08-03T04:00:00+05:30",
         },
     )
 
     assert response.status_code == 200, response.text
-    assert response.json()["forecasts"][0]["timestamp"] == "2026-08-03T04:00:00+00:00"
+    assert response.json()["forecasts"][0]["timestamp"] == "2026-08-02T22:30:00+00:00"
     assert forecaster.features["timestamp"].iloc[0] == pd.Timestamp("2026-08-03T04:00:00Z")
     latest = forecaster.features.iloc[0]
     assert pd.isna(latest["actual_headcount"])
@@ -336,7 +336,7 @@ def test_forecast_without_history_before_target_returns_not_found(monkeypatch):
         json={
             "room_ids": ["B01-R101"],
             "horizon_hours": 1,
-            "start_time": "2026-08-03T04:00:00Z",
+            "start_time": "2026-08-03T04:00:00+05:30",
         },
     )
 
@@ -401,7 +401,7 @@ def test_forecast_feature_builder_receives_bounded_as_of_history(monkeypatch):
         json={
             "room_ids": ["B01-R101"],
             "horizon_hours": 1,
-            "start_time": timestamps[201].isoformat(),
+            "start_time": "2026-08-11T09:00:00+05:30",
         },
     )
 
