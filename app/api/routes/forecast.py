@@ -11,6 +11,7 @@ Provides REST endpoints for occupancy forecasting including:
 from datetime import datetime, timezone
 from functools import lru_cache
 import json
+import math
 from pathlib import Path
 from typing import List, Optional
 
@@ -298,9 +299,9 @@ async def predict_occupancy(
             intervals[f"p{int(cl*100)}"] = float(pred)
         intervals = dict(sorted(intervals.items(), key=lambda item: int(item[0][1:])))
         capacity = pd.to_numeric(pd.Series([row.get("capacity")]), errors="coerce").iloc[0]
-        predicted_headcount = max(0.0, float(pred))
+        predicted_headcount = max(0, math.floor(float(pred) + 0.5))
         if pd.notna(capacity):
-            predicted_headcount = min(predicted_headcount, max(0.0, float(capacity)))
+            predicted_headcount = min(predicted_headcount, max(0, math.floor(float(capacity))))
         intervals = {key: predicted_headcount for key in intervals}
 
         forecasts.append(ForecastResponse(

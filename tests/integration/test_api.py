@@ -171,6 +171,34 @@ def test_forecast_uses_campus_local_time_for_timetable_features(monkeypatch):
 	assert unscheduled["scheduled_course_code"] is None
 
 
+@pytest.mark.parametrize(
+	("model_prediction", "expected_headcount"),
+	[(0.49, 0), (0.5, 1), (12.5, 13)],
+)
+def test_forecast_returns_whole_person_headcounts(monkeypatch, model_prediction, expected_headcount):
+	class FractionalForecaster:
+		def predict(self, features):
+			return [model_prediction]
+
+	monkeypatch.setattr(
+		forecast_routes,
+		"get_forecaster",
+		lambda: FractionalForecaster(),
+	)
+
+	with TestClient(api_app) as test_client:
+		response = test_client.get(
+			"/api/v1/forecast/predict/B01-R101",
+			headers={"X-API-Key": API_KEY},
+			params={"start_time": "2026-10-09T09:00:00+05:30"},
+		)
+
+	assert response.status_code == 200, response.text
+	result = response.json()
+	assert result["predicted_headcount"] == expected_headcount
+	assert set(result["prediction_interval"].values()) == {expected_headcount}
+
+
 def test_dashboard_overview_to_forecast_uses_real_fastapi_and_selected_room(monkeypatch):
 	with TestClient(api_app) as test_client:
 		calls = _bind_client_to_testserver(monkeypatch, test_client)
