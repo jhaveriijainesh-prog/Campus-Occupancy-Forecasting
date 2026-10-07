@@ -27,8 +27,8 @@ import type {
   ForecastResponse,
   HealthResponse,
   ModelInfoResponse,
-  OptimizationResult,
   ReadinessResponse,
+  ScenarioResponse,
   UtilizationResponse,
 } from './types'
 
@@ -125,7 +125,7 @@ function AppShell() {
         '/': 'Overview',
         '/forecast': 'Forecast Explorer',
         '/rooms': 'Room Intelligence',
-        '/optimization': 'Optimization',
+        '/optimization': 'What-if Planner',
         '/health': 'System Health',
       } as Record<string, string>
     )[location.pathname] ?? 'Overview'
@@ -155,7 +155,7 @@ function AppShell() {
     { to: '/', label: 'Overview', icon: LayoutDashboard },
     { to: '/forecast', label: 'Forecast Explorer', icon: TrendingUp },
     { to: '/rooms', label: 'Room Intelligence', icon: Building2 },
-    { to: '/optimization', label: 'Optimization', icon: Workflow },
+    { to: '/optimization', label: 'What-if Planner', icon: Workflow },
     { to: '/health', label: 'System Health', icon: HeartPulse },
   ]
 
@@ -201,13 +201,13 @@ function AppShell() {
           <div className="mt-auto rounded-2xl border border-slate-800 bg-slate-900/80 p-4 text-sm text-slate-300">
             <div className="mb-1 flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-slate-400">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Local environment
+              Demo environment
             </div>
             <div className="font-medium text-emerald-300">
               Synthetic demo data
             </div>
             <div className="mt-1 text-xs text-slate-400">
-              Read-only local operations view
+              Interactive analytics · synthetic data
             </div>
           </div>
         </aside>
@@ -476,6 +476,13 @@ function OverviewPage() {
 
 function ForecastPage() {
   const [roomId, setRoomId] = useState('B01-R101')
+  const [forecastTime, setForecastTime] = useState(() => {
+    const target = new Date(Date.now() + 60 * 60 * 1000)
+    target.setMinutes(0, 0, 0)
+    return new Date(target.getTime() - target.getTimezoneOffset() * 60_000)
+      .toISOString()
+      .slice(0, 16)
+  })
   const [model, setModel] = useState<ModelInfoResponse | null>(null)
   const [forecast, setForecast] = useState<ForecastResponse | null>(null)
   const [loading, setLoading] = useState(false)
@@ -503,11 +510,18 @@ function ForecastPage() {
     }
   }, [])
 
-  const handleForecast = async () => {
+  const handleForecast = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!roomId.trim() || !forecastTime) return
     setLoading(true)
     setError(null)
+    setForecast(null)
     try {
-      const result = await api.forecast(roomId, 1)
+      const result = await api.forecast(
+        roomId.trim(),
+        new Date(forecastTime).toISOString(),
+        1,
+      )
       setForecast(result)
     } catch (err) {
       setError(errorMessage(err))
@@ -522,19 +536,32 @@ function ForecastPage() {
     <>
       <PageIntro
         title="Forecast Explorer"
-        description="Read-only room forecast using the verified one-hour point-estimate model contract."
+        description="Choose a room and target time to get a one-hour occupancy forecast from the trained model."
       />
 
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <Card title="Forecast controls">
-          <div className="space-y-4">
+          <form className="space-y-4" onSubmit={handleForecast}>
             <label className="block text-sm text-slate-300">
               Room ID
               <input
+                required
+                aria-label="Room ID"
                 value={roomId}
                 onChange={(event) => setRoomId(event.target.value)}
                 className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none ring-0 transition focus:border-cyan-400"
                 placeholder="B01-R101"
+              />
+            </label>
+
+            <label className="block text-sm text-slate-300">
+              Forecast target time
+              <input
+                required
+                type="datetime-local"
+                value={forecastTime}
+                onChange={(event) => setForecastTime(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
               />
             </label>
 
@@ -546,9 +573,8 @@ function ForecastPage() {
             </div>
 
             <button
-              type="button"
-              onClick={handleForecast}
-              disabled={loading}
+              type="submit"
+              disabled={loading || !roomId.trim() || !forecastTime}
               className="w-full rounded-xl bg-cyan-500 px-4 py-2.5 font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
             >
               {loading ? 'Generating forecast…' : 'Generate forecast'}
@@ -565,7 +591,7 @@ function ForecastPage() {
                 </div>
               </div>
             ) : null}
-          </div>
+          </form>
         </Card>
 
         <Card title="Forecast result">
@@ -661,27 +687,27 @@ function ForecastPage() {
 }
 
 function RoomsPage() {
+  const [roomId, setRoomId] = useState('B01-R101')
   const [metrics, setMetrics] = useState<UtilizationResponse | null>(null)
   const [clusters, setClusters] = useState<ClusterResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const [queryLoading, setQueryLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [clusterError, setClusterError] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
     const load = async () => {
       try {
-        const [roomMetrics, clusterData] = await Promise.all([
+        const [roomMetrics, clusterData] = await Promise.allSettled([
           api.utilization({ scope: 'room', room_id: 'B01-R101' }),
-          api.clusters().catch(() => null),
+          api.clusters(),
         ])
-
         if (!active) return
-        setMetrics(roomMetrics)
-        setClusters(clusterData)
-        setError(null)
-      } catch (err) {
-        if (!active) return
-        setError(errorMessage(err))
+        if (roomMetrics.status === 'fulfilled') setMetrics(roomMetrics.value)
+        else setError(errorMessage(roomMetrics.reason))
+        if (clusterData.status === 'fulfilled') setClusters(clusterData.value)
+        else setClusterError(errorMessage(clusterData.reason))
       } finally {
         if (active) setLoading(false)
       }
@@ -694,197 +720,393 @@ function RoomsPage() {
   }, [])
 
   if (loading) return <LoadingPanel label="Loading room intelligence" />
-  if (error) return <ErrorPanel message={error} />
+
+  const handleRoomQuery = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!roomId.trim()) return
+    setQueryLoading(true)
+    setError(null)
+    try {
+      const roomMetrics = await api.utilization({
+        scope: 'room',
+        room_id: roomId.trim(),
+      })
+      setMetrics(roomMetrics)
+    } catch (err) {
+      setMetrics(null)
+      setError(errorMessage(err))
+    } finally {
+      setQueryLoading(false)
+    }
+  }
 
   const matchingRoom = clusters?.rooms.find(
-    (room) => room.room_id === 'B01-R101',
+    (room) => room.room_id === metrics?.room_id,
   )
 
   return (
     <>
       <PageIntro
         title="Room Intelligence"
-        description="Room-level indicators using the verified metrics API and any available cluster metadata."
+        description="Enter a room ID to query its utilization, occupancy, and behavioral cluster."
       />
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <StatCard
-          label="Seat utilization"
-          value={formatPercent(metrics?.metrics.seat_utilization_rate)}
-          hint="current room"
-        />
-        <StatCard
-          label="Peak occupancy"
-          value={formatNumber(metrics?.metrics.peak_occupancy)}
-          hint="people"
-        />
-        <StatCard
-          label="RFU"
-          value={formatPercent(metrics?.metrics.room_frequency_of_use)}
-          hint="room usage rate"
-        />
-        <StatCard
-          label="WSH"
-          value={formatNumber(metrics?.metrics.wasted_seat_hours)}
-          hint="seat-hours"
-        />
-      </div>
+      <Card title="Room lookup" className="mb-6">
+        <form
+          className="flex flex-col gap-3 sm:flex-row sm:items-end"
+          onSubmit={handleRoomQuery}
+        >
+          <label className="block flex-1 text-sm text-slate-300">
+            Room ID
+            <input
+              required
+              list="known-room-ids"
+              value={roomId}
+              onChange={(event) => setRoomId(event.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+              placeholder="e.g. B01-R101"
+            />
+            <datalist id="known-room-ids">
+              {clusters?.rooms.map((room) => (
+                <option key={room.room_id} value={room.room_id} />
+              ))}
+            </datalist>
+          </label>
+          <button
+            type="submit"
+            disabled={queryLoading || !roomId.trim()}
+            className="rounded-xl bg-cyan-500 px-5 py-2.5 font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
+          >
+            {queryLoading ? 'Loading room…' : 'Get room metrics'}
+          </button>
+        </form>
+        {clusterError ? (
+          <p className="mt-3 text-xs text-amber-200">
+            Room suggestions are unavailable: {clusterError}
+          </p>
+        ) : null}
+      </Card>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <Card title="Room metrics">
-          <div className="space-y-3 text-sm text-slate-300">
-            <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-              <span>Room ID</span>
-              <span className="font-medium text-white">
-                {metrics?.room_id ?? 'B01-R101'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-              <span>Scope</span>
-              <span className="font-medium text-white">
-                {metrics?.scope ?? 'room'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-              <span>Source timestamp</span>
-              <span className="font-medium text-white">
-                {formatTimestamp(metrics?.source_timestamp)}
-              </span>
-            </div>
+      {error ? (
+        <div className="mb-6">
+          <ErrorPanel message={error} />
+        </div>
+      ) : null}
+      {!metrics ? (
+        <EmptyPanel message="Enter a known room ID and request its metrics." />
+      ) : (
+        <>
+          <div className="grid gap-4 md:grid-cols-4">
+            <StatCard
+              label="Seat utilization"
+              value={formatPercent(metrics?.metrics.seat_utilization_rate)}
+              hint="current room"
+            />
+            <StatCard
+              label="Peak occupancy"
+              value={formatNumber(metrics?.metrics.peak_occupancy)}
+              hint="people"
+            />
+            <StatCard
+              label="RFU"
+              value={formatPercent(metrics?.metrics.room_frequency_of_use)}
+              hint="room usage rate"
+            />
+            <StatCard
+              label="WSH"
+              value={formatNumber(metrics?.metrics.wasted_seat_hours)}
+              hint="seat-hours"
+            />
           </div>
-        </Card>
 
-        <Card title="Room cluster status">
-          {matchingRoom ? (
-            <div className="space-y-3 text-sm text-slate-300">
-              <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <span>Assigned cluster</span>
-                <span className="font-medium text-white">
-                  {matchingRoom.cluster_label ??
-                    `Cluster ${matchingRoom.cluster_id}`}
-                </span>
+          <div className="mt-6 grid gap-6 xl:grid-cols-2">
+            <Card title="Room metrics">
+              <div className="space-y-3 text-sm text-slate-300">
+                <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                  <span>Room ID</span>
+                  <span className="font-medium text-white">
+                    {metrics.room_id}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                  <span>Scope</span>
+                  <span className="font-medium text-white">
+                    {metrics?.scope ?? 'room'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                  <span>Source timestamp</span>
+                  <span className="font-medium text-white">
+                    {formatTimestamp(metrics?.source_timestamp)}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <span>Cluster ID</span>
-                <span className="font-medium text-white">
-                  {matchingRoom.cluster_id}
-                </span>
-              </div>
-              <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <span>Feature profile</span>
-                <span className="font-medium text-white">
-                  {clusters?.feature_names.length ?? 0} metrics
-                </span>
-              </div>
-            </div>
-          ) : (
-            <EmptyPanel message="Cluster metadata is not available for the current room in this API scope." />
-          )}
-        </Card>
-      </div>
+            </Card>
+
+            <Card title="Room cluster status">
+              {matchingRoom ? (
+                <div className="space-y-3 text-sm text-slate-300">
+                  <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                    <span>Assigned cluster</span>
+                    <span className="font-medium text-white">
+                      {matchingRoom.cluster_label ??
+                        `Cluster ${matchingRoom.cluster_id}`}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                    <span>Cluster ID</span>
+                    <span className="font-medium text-white">
+                      {matchingRoom.cluster_id}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                    <span>Feature profile</span>
+                    <span className="font-medium text-white">
+                      {clusters?.feature_names.length ?? 0} metrics
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <EmptyPanel
+                  message={
+                    clusterError ??
+                    'No cluster profile is available for this room.'
+                  }
+                />
+              )}
+            </Card>
+          </div>
+        </>
+      )}
     </>
   )
 }
 
 function OptimizationPage() {
-  const [result, setResult] = useState<OptimizationResult | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [clusters, setClusters] = useState<ClusterResponse | null>(null)
+  const [occupancyMultiplier, setOccupancyMultiplier] = useState('1')
+  const [enrollmentMultiplier, setEnrollmentMultiplier] = useState('1')
+  const [closedRooms, setClosedRooms] = useState<string[]>([])
+  const [result, setResult] = useState<ScenarioResponse | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [roomsLoading, setRoomsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
-    const load = async () => {
+    const loadRooms = async () => {
       try {
-        const response = await api.optimization()
+        const response = await api.clusters()
         if (!active) return
-        setResult(response)
+        setClusters(response)
       } catch (err) {
         if (!active) return
         setError(errorMessage(err))
       } finally {
-        if (active) setLoading(false)
+        if (active) setRoomsLoading(false)
       }
     }
 
-    void load()
+    void loadRooms()
     return () => {
       active = false
     }
   }, [])
 
-  if (loading) return <LoadingPanel label="Checking optimization capability" />
+  const handleScenario = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const occupancy = Number(occupancyMultiplier)
+    const enrollment = Number(enrollmentMultiplier)
+    if (!Number.isFinite(occupancy) || !Number.isFinite(enrollment)) return
+    setLoading(true)
+    setError(null)
+    setResult(null)
+    try {
+      const response = await api.simulate({
+        occupancy_multiplier: occupancy,
+        enrollment_multiplier: enrollment,
+        closed_rooms: closedRooms,
+      })
+      setResult(response)
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const toggleClosedRoom = (roomId: string) => {
+    setClosedRooms((current) =>
+      current.includes(roomId)
+        ? current.filter((id) => id !== roomId)
+        : [...current, roomId],
+    )
+  }
 
   return (
     <>
       <PageIntro
-        title="Optimization"
-        description="Constraint-aware analytical capability. The dashboard remains read-only and does not invent unsupported optimization actions."
+        title="What-if planner"
+        description="Change occupancy assumptions or close rooms to see how campus utilization indicators would respond. Scenarios do not change source data."
       />
 
-      {error || !result ? (
-        <Card title="Analytical capability state">
-          <div className="space-y-3 text-sm text-slate-300">
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-100">
-              {error?.startsWith('HTTP 403:')
-                ? '403 Forbidden · Optimization comparison requires the optimize permission. This dashboard uses a read-only credential and will not request elevated access.'
-                : 'Optimization remains a backend analytical capability; this read-only dashboard does not invent unsupported results.'}
-            </div>
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-              {error && !error.startsWith('HTTP 403:')
-                ? error
-                : 'No comparison result is available to this credential.'}
-            </div>
-          </div>
-        </Card>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card title="Baseline comparison">
-            <div className="space-y-3 text-sm text-slate-300">
-              <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <span>Method</span>
-                <span className="font-medium text-white">
-                  {result.baseline.method}
-                </span>
-              </div>
-              <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <span>Feasible</span>
-                <span className="font-medium text-white">
-                  {String(result.baseline.feasible)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <span>Unused capacity</span>
-                <span className="font-medium text-white">
-                  {String(result.baseline.objective_unused_capacity)}
-                </span>
-              </div>
-            </div>
-          </Card>
+      <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
+        <Card title="Scenario inputs">
+          <form className="space-y-5" onSubmit={handleScenario}>
+            <label className="block text-sm text-slate-300">
+              Occupancy change
+              <span className="mt-1 block text-xs text-slate-400">
+                Multiply observed headcounts by this factor (0.1–5).
+              </span>
+              <input
+                required
+                type="number"
+                min="0.1"
+                max="5"
+                step="0.1"
+                value={occupancyMultiplier}
+                onChange={(event) => setOccupancyMultiplier(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+              />
+            </label>
 
-          <Card title="MILP comparison">
-            <div className="space-y-3 text-sm text-slate-300">
-              <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <span>Method</span>
-                <span className="font-medium text-white">
-                  {result.milp.method}
-                </span>
+            <label className="block text-sm text-slate-300">
+              Enrollment change
+              <span className="mt-1 block text-xs text-slate-400">
+                Multiply scheduled enrollment by this factor (0.1–5).
+              </span>
+              <input
+                required
+                type="number"
+                min="0.1"
+                max="5"
+                step="0.1"
+                value={enrollmentMultiplier}
+                onChange={(event) =>
+                  setEnrollmentMultiplier(event.target.value)
+                }
+                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+              />
+            </label>
+
+            <fieldset>
+              <legend className="text-sm text-slate-300">Rooms to close</legend>
+              <p className="mt-1 text-xs text-slate-400">
+                Closed rooms are excluded from simulated occupancy.
+              </p>
+              <div className="mt-2 max-h-48 space-y-2 overflow-y-auto rounded-xl border border-slate-700 bg-slate-950/60 p-3">
+                {roomsLoading ? (
+                  <p className="text-sm text-slate-400">Loading room list…</p>
+                ) : clusters?.rooms.length ? (
+                  clusters.rooms.map((room) => (
+                    <label
+                      key={room.room_id}
+                      className="flex items-center gap-2 text-sm text-slate-200"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={closedRooms.includes(room.room_id)}
+                        onChange={() => toggleClosedRoom(room.room_id)}
+                        className="accent-cyan-400"
+                      />
+                      {room.room_id}
+                    </label>
+                  ))
+                ) : (
+                  <p className="text-sm text-amber-200">
+                    {error ?? 'No rooms are available to select.'}
+                  </p>
+                )}
               </div>
-              <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <span>Feasible</span>
-                <span className="font-medium text-white">
-                  {String(result.milp.feasible)}
-                </span>
+            </fieldset>
+
+            {error ? (
+              <div
+                role="alert"
+                className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-100"
+              >
+                {error}
               </div>
-              <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <span>Runtime</span>
-                <span className="font-medium text-white">
-                  {result.milp.runtime_seconds ?? 'n/a'}s
-                </span>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={loading || roomsLoading}
+              className="w-full rounded-xl bg-cyan-500 px-4 py-2.5 font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
+            >
+              {loading ? 'Running scenario…' : 'Run what-if scenario'}
+            </button>
+          </form>
+        </Card>
+
+        <Card title="Scenario results">
+          {result ? (
+            <div className="space-y-4">
+              <p className="text-xs text-slate-400">
+                Scenario {result.scenario_id} · compared with the same
+                source-data baseline
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[420px] text-left text-sm">
+                  <thead className="text-xs uppercase tracking-wide text-slate-400">
+                    <tr>
+                      <th className="pb-3 pr-3">Measure</th>
+                      <th className="pb-3 pr-3">Baseline</th>
+                      <th className="pb-3 pr-3">Scenario</th>
+                      <th className="pb-3">Change</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800 text-slate-200">
+                    {(
+                      [
+                        [
+                          'Seat utilization',
+                          'seat_utilization_rate',
+                          'percent',
+                        ],
+                        ['Room frequency', 'room_frequency_of_use', 'percent'],
+                        ['Wasted seat-hours', 'wasted_seat_hours', 'number'],
+                        ['Peak occupancy', 'peak_occupancy', 'number'],
+                      ] as const
+                    ).map(([label, key, format]) => {
+                      const baseline = result.baseline_metrics[key]
+                      const scenario = result.scenario_metrics[key]
+                      const delta = result.metric_deltas[key] ?? 0
+                      const display = (value: number) =>
+                        format === 'percent'
+                          ? formatPercent(value)
+                          : formatNumber(value)
+                      const change =
+                        format === 'percent'
+                          ? `${delta > 0 ? '+' : ''}${(delta * 100).toFixed(1)} pp`
+                          : `${delta > 0 ? '+' : ''}${formatNumber(delta)}`
+                      return (
+                        <tr key={key}>
+                          <th scope="row" className="py-3 pr-3 font-medium">
+                            {label}
+                          </th>
+                          <td className="py-3 pr-3">{display(baseline)}</td>
+                          <td className="py-3 pr-3 font-semibold text-white">
+                            {display(scenario)}
+                          </td>
+                          <td className="py-3">{change}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300">
+                {result.scenario_metrics.observations.toLocaleString()}{' '}
+                observations evaluated; {result.parameters.closed_rooms.length}{' '}
+                room(s) closed.
               </div>
             </div>
-          </Card>
-        </div>
-      )}
+          ) : (
+            <EmptyPanel message="Adjust scenario assumptions and run the simulation to see measured changes against the baseline." />
+          )}
+        </Card>
+      </div>
     </>
   )
 }

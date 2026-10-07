@@ -291,6 +291,7 @@ async def predict_single_room(
     room_id: str,
     horizon_hours: int = Query(default=1, ge=1, le=168),
     confidence_levels: str = Query(default="0.1,0.5,0.9"),
+    start_time: str | None = Query(default=None, description="Forecast target time (ISO 8601)"),
     _: str = Depends(require_forecast),
 ):
     """
@@ -312,6 +313,7 @@ async def predict_single_room(
         request = ForecastRequest(
             room_ids=[room_id],
             horizon_hours=horizon_hours,
+            start_time=start_time,
             confidence_levels=levels,
         )
     except ValidationError as exc:

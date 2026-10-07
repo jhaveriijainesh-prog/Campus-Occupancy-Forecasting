@@ -1,6 +1,6 @@
 # BDS-06 React Dashboard
 
-The React dashboard is a read-only interface to the FastAPI service. Occupancy and timetable values are synthetic demonstration data, not live campus telemetry.
+The React dashboard is an interactive, read-only analytics interface to the FastAPI service. Users can request a room forecast for a selected time, query room-level metrics, and run what-if scenarios. Occupancy and timetable values are synthetic demonstration data, not live campus telemetry.
 
 ## Run Locally
 
@@ -29,9 +29,9 @@ To deploy, create a Blueprint in Render from this repository and use `render.yam
 ## Routes
 
 - `/` - API-driven campus utilization overview and readiness
-- `/forecast` - one room, one hour, point estimate
-- `/rooms` - room metrics and API-returned cluster metadata
-- `/optimization` - reports the real `403` boundary for read-only access
+- `/forecast` - one room, selected target time, one-hour point estimate
+- `/rooms` - user-selected room metrics and API-returned cluster metadata
+- `/optimization` - interactive occupancy/enrollment what-if simulation and room closures
 - `/health` - API health, readiness, version, and dependency checks
 
 ## Checks
@@ -46,9 +46,9 @@ The Vite build may report a JavaScript bundle-size advisory; it is not suppresse
 
 ## Scope
 
-- Forecasting remains one room, one hour, and point-estimate only.
+- Forecasting remains one room, one hour, and point-estimate only; the target time is user-selected.
 - Missing API values remain unavailable rather than being substituted with zero.
-- The frontend has no privileged optimization credential and does not fabricate optimization output.
+- What-if runs are temporary comparisons against the same baseline; they do not mutate campus data. The MILP allocation comparison remains a separate privileged backend capability.
 - The existing Compose stack remains FastAPI and Streamlit for local use; Render uses `Dockerfile.render`.
 
 See [the deployment and frontend guide](../docs/react_frontend.md), [API mapping](../docs/react_dashboard_mapping.md), and [screenshot index](../docs/react_dashboard_screenshots.md).

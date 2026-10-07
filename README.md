@@ -5,27 +5,29 @@
 **Academic Level:** Third Year B.Sc. Data Science (T.Y. B.Sc. DS) – Semester V Capstone Project  
 **System Architecture:** FastAPI + Streamlit + Docker Compose for local use; React + FastAPI in the Render web-service image
 
-**Verified MVP:** Synthetic-data utilization analytics, a one-hour XGBoost room forecast, read-only dashboards, and a reproducible local Docker demo; a Render deployment blueprint is included
+**Verified MVP:** Synthetic-data utilization analytics, a one-hour XGBoost room forecast, interactive room lookup and what-if scenarios, and a reproducible local Docker demo; the public React demo is deployed on Render's free plan
 
 ### Problem
 Campus planning often depends on nominal schedules rather than observed room use. The project explores whether short-term occupancy analytics and simple capacity-aware reasoning can help identify underused and overused spaces using a synthetic, reproducible campus dataset.
 
 ### Solution
-The project combines a validated data pipeline, explicit leakage controls, a one-hour forecast, utilization metrics, and analytical optimization evidence. The system exposes a read-only dashboard and supporting API routes for local demonstration and review.
+The project combines a validated data pipeline, explicit leakage controls, a one-hour forecast, utilization metrics, and analytical optimization evidence. The hosted read-only dashboard accepts room and scenario inputs and returns forecasts and analytics from the supporting API.
 
 ### Architecture
-The solution is a modular Python monolith with a FastAPI backend, a Streamlit dashboard, and Docker Compose orchestration for local use. A React dashboard is also included. The Render image serves React and FastAPI together, with a same-origin Nginx proxy so the read-only API key stays server-side. The dashboards consume API responses rather than reaching into model files or processed data directly.
+The solution is a modular Python monolith with a FastAPI backend, a Streamlit dashboard, and Docker Compose orchestration for local use. The hosted React dashboard serves with FastAPI through a same-origin Nginx proxy that keeps the read-only API key server-side. Both dashboards consume API responses rather than reading model files or processed data directly.
 
 ### Technical contribution
 The project contributes a rigorous, evidence-based capstone implementation with: dataset validation and cleaning, causal feature engineering, chronological forecasting, utilization metrics (SUR/RFU/WSH), room clustering analysis, what-if simulation, and a greedy-vs-MILP allocation comparison on synthetic data.
 
 ### Key features
 - Overview dashboards with readiness and operational KPIs
-- Forecast Explorer with one-room, one-hour point forecast
+- Forecast Explorer with user-selected room and target time for a one-hour point forecast
+- Room Intelligence with user-selected room metrics and cluster metadata
+- What-if planner with occupancy/enrollment changes and room closures
 - API-level security and least-privilege key checks
 - Local health/readiness validation
 - Leakage-prevention regression tests
-- Optimization and clustering as analytical capability, not a separate dashboard page
+- MILP allocation comparison remains an elevated backend capability; interactive what-if simulation is available to dashboard users
 
 ### Testing
 The checked-in test suite includes dashboard smoke tests, API checks, simulation/optimization tests, and strict temporal leakage validation.
@@ -34,7 +36,7 @@ The checked-in test suite includes dashboard smoke tests, API checks, simulation
 The project uses API keys with permission checks and sanitizes sensitive details in user-facing error output. Render generates distinct production API keys for its demo service; this is not an institutional identity or secret-management integration.
 
 ### Reproducibility
-Docker Compose remains the supported local demonstration path. The root `render.yaml` and `Dockerfile.render` provide an optional public demo deployment path; a live service URL and production-readiness claim are not established by this repository alone.
+Docker Compose remains the supported local demonstration path. The root `render.yaml` and `Dockerfile.render` deploy the public [free-tier Render demo](https://campus-occupancy-forecasting.onrender.com/); this does not constitute production readiness.
 
 ### Limitations
 The repository uses synthetic data, the served forecast is one hour and point-based, and the optimization evidence is bounded to the checked-in academic scenario. Render's free web-service plan may spin down while idle. This is a demo, not a live institutional deployment or production service.
@@ -59,7 +61,7 @@ The synthetic results are not evidence of real campus occupancy or operational s
 
 ### Startup MVP Boundary
 
-The dashboard exposes only `Overview` and `Forecast Explorer`. It supports aggregate campus/building/room metrics and a one-room, one-hour XGBoost point forecast. Clustering, simulation, and room allocation are API/offline analytical capabilities, not dashboard pages. Live sensor integration, model retraining, calibrated forecast intervals, and forecast horizons beyond one hour are not part of the verified startup MVP.
+The local Streamlit MVP exposes `Overview` and `Forecast Explorer`. The hosted React dashboard additionally provides room lookup and an interactive what-if planner, while keeping the forecast to one room, one hour, and an honest point estimate. The separate MILP allocation comparison remains a privileged analytical capability. Live sensor integration, model retraining, calibrated forecast intervals, and forecast horizons beyond one hour are not part of the verified MVP.
 
 For detailed documentation:
 - 📄 **[Requirements Specification (SRS)](docs/01_requirements.md)**

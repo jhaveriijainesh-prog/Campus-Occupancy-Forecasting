@@ -6,6 +6,8 @@ import type {
   ModelInfoResponse,
   OptimizationResult,
   ReadinessResponse,
+  ScenarioRequest,
+  ScenarioResponse,
   UtilizationResponse,
 } from '../types'
 
@@ -93,16 +95,26 @@ export const api = {
       method: 'GET',
     }),
 
-  forecast: (roomId: string, horizon = 1) =>
-    request<ForecastResponse>(
-      `/api/v1/forecast/predict/${encodeURIComponent(roomId)}?horizon_hours=${horizon}`,
-      {
-        method: 'GET',
-      },
-    ),
+  forecast: (roomId: string, startTime: string, horizon = 1) => {
+    const params = new URLSearchParams({
+      horizon_hours: String(horizon),
+      start_time: startTime,
+    })
+    return request<ForecastResponse>(
+      `/api/v1/forecast/predict/${encodeURIComponent(roomId)}?${params}`,
+      { method: 'GET' },
+    )
+  },
 
   clusters: () =>
     request<ClusterResponse>('/api/v1/clustering/rooms', { method: 'GET' }),
+
+  simulate: (scenario: ScenarioRequest) =>
+    request<ScenarioResponse>('/api/v1/simulation/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(scenario),
+    }),
 
   optimization: () =>
     request<OptimizationResult>('/api/v1/optimize/compare', { method: 'POST' }),

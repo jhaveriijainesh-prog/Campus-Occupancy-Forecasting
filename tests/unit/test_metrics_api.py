@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 from app.analytics.metrics import calculate_utilization_metrics, filter_occupancy
 from app.api.main import app
 from app.api.routes import forecast as forecast_route, health as health_route
+from app.core.config import DEFAULT_API_READ_KEY
 
 
 API_KEY = "bds06-super-secret-development-key-change-in-prod"
@@ -196,6 +197,36 @@ def test_forecast_labels_point_estimate_interval_honestly():
     assert payload["horizon_semantics"] == "one_step_ahead_hourly"
     assert payload["prediction_interval"]["p10"] <= payload["prediction_interval"]["p50"] <= payload["prediction_interval"]["p90"]
     assert 0.0 <= payload["predicted_headcount"] <= 120.0
+
+
+def test_forecast_accepts_requested_target_time():
+    target_time = "2026-10-07T12:00:00Z"
+    response = TestClient(app).get(
+        "/api/v1/forecast/predict/B01-R101",
+        headers={"X-API-Key": API_KEY},
+        params={"start_time": target_time},
+    )
+
+    assert response.status_code == 200, response.text
+    assert response.json()["timestamp"] == "2026-10-07T12:00:00+00:00"
+
+
+def test_read_only_key_can_run_what_if_scenarios():
+    response = TestClient(app).post(
+        "/api/v1/simulation/run",
+        headers={"X-API-Key": DEFAULT_API_READ_KEY},
+        json={
+            "occupancy_multiplier": 1.2,
+            "enrollment_multiplier": 1.1,
+            "closed_rooms": ["B01-R101"],
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["parameters"]["closed_rooms"] == ["B01-R101"]
+    assert payload["baseline_metrics"] != payload["scenario_metrics"]
+    assert "seat_utilization_rate" in payload["metric_deltas"]
 
 
 def test_forecast_rejects_unsupported_artifact_horizon():

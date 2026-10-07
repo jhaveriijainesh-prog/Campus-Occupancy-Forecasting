@@ -32,19 +32,19 @@ Open `http://127.0.0.1:5173`. Vite proxies `/api` to `http://127.0.0.1:8000`. It
 
 The root `render.yaml` defines one Docker web service for React and FastAPI. `Dockerfile.render` builds the frontend and creates the deterministic synthetic dataset and one-hour forecast model from the checked-in generator/training scripts. Nginx serves the SPA and injects the Render-managed read-only key into same-origin `/api/` requests; Render generates separate production API keys.
 
-Create a Blueprint in Render from this repository and deploy `render.yaml`. The configured free plan may spin down while idle; the first request afterward may take longer. Occupancy remains synthetic demonstration data. This is a public demo setup, not an institutional production service. A live URL and successful remote container build are not established by the repository alone.
+The public free-tier demo is available at [campus-occupancy-forecasting.onrender.com](https://campus-occupancy-forecasting.onrender.com/). The service may spin down while idle, so the first request afterward may take longer. Occupancy remains synthetic demonstration data; this is not an institutional production service.
 
 ## Routes and Capabilities
 
 | Route | Capability |
 | --- | --- |
 | `/` | Campus utilization KPIs, chart, API status, and readiness |
-| `/forecast` | One-room, one-hour point forecast |
-| `/rooms` | Room metrics and returned cluster metadata |
-| `/optimization` | Displays the actual `403` permission boundary for read-only access |
+| `/forecast` | User-selected room and target time; one-hour point forecast |
+| `/rooms` | User-selected room metrics and returned cluster metadata |
+| `/optimization` | Interactive occupancy/enrollment what-if simulation with room closures |
 | `/health` | API health, readiness, version, and dependency checks |
 
-Forecast output is point-estimate-only; the UI does not present fabricated uncertainty. Missing API values remain unavailable. Optimization comparison requires the `optimize` permission, which is not granted to the dashboard's read-only key.
+Forecast output is point-estimate-only; the UI does not present fabricated uncertainty. Missing API values remain unavailable. What-if scenarios run under the read-only credential and compare against the immutable source-data baseline. The separate MILP allocation comparison still requires the `optimize` permission.
 
 ## Quality Checks
 

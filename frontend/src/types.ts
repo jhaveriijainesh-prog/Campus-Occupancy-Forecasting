@@ -39,6 +39,20 @@ export type UtilizationResponse = {
   source_timestamp?: string | null
 }
 
+export type ScenarioRequest = {
+  occupancy_multiplier: number
+  enrollment_multiplier: number
+  closed_rooms: string[]
+}
+
+export type ScenarioResponse = {
+  scenario_id: string
+  parameters: ScenarioRequest & { capacity_adjustments: Record<string, number> }
+  baseline_metrics: UtilizationMetrics
+  scenario_metrics: UtilizationMetrics
+  metric_deltas: Partial<UtilizationMetrics>
+}
+
 export type ForecastResponse = {
   room_id: string
   timestamp: string

@@ -12,30 +12,31 @@ This mapping records the FastAPI contract consumed by the existing React dashboa
 | Overview: API and readiness status                    | `GET /api/v1/health`, `GET /api/v1/health/ready`                                              | Returns API health, readiness, and dependency state                              | `AppShell` live status badge and `OverviewPage` status panels                                       |
 | Overview: campus utilization KPIs                     | `GET /api/v1/metrics/utilization?scope=campus`                                                | Returns campus SUR, RFU, WSH, peak occupancy, observations, and source timestamp | `OverviewPage` KPI cards and snapshot chart                                                         |
 | Forecast Explorer: room selection and request context | `GET /api/v1/forecast/model/info`                                                             | Returns model metadata, version, and supported horizon                           | `ForecastPage` model status and controls                                                            |
-| Forecast Explorer: one-hour point forecast            | `GET /api/v1/forecast/predict/{room_id}?horizon_hours=1`                                      | Generates a supported one-room, one-hour point forecast                          | `ForecastPage` result panel                                                                         |
+| Forecast Explorer: one-hour point forecast            | `GET /api/v1/forecast/predict/{room_id}?horizon_hours=1&start_time=...`                       | Generates a room forecast for the requested target time                          | `ForecastPage` result panel                                                                         |
 | Forecast Explorer: model metadata                     | `GET /api/v1/forecast/model/info`                                                             | Returns model type, version, and supported one-hour horizon                      | `ForecastPage` model status and forecast controls                                                   |
 | Dashboard shell status + service health               | `GET /api/v1/health`                                                                          | Returns live API status and timestamp                                            | `AppShell` live status badge                                                                        |
-| Room-level analysis                                   | `GET /api/v1/metrics/utilization?scope=room&room_id=B01-R101`, `GET /api/v1/clustering/rooms` | Returns room KPIs and cluster profile metadata                                   | `RoomsPage` room metrics, `cluster_id`, and `cluster_label`                                         |
-| Optimization/analytical capability                    | `POST /api/v1/optimize/compare`                                                               | Compares allocation strategies; requires the `optimize` permission               | `OptimizationPage` shows the read-only credential boundary instead of attempting privileged actions |
+| Room-level analysis                                   | `GET /api/v1/metrics/utilization?scope=room&room_id=...`, `GET /api/v1/clustering/rooms`       | Returns selected-room KPIs and cluster profile metadata                          | `RoomsPage` user-selected metrics and cluster metadata                                             |
+| What-if scenario                                       | `POST /api/v1/simulation/run`                                                                | Returns baseline and scenario metrics for occupancy/enrollment factors and room closures | `OptimizationPage` interactive inputs and comparison results                                |
+| MILP allocation comparison                             | `POST /api/v1/optimize/compare`                                                               | Compares allocation strategies; requires the `optimize` permission               | Kept separate from the read-only user-facing what-if planner                                       |
 | System health dashboard                               | `GET /api/v1/health`, `GET /api/v1/health/ready`, `GET /api/v1/health/detailed`               | Real observability and dependency state                                          | `HealthPage`                                                                                        |
 
 ## Observed verified boundaries
 
-- The React product enhancement is read-only. Existing Streamlit workflows remain unchanged.
+- The React product accepts analytical inputs but does not mutate source data. Existing Streamlit workflows remain unchanged.
 - Occupancy values come from the project's synthetic demonstration dataset, not live campus sensors.
 - The verified forecast contract is strictly one room and one hour: `horizon_hours = 1` and point-estimate-only output.
 - The UI must not claim support for multi-hour, interval-heavy, or probabilistic forecasting unless the backend contract explicitly provides it.
-- Optimization, clustering, and simulation remain analytical capabilities in the backend, not fully exposed live dashboards in the startup MVP.
+- MILP allocation comparison remains a privileged backend capability. Room clustering and what-if simulation are exposed in the React demo.
 
 ## React route mapping
 
 - `/` → Overview page
 - `/forecast` → Forecast Explorer page
 - `/rooms` → Room Intelligence page
-- `/optimization` → Optimization / analytical capability page
+- `/optimization` → What-if planner page
 - `/health` → System Health page
 
-React calls same-origin `/api` paths. Local Vite attaches the configured read credential to upstream FastAPI requests server-side; the Render Nginx proxy does the same with its platform-managed key. Neither key is compiled into browser assets. The read-only credential cannot call optimization comparison, so FastAPI returns `403`. The UI reports that boundary and does not request elevated access.
+React calls same-origin `/api` paths. Local Vite attaches the configured read credential to upstream FastAPI requests server-side; the Render Nginx proxy does the same with its platform-managed key. Neither key is compiled into browser assets. The read-only key is sufficient for forecasts, room metrics, clustering, and non-mutating simulations. Only the separate allocation-comparison endpoint requires the elevated `optimize` permission.
 
 The detailed health response includes an environment field, but React intentionally omits it and displays only health/readiness, service version, and dependency checks.
 
@@ -51,6 +52,7 @@ The detailed health response includes an environment field, but React intentiona
 - `app/api/routes/metrics.py` exposes utilization metrics.
 - `app/api/routes/forecast.py` exposes model metadata and the supported single-room forecast route.
 - `app/api/routes/optimization.py` exposes analytical optimization comparison.
+- `app/api/routes/simulation.py` exposes validated non-mutating scenario simulation.
 - `app/api/routes/clustering.py` exposes room clustering metadata.
 
 ## Screenshot Evidence
