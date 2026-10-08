@@ -42,7 +42,30 @@ HORIZON_SEMANTICS = "one_step_ahead_hourly"
 
 # Global model cache
 _forecaster: Optional[OccupancyForecaster] = None
+_forecaster_signature: Optional[tuple[int, int]] = None
 _feature_engineer: Optional[FeatureEngineer] = None
+
+
+def _normalize_forecast_start_time(start_time_value: str | None, timezone_name: str) -> pd.Timestamp:
+    """Normalize the request timestamp while preserving the exact instant supplied by callers.
+
+    Naive datetimes are interpreted as campus-local time per the contract. Timezone-aware values
+    retain their exact instant and are not re-encoded through a local/UTC round trip.
+    """
+    if start_time_value is None:
+        return pd.Timestamp.now(tz="UTC")
+
+    ts = pd.Timestamp(start_time_value)
+    if ts.tzinfo is None:
+        return ts.tz_localize(timezone_name)
+    return ts
+
+
+def _request_wall_time(requested_start: pd.Timestamp, timezone_name: str) -> pd.Timestamp:
+    """Return the campus wall-clock timestamp used for local bucket matching."""
+    if requested_start.tzinfo is None:
+        return requested_start.tz_localize(timezone_name)
+    return requested_start.tz_convert(timezone_name)
 
 
 @router.get(
@@ -107,18 +130,32 @@ def _load_processed_frame(path: str, modified_ns: int, size_bytes: int) -> pd.Da
 
 def get_forecaster() -> OccupancyForecaster:
     """Get or load the trained forecaster model."""
-    global _forecaster
-    if _forecaster is None:
-        settings = get_settings()
-        model_path = settings.experiments_dir / "xgboost"
-        if not (model_path / "model.json").exists():
-            raise HTTPException(
-                status_code=503,
-                detail="Model not trained. Run training pipeline first."
-            )
+    global _forecaster, _forecaster_signature
+    settings = get_settings()
+    model_path = settings.experiments_dir / "xgboost"
+    model_file = model_path / "model.json"
+    metadata_file = model_path / "feature_metadata.json"
+    if not metadata_file.exists():
+        raise HTTPException(
+            status_code=503,
+            detail="Forecast model metadata is unavailable"
+        )
+    if not model_file.exists():
+        raise HTTPException(
+            status_code=503,
+            detail="Forecast model artifact is unavailable"
+        )
+
+    artifact_signature = (
+        int(model_file.stat().st_mtime_ns),
+        int(metadata_file.stat().st_mtime_ns),
+    )
+    if _forecaster is None or _forecaster_signature != artifact_signature:
         try:
-            _forecaster = OccupancyForecaster()
-            _forecaster.load(model_path)
+            loaded = OccupancyForecaster()
+            loaded.load(model_path)
+            _forecaster = loaded
+            _forecaster_signature = artifact_signature
         except Exception as exc:
             raise HTTPException(status_code=503, detail=f"Forecast model artifacts are unavailable: {exc}") from exc
     return _forecaster
@@ -129,7 +166,7 @@ def get_feature_engineer() -> FeatureEngineer:
     global _feature_engineer
     if _feature_engineer is None:
         settings = get_settings()
-        _feature_engineer = FeatureEngineer(forecast_horizon=1)
+        _feature_engineer = FeatureEngineer(forecast_horizon=1, timezone=settings.time_zone)
     return _feature_engineer
 
 
@@ -178,21 +215,24 @@ async def predict_occupancy(
     except Exception as exc:
         raise HTTPException(status_code=503, detail=f"Processed forecast data is unavailable: {exc}") from exc
 
-    # Keep the requested instant for the response, but align inference features
-    # to the campus wall clock used by the generated occupancy/timetable data.
+    # Preserve the exact caller-supplied instant while interpreting naive values per the
+    # documented campus-local contract. The feature-engineering layer uses the campus timezone
+    # for local day/hour matching, but the forecast row timestamp itself must still represent the
+    # exact requested instant that the API is forecasting.
     try:
-        if request.start_time:
-            start_time = pd.Timestamp(request.start_time)
-            start_time = start_time.tz_localize("UTC") if start_time.tzinfo is None else start_time.tz_convert("UTC")
-        else:
-            start_time = pd.Timestamp.now(tz="UTC")
-        campus_start_time = start_time.tz_convert(settings.time_zone)
-        model_start_time = campus_start_time.tz_localize(None).tz_localize("UTC")
+        requested_start = _normalize_forecast_start_time(request.start_time, settings.time_zone)
+        requested_wall_time = _request_wall_time(requested_start, settings.time_zone)
+        requested_utc = requested_start.tz_convert("UTC") if requested_start.tzinfo is not None else requested_wall_time.tz_convert("UTC")
     except (TypeError, ValueError) as exc:
         raise HTTPException(
             status_code=422,
             detail="start_time or configured campus timezone is invalid",
         ) from exc
+
+    # The API must keep the exact forecast instant for the target row. If the caller supplied
+    # a timezone-aware value, keep it exactly as provided; only local wall-clock fields are derived
+    # from the campus timezone for timetable matching.
+    target_timestamp = requested_start if requested_start.tzinfo is not None else requested_wall_time
 
     required_columns = {"room_id", "timestamp", "capacity", "actual_headcount"}
     for name, frame in (
@@ -225,7 +265,7 @@ async def predict_occupancy(
     occupancy_timestamps = pd.to_datetime(requested_occupancy["timestamp"], utc=True, errors="coerce")
     if occupancy_timestamps.isna().any():
         raise HTTPException(status_code=503, detail="Processed occupancy data contains invalid timestamps")
-    history_cutoff = model_start_time - pd.Timedelta(hours=request.horizon_hours)
+    history_cutoff = requested_start.tz_convert("UTC") - pd.Timedelta(hours=request.horizon_hours)
     history_mask = occupancy_timestamps.le(history_cutoff)
     available_history = requested_occupancy.loc[history_mask].copy()
     available_history["timestamp"] = occupancy_timestamps.loc[history_mask]
@@ -253,7 +293,7 @@ async def predict_occupancy(
         .copy()
     )
     target_rows = latest_history.copy()
-    target_rows["timestamp"] = model_start_time
+    target_rows["timestamp"] = target_timestamp
     target_rows["actual_headcount"] = float("nan")
     target_rows["observation_id"] = target_rows["room_id"].map(lambda room_id: f"forecast-{room_id}")
     target_rows["is_imputed"] = 0
@@ -263,12 +303,16 @@ async def predict_occupancy(
         errors="ignore",
     )
 
-    semester_start = pd.Timestamp(settings.semester_start_date, tz="UTC").date()
-    target_date = model_start_time.date()
-    target_rows["week_number"] = ((target_date - semester_start).days // 7) + 1
+    target_rows["local_timestamp"] = requested_wall_time
+    target_rows["local_hour"] = requested_wall_time.hour
+    target_rows["local_day_of_week"] = requested_wall_time.dayofweek
+    target_rows["local_day_of_month"] = requested_wall_time.day
+    target_rows["local_month"] = requested_wall_time.month
+    target_rows["is_weekend"] = int(requested_wall_time.dayofweek >= 5)
+    target_rows["week_number"] = ((requested_wall_time.date() - pd.Timestamp(settings.semester_start_date).tz_localize("UTC").date()).days // 7) + 1
 
     try:
-        target_context = harmonize_sources(target_rows, timetable_df, events_df)
+        target_context = harmonize_sources(target_rows, timetable_df, events_df, timezone=settings.time_zone)
         if "campus_event_type" in target_context:
             target_context["event_type"] = target_context["campus_event_type"].fillna("normal")
         else:
@@ -304,11 +348,13 @@ async def predict_occupancy(
             predicted_headcount = min(predicted_headcount, max(0, math.floor(float(capacity))))
         intervals = {key: predicted_headcount for key in intervals}
 
+        response_timestamp = requested_start if requested_start.tzinfo is not None else requested_wall_time
         forecasts.append(ForecastResponse(
             room_id=room_id,
-            timestamp=start_time.isoformat(),
+            timestamp=response_timestamp.isoformat(),
             horizon_hours=request.horizon_hours,
             predicted_headcount=predicted_headcount,
+            capacity=None if pd.isna(capacity) else float(capacity),
             is_scheduled=bool(row.get("is_scheduled", 0)),
             scheduled_enrollment=int(row.get("scheduled_enrollment", 0)),
             scheduled_course_code=(

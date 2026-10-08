@@ -58,6 +58,7 @@ export type ForecastResponse = {
   timestamp: string
   horizon_hours: number
   predicted_headcount: number
+  capacity?: number | null
   is_scheduled: boolean
   scheduled_enrollment: number
   scheduled_course_code?: string | null

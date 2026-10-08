@@ -1015,11 +1015,25 @@ function ForecastPage() {
             <ErrorPanel message={error} />
           ) : forecast ? (
             <div className="space-y-4">
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                 <StatCard
                   label="Predicted headcount"
                   value={formatNumber(forecast.predicted_headcount)}
                   hint="people"
+                />
+                <StatCard
+                  label="Room capacity"
+                  value={formatNumber(forecast.capacity ?? undefined)}
+                  hint="people"
+                />
+                <StatCard
+                  label="Predicted utilization"
+                  value={formatPercent(
+                    forecast.capacity && forecast.capacity > 0
+                      ? forecast.predicted_headcount / forecast.capacity
+                      : undefined,
+                  )}
+                  hint="of room capacity"
                 />
                 <StatCard
                   label="Horizon"

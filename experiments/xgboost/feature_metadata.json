@@ -1,7 +1,8 @@
 {
   "model_type": "XGBRegressor",
+  "schema_version": 1,
   "random_seed": 42,
-  "best_iteration": 224,
+  "best_iteration": 179,
   "feature_names": [
     "hour",
     "day_of_week",
@@ -14,6 +15,7 @@
     "is_holiday",
     "is_imputed",
     "was_clamped",
+    "campus_event_impact_factor",
     "day_of_month",
     "month",
     "is_weekend",
@@ -54,8 +56,8 @@
   ],
   "categorical_features": [
     "room_id",
-    "building_id",
-    "room_type"
+    "room_type",
+    "building_id"
   ],
   "params": {
     "n_estimators": 500,
@@ -71,20 +73,20 @@
     "n_jobs": -1
   },
   "top_features": {
-    "enrollment_vs_rolling_mean_24h": 0.158924,
-    "is_scheduled": 0.148326,
-    "scheduled_enrollment": 0.124702,
-    "is_exam_period": 0.11419,
-    "room_type": 0.06691,
-    "lag_24h": 0.064091,
-    "has_event": 0.059233,
-    "capacity": 0.048601,
-    "lag_24h_utilization": 0.033455,
-    "is_holiday": 0.026251,
-    "is_weekend": 0.021666,
-    "room_id": 0.017593,
-    "rolling_mean_24h": 0.011186,
-    "rolling_std_24h": 0.011154,
-    "lag_168h": 0.007912
+    "scheduled_enrollment": 0.249819,
+    "is_scheduled": 0.193308,
+    "enrollment_vs_rolling_mean_24h": 0.18152,
+    "is_exam_period": 0.069169,
+    "has_event": 0.042373,
+    "is_holiday": 0.033224,
+    "room_id": 0.029885,
+    "campus_event_impact_factor": 0.028701,
+    "lag_24h_utilization": 0.02589,
+    "capacity": 0.023175,
+    "room_type": 0.02192,
+    "rolling_std_168h": 0.019491,
+    "lag_24h": 0.015593,
+    "lag_2h": 0.005139,
+    "rolling_max_168h": 0.004461
   }
 }

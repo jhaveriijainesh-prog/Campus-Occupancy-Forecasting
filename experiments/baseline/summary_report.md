@@ -1,8 +1,8 @@
 # BDS-06: Baseline Forecasting Experiment Report
 
-**Execution Timestamp:** 2026-09-24T14:40:35.168826 UTC  
+**Execution Timestamp:** 2026-10-08T01:16:31.956806 UTC
 **Dataset:** `data/processed/occupancy.parquet`  
-**Split Boundary:** Train (W1–10, 53,760 rows) | Val (W11–12, 10,752 rows) | Test (W13–16, 21,504 rows)  
+**Split Boundary:** Train (W1–10, 53,760 rows) | Val (W11–12, 10,752 rows) | Test (W13–16, 21,504 rows)
 
 ---
 
@@ -10,13 +10,13 @@
 
 | Baseline Model | Train MAE | Train RMSE | Train R² | Val MAE | Val RMSE | Val R² | Test MAE | Test RMSE | Test R² | Test WAPE |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **HistoricalSeasonalProfile** | 1.5755 | 6.5907 | 0.4794 | 1.4437 | 5.1542 | -0.072 | 2.5975 | 10.1839 | 0.2335 | 102.7% |
-| **SeasonalLastWeek** | 2.0473 | 9.9753 | -0.1927 | 1.3584 | 4.0096 | 0.3512 | 2.9778 | 10.5901 | 0.1711 | 117.8% |
-| **StaticTimetable** | 1.3434 | 7.7589 | 0.2784 | 0.9296 | 6.8129 | -0.873 | 2.5478 | 11.9689 | -0.0588 | 100.8% |
+| **HistoricalSeasonalProfile** | 1.9405 | 7.0035 | 0.7543 | 2.6255 | 9.4104 | 0.0706 | 3.2442 | 11.2925 | 0.3695 | 84.8% |
+| **SeasonalLastWeek** | 2.8429 | 10.9107 | 0.4038 | 2.5819 | 6.7454 | 0.5225 | 4.8355 | 12.278 | 0.2546 | 126.4% |
+| **StaticTimetable** | 2.319 | 9.5985 | 0.5386 | 3.0671 | 13.4252 | -0.8915 | 3.9289 | 14.7939 | -0.0822 | 102.7% |
 
 ---
 
 ## 2. Key Findings & Empirical Benchmark
-- **Champion Baseline:** `HistoricalSeasonalProfile` achieves the strongest baseline performance with **Test MAE = 2.5975**, **RMSE = 10.1839**, and **R² = 0.2335**.
-- **Static Timetable Flaw:** `StaticTimetable` exhibits high error (Test MAE = 2.5478) because it fails to model actual student attendance dropouts, idle evening intervals, and exam-week timetable suspensions.
+- **Champion Baseline:** `HistoricalSeasonalProfile` achieves the strongest baseline performance with **Test MAE = 3.2442**, **RMSE = 11.2925**, and **R² = 0.3695**.
+- **Static Timetable Flaw:** `StaticTimetable` exhibits high error (Test MAE = 3.9289) because it fails to model actual student attendance dropouts, idle evening intervals, and exam-week timetable suspensions.
 - **Weekly Naive Vulnerability:** `SeasonalLastWeek` suffers when calendar disruptions (such as holidays or study breaks) contaminate the reference lag $y_{t-168}$.

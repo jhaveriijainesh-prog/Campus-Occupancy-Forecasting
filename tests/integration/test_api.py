@@ -160,7 +160,7 @@ def test_forecast_uses_campus_local_time_for_timetable_features(monkeypatch):
 		"scheduled_enrollment": 0,
 	}
 	result = response.json()
-	assert result["timestamp"] == "2026-10-09T03:30:00+00:00"
+	assert result["timestamp"] == "2026-10-09T09:00:00+05:30"
 	assert result["predicted_headcount"] == 95
 	assert result["is_scheduled"] is True
 	assert result["scheduled_enrollment"] == 95

@@ -308,6 +308,11 @@ def generate_occupancy(
         event_type = event_info["event_type"] if event_info else "normal"
 
         for hour in range(24):
+            timestamp_utc = (
+                pd.Timestamp(f"{date_str}T{hour:02d}:00:00", tz="Asia/Kolkata")
+                .tz_convert("UTC")
+                .strftime("%Y-%m-%dT%H:%M:%SZ")
+            )
             for room_id, rdata in room_map.items():
                 capacity = rdata["capacity"]
                 room_type = rdata["room_type"]
@@ -462,7 +467,7 @@ def generate_occupancy(
 
                 observations.append({
                     "observation_id": f"OBS-{obs_id:07d}",
-                    "timestamp": f"{date_str}T{hour:02d}:00:00Z",
+                    "timestamp": timestamp_utc,
                     "date": date_str,
                     "hour": hour,
                     "day_of_week": dow,

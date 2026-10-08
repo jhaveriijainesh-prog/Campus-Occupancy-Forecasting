@@ -70,6 +70,22 @@ def test_temporal_split_chronological_boundaries(synthetic_time_series):
     assert val_max < test_min, f"Temporal leakage: val_max ({val_max}) >= test_min ({test_min})"
 
 
+def test_temporal_split_uses_campus_date_when_utc_date_crosses_boundary():
+    frame = pd.DataFrame(
+        [
+            {"timestamp": "2026-10-12T00:30:00Z", "date": "2026-10-11", "actual_headcount": 10},
+            {"timestamp": "2026-10-12T01:30:00Z", "date": "2026-10-12", "actual_headcount": 20},
+            {"timestamp": "2026-10-26T00:30:00Z", "date": "2026-10-26", "actual_headcount": 30},
+        ]
+    )
+
+    train, val, test = FeatureEngineer.temporal_split(frame)
+
+    assert train["actual_headcount"].tolist() == [10]
+    assert val["actual_headcount"].tolist() == [20]
+    assert test["actual_headcount"].tolist() == [30]
+
+
 def test_lag_causality_exact_antecedent_alignment(synthetic_time_series):
     """Assert that lag_1h at timestamp t equals exactly actual_headcount at timestamp (t - 1)."""
     fe = FeatureEngineer(forecast_horizon=1)

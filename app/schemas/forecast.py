@@ -43,6 +43,7 @@ class ForecastResponse(BaseModel):
     timestamp: str
     horizon_hours: int
     predicted_headcount: float
+    capacity: float | None = None
     is_scheduled: bool = False
     scheduled_enrollment: int = 0
     scheduled_course_code: str | None = None

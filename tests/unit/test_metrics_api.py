@@ -155,7 +155,7 @@ def test_filtered_metrics_use_filtered_source_timestamp():
     )
 
     assert response.status_code == 200, response.text
-    assert response.json()["source_timestamp"] == "2026-08-03T00:00:00Z"
+    assert response.json()["source_timestamp"] == "2026-08-02T23:30:00Z"
 
 
 def test_empty_filtered_metrics_do_not_claim_an_out_of_window_timestamp():
@@ -194,6 +194,7 @@ def test_forecast_labels_point_estimate_interval_honestly():
     payload = response.json()
     assert payload["interval_method"] == "point_estimate_only"
     assert len(set(payload["prediction_interval"].values())) == 1
+    assert payload["capacity"] == 120
     assert payload["horizon_semantics"] == "one_step_ahead_hourly"
     assert payload["prediction_interval"]["p10"] <= payload["prediction_interval"]["p50"] <= payload["prediction_interval"]["p90"]
     assert 0.0 <= payload["predicted_headcount"] <= 120.0
@@ -246,7 +247,7 @@ def test_forecast_uses_only_causal_history_before_requested_timestamp(monkeypatc
         "room_id": ["B01-R101"] * 6,
         "timestamp": timestamps,
         "capacity": [100] * 6,
-        "actual_headcount": [1, 10, 20, 30, 777, 999],
+        "actual_headcount": [10, 20, 30, 40, 50, 60],
         "is_scheduled": [True] * 6,
         "scheduled_course_code": ["DS101"] * 6,
         "scheduled_enrollment": [80] * 6,
@@ -261,8 +262,8 @@ def test_forecast_uses_only_causal_history_before_requested_timestamp(monkeypatc
     timetable = pd.DataFrame({
         "room_id": ["B01-R101"],
         "day_of_week": ["Monday"],
-        "start_time": ["04:00:00"],
-        "end_time": ["05:00:00"],
+        "start_time": ["09:00:00"],
+        "end_time": ["10:00:00"],
         "course_code": ["DS101"],
         "enrolled_count": [80],
         "timetable_id": ["TT-1"],
@@ -287,25 +288,52 @@ def test_forecast_uses_only_causal_history_before_requested_timestamp(monkeypatc
         }[name],
     )
 
+    request_time = "2026-08-03T09:30:00+05:30"
     response = TestClient(app).post(
         "/api/v1/forecast/predict",
         headers={"X-API-Key": API_KEY},
         json={
             "room_ids": ["B01-R101"],
             "horizon_hours": 1,
-            "start_time": "2026-08-03T04:00:00+05:30",
+            "start_time": request_time,
         },
     )
 
     assert response.status_code == 200, response.text
-    assert response.json()["forecasts"][0]["timestamp"] == "2026-08-02T22:30:00+00:00"
-    assert forecaster.features["timestamp"].iloc[0] == pd.Timestamp("2026-08-03T04:00:00Z")
+    assert response.json()["forecasts"][0]["timestamp"] == request_time
+    assert forecaster.features["timestamp"].iloc[0] == pd.Timestamp(request_time)
     latest = forecaster.features.iloc[0]
     assert pd.isna(latest["actual_headcount"])
-    assert latest["lag_1h"] == 30
-    assert latest["rolling_mean_4h"] == 15.25
+    assert latest["lag_1h"] == 40
+    assert latest["rolling_mean_4h"] == 25.0
     assert latest["scheduled_enrollment"] == 80
     assert latest["is_scheduled"] == 1
+
+    utc_req = "2026-08-03T04:00:00Z"
+    same_instant_ist = "2026-08-03T09:30:00+05:30"
+    utc_response = TestClient(app).post(
+        "/api/v1/forecast/predict",
+        headers={"X-API-Key": API_KEY},
+        json={
+            "room_ids": ["B01-R101"],
+            "horizon_hours": 1,
+            "start_time": utc_req,
+        },
+    )
+    ist_response = TestClient(app).post(
+        "/api/v1/forecast/predict",
+        headers={"X-API-Key": API_KEY},
+        json={
+            "room_ids": ["B01-R101"],
+            "horizon_hours": 1,
+            "start_time": same_instant_ist,
+        },
+    )
+    assert utc_response.status_code == 200
+    assert ist_response.status_code == 200
+    assert utc_response.json()["forecasts"][0]["timestamp"] == "2026-08-03T04:00:00+00:00"
+    assert ist_response.json()["forecasts"][0]["timestamp"] == "2026-08-03T09:30:00+05:30"
+    assert utc_response.json()["forecasts"][0]["predicted_headcount"] == ist_response.json()["forecasts"][0]["predicted_headcount"]
 
 
 def test_forecast_without_history_before_target_returns_not_found(monkeypatch):
@@ -407,13 +435,13 @@ def test_forecast_feature_builder_receives_bounded_as_of_history(monkeypatch):
 
     assert response.status_code == 200, response.text
     assert feature_engineer.input_row_count == 169
-    assert feature_engineer.input["timestamp"].max() == timestamps[201]
+    assert feature_engineer.input["timestamp"].max() == pd.Timestamp("2026-08-11T03:30:00Z")
     assert feature_engineer.input.iloc[-1]["actual_headcount"] != 201
     target_features = forecaster.features.iloc[0]
-    assert target_features["timestamp"] == timestamps[201]
+    assert target_features["timestamp"] == pd.Timestamp("2026-08-11T03:30:00Z")
     assert pd.isna(target_features["actual_headcount"])
-    assert target_features["lag_1h"] == 200
-    assert target_features["lag_168h"] == 33
+    assert target_features["lag_1h"] == 194
+    assert target_features["lag_168h"] == 27
 
 
 @pytest.mark.parametrize(("missing_file", "missing_check"), [

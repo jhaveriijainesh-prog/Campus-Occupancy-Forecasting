@@ -55,9 +55,10 @@ class CleaningSummary:
 class CampusDataCleaner:
     """Production cleaning engine enforcing strict integrity without silent deletions."""
 
-    def __init__(self, processed_dir: str = "data/processed"):
+    def __init__(self, processed_dir: str = "data/processed", timezone: str = "Asia/Kolkata"):
         self.processed_dir = Path(processed_dir)
         self.processed_dir.mkdir(parents=True, exist_ok=True)
+        self.timezone = timezone
         self.validator = CampusDataValidator()
         self.audit_log: List[CleaningAuditRecord] = []
         self.quarantined_records: List[Dict[str, Any]] = []
@@ -452,7 +453,12 @@ class CampusDataCleaner:
         cleaned_tt, sum_tt = self.clean_timetable(raw_timetable, cleaned_rooms)
         cleaned_events = raw_events.copy()
         cleaned_occ, sum_occ = self.clean_occupancy(raw_occupancy, cleaned_rooms)
-        cleaned_occ = harmonize_sources(cleaned_occ, cleaned_tt, cleaned_events)
+        cleaned_occ = harmonize_sources(
+            cleaned_occ,
+            cleaned_tt,
+            cleaned_events,
+            timezone=self.timezone,
+        )
 
         # Post-cleaning Validation
         val_rooms_post = self.validator.validate_rooms(cleaned_rooms)

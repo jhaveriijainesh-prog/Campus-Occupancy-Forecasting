@@ -21,7 +21,12 @@ def test_real_repository_data_flows_through_analytics_pipeline(tmp_path):
     cleaned_rooms, _ = cleaner.clean_rooms(rooms)
     cleaned_timetable, _ = cleaner.clean_timetable(timetable, cleaned_rooms)
     cleaned_occupancy, _ = cleaner.clean_occupancy(occupancy, cleaned_rooms)
-    harmonized = harmonize_sources(cleaned_occupancy, cleaned_timetable, events)
+    harmonized = harmonize_sources(
+        cleaned_occupancy,
+        cleaned_timetable,
+        events,
+        timezone="Asia/Kolkata",
+    )
 
     metrics = calculate_utilization_metrics(harmonized)
     features = FeatureEngineer(forecast_horizon=1).create_features(harmonized.head(5000))

@@ -1,8 +1,41 @@
 """Regression tests for the synthetic campus demo data."""
 
 import numpy as np
+import pandas as pd
 
-from scripts.generate_data import generate_rooms, generate_timetable
+from scripts.generate_data import generate_occupancy, generate_rooms, generate_timetable
+
+
+def test_generated_occupancy_timestamps_preserve_campus_local_hour():
+    rooms = pd.DataFrame(
+        [{"room_id": "B01-R101", "capacity": 120, "room_type": "Lecture Hall"}]
+    )
+    timetable = pd.DataFrame(
+        [{
+            "room_id": "B01-R101",
+            "day_of_week": "Monday",
+            "start_time": "08:00:00",
+            "end_time": "09:00:00",
+            "course_code": "DS101",
+            "course_name": "Data Science",
+            "enrolled_count": 80,
+            "room_type_required": "Lecture Hall",
+        }]
+    )
+
+    occupancy = generate_occupancy(
+        rooms,
+        timetable,
+        pd.DataFrame(columns=["date", "event_type"]),
+        pd.Timestamp("2026-08-03").date(),
+        1,
+        np.random.default_rng(42),
+    )
+    scheduled = occupancy.loc[occupancy["is_scheduled"]].iloc[0]
+
+    assert scheduled["hour"] == 8
+    assert pd.Timestamp(scheduled["timestamp"]).tz_convert("Asia/Kolkata").hour == 8
+    assert scheduled["timestamp"] == "2026-08-03T02:30:00Z"
 
 
 def test_timetable_covers_every_room_with_capacity_safe_non_overlapping_sessions():

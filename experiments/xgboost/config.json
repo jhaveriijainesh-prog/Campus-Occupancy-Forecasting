@@ -1,6 +1,6 @@
 {
   "model_type": "XGBRegressor",
-  "execution_timestamp": "2026-09-24T14:44:47.626610+00:00",
+  "execution_timestamp": "2026-10-08T01:16:41.264145+00:00",
   "random_seed": 42,
   "forecast_horizon": 1,
   "chronological_splits": {
@@ -20,8 +20,8 @@
       "records": 21504
     }
   },
-  "num_features": 48,
-  "best_iteration": 224,
+  "num_features": 49,
+  "best_iteration": 179,
   "hyperparameters": {
     "n_estimators": 500,
     "learning_rate": 0.05,

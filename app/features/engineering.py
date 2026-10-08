@@ -24,7 +24,8 @@ class FeatureEngineer:
         self,
         forecast_horizon: int = 1,
         lag_hours: Optional[List[int]] = None,
-        rolling_windows: Optional[List[int]] = None
+        rolling_windows: Optional[List[int]] = None,
+        timezone: str = "Asia/Kolkata",
     ):
         """
         Initialize FeatureEngineer.
@@ -43,6 +44,7 @@ class FeatureEngineer:
         self.forecast_horizon = forecast_horizon
         self.lag_hours = lag_hours or [1, 2, 3, 24, 48, 168]
         self.rolling_windows = rolling_windows or [4, 24, 168]
+        self.timezone = timezone
 
     def create_features(
         self,
@@ -61,21 +63,22 @@ class FeatureEngineer:
         Returns:
             Enriched pandas DataFrame containing target and engineered features.
         """
-        # Ensure chronological ordering per room
+        # Ensure chronological ordering per room. The feature-engineering layer operates on
+        # UTC-normalized timestamps but derives local hour/day features from the configured
+        # campus timezone so timetable matching stays aligned to local academic time.
         df = occupancy_df.copy()
         df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
         df = df.sort_values(by=["room_id", "timestamp"]).reset_index(drop=True)
+        local_timestamp = df["timestamp"].dt.tz_convert(self.timezone)
+        df["hour"] = local_timestamp.dt.hour
+        df["day_of_week"] = local_timestamp.dt.dayofweek
+        df["day_of_month"] = local_timestamp.dt.day
+        df["month"] = local_timestamp.dt.month
+        df["is_weekend"] = (df["day_of_week"] >= 5).astype(int)
 
         # -----------------------------------------------------------------
         # 1. Temporal & Cyclical Encodings (Deterministic & Known Ahead)
         # -----------------------------------------------------------------
-        dt = df["timestamp"].dt
-        df["hour"] = dt.hour
-        df["day_of_week"] = dt.dayofweek  # 0 = Monday, 6 = Sunday
-        df["day_of_month"] = dt.day
-        df["month"] = dt.month
-        df["is_weekend"] = (df["day_of_week"] >= 5).astype(int)
-
         # 24-hour and 7-day cyclical sin/cos encodings for continuity (e.g. 23:00 -> 00:00)
         df["sin_hour"] = np.sin(2 * np.pi * df["hour"] / 24.0)
         df["cos_hour"] = np.cos(2 * np.pi * df["hour"] / 24.0)
@@ -235,7 +238,8 @@ class FeatureEngineer:
             (train_df, val_df, test_df)
         """
         df_sorted = df.sort_values(by="timestamp").copy()
-        date_series = pd.to_datetime(df_sorted["timestamp"]).dt.date
+        split_dates = df_sorted["date"] if "date" in df_sorted.columns else df_sorted["timestamp"]
+        date_series = pd.to_datetime(split_dates).dt.date
 
         t_end = pd.to_datetime(train_end_date).date()
         v_end = pd.to_datetime(val_end_date).date()

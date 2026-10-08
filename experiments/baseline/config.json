@@ -1,6 +1,6 @@
 {
   "experiment_name": "campus_occupancy_baseline",
-  "timestamp": "2026-09-24T14:40:35.168826",
+  "timestamp": "2026-10-08T01:16:31.956806",
   "data_source": "data/processed/occupancy.parquet",
   "chronological_splits": {
     "train_period": {

@@ -191,6 +191,7 @@ class OccupancyForecaster:
 
         metadata = {
             "model_type": "XGBRegressor",
+            "schema_version": 1,
             "random_seed": self.random_seed,
             "best_iteration": self.best_iteration_,
             "feature_names": self.feature_names_,
@@ -208,6 +209,33 @@ class OccupancyForecaster:
             "metadata_path": str(meta_file),
         }
 
+    @staticmethod
+    def validate_metadata(metadata: Dict[str, Any]) -> List[str]:
+        """Validate model metadata before accepting the artifact as compatible."""
+        if not isinstance(metadata, dict):
+            raise ValueError("Model metadata is missing or not a JSON object.")
+
+        feature_names = metadata.get("feature_names")
+        if not isinstance(feature_names, list) or not feature_names:
+            raise ValueError("Model metadata is missing a valid feature_names list.")
+        if any(not isinstance(name, str) or not name.strip() for name in feature_names):
+            raise ValueError("Model metadata contains invalid feature names.")
+
+        model_type = metadata.get("model_type")
+        if model_type is not None and model_type != "XGBRegressor":
+            raise ValueError(f"Incompatible model artifact: model_type={model_type!r}")
+
+        schema_version = metadata.get("schema_version")
+        if schema_version is not None:
+            try:
+                version = int(schema_version)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"Incompatible model artifact schema version: {schema_version!r}") from exc
+            if version != 1:
+                raise ValueError(f"Incompatible model artifact schema version: {version}")
+
+        return feature_names
+
     def load(self, model_dir: Union[str, Path]) -> "OccupancyForecaster":
         """Load trained model and feature metadata from directory."""
         in_path = Path(model_dir)
@@ -220,7 +248,8 @@ class OccupancyForecaster:
         with open(meta_file, "r", encoding="utf-8") as f:
             metadata = json.load(f)
 
-        self.feature_names_ = metadata["feature_names"]
+        feature_names = self.validate_metadata(metadata)
+        self.feature_names_ = feature_names
         self.categorical_features_ = metadata.get("categorical_features", [])
         self.random_seed = metadata.get("random_seed", 42)
         self.best_iteration_ = metadata.get("best_iteration")
